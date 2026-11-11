@@ -36,6 +36,14 @@ jobs:
                 isolinux syslinux-common mtools dosfstools rsync sudo && \
               lb build
             "
+      - name: Verificar Integridade da ISO
+        run: |
+          SIZE=$(stat -c%s live-image-amd64.hybrid.iso)
+          echo "Tamanho da ISO: $SIZE bytes"
+          if [ $SIZE -lt 1000000000 ]; then
+            echo "ERRO FATAL: A ISO tem menos de 1GB. O build falhou silenciosamente."
+            exit 1
+          fi
 
       - name: Renomear a ISO
         run: mv live-image-amd64.hybrid.iso LegacyOS_1.0.iso
