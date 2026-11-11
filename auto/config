@@ -15,4 +15,4 @@ lb config noauto \
   --iso-publisher "LegacyOS Team" \
   --iso-volume "LegacyOS_1.0" \
   --linux-flavours "amd64" \
-  --bootappend-live "boot=live components quiet splash noeject nomodeset"
+  --bootappend-live "boot=live components quiet splash noeject"
