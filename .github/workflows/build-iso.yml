@@ -12,8 +12,10 @@ jobs:
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      - name: Liberar Espaço em Disco (No Host)
+      - name: Liberar Espaço em Disco (Host)
         uses: easimon/maximize-build-space@v10
         with:
           root-reserve-mb: 5120
@@ -22,33 +24,54 @@ jobs:
           remove-android: 'true'
           remove-haskell: 'true'
           remove-codeql: 'true'
+          remove-docker-images: 'true'
 
       - name: Executar Build em Container Debian Trixie
         run: |
+          if [ ! -f "auto/config" ]; then
+            echo "ERRO FATAL: auto/config não encontrado no repositório!"
+            exit 1
+          fi
+          
           docker run --rm --privileged \
             -v "${{ github.workspace }}:/work" \
             -w /work \
             debian:trixie \
-                        bash -c "
-              apt-get update && \
+            bash -c "
+              apt-get update
               apt-get install -y --no-install-recommends \
                 live-build debootstrap squashfs-tools xorriso \
-                isolinux syslinux-common mtools dosfstools rsync sudo && \
-              chmod +x auto/config && \
-              ./auto/config && \
+                isolinux syslinux-common mtools dosfstools rsync sudo
+                
+              echo '[*] Limpando ambiente de build...'
+              lb clean --purge || true
+              
+              echo '[*] Executando auto/config...'
+              bash auto/config
+              
+              echo '[*] Iniciando lb build (pode demorar de 30 a 50 min)...'
               lb build
             "
+
       - name: Verificar Integridade da ISO
         run: |
-          SIZE=$(stat -c%s live-image-amd64.hybrid.iso)
-          echo "Tamanho da ISO: $SIZE bytes"
-          if [ $SIZE -lt 1000000000 ]; then
+          ISO_FILE=$(find . -maxdepth 1 -name "*.iso" | head -n 1)
+          
+          if [ -z "$ISO_FILE" ]; then
+            echo "ERRO FATAL: Nenhuma ISO foi gerada."
+            exit 1
+          fi
+          
+          SIZE=$(stat -c%s "$ISO_FILE")
+          echo "Tamanho da ISO gerada: $SIZE bytes"
+          
+          if [ "$SIZE" -lt 1000000000 ]; then
             echo "ERRO FATAL: A ISO tem menos de 1GB. O build falhou silenciosamente."
             exit 1
           fi
-
-      - name: Renomear a ISO
-        run: mv live-image-amd64.hybrid.iso LegacyOS_1.0.iso
+          
+          echo "✅ ISO validada com sucesso!"
+          mv "$ISO_FILE" LegacyOS_1.0.iso
 
       - name: Fazer Upload da ISO
         uses: actions/upload-artifact@v4
