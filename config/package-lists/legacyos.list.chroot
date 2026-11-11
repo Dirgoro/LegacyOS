@@ -1,0 +1,8 @@
+xfce4 xfce4-terminal thunar thunar-archive-plugin thunar-volman
+xfce4-panel xfce4-settings xfce4-power-manager xfce4-notifyd
+lightdm lightdm-gtk-greeter
+network-manager network-manager-gnome
+firmware-iwlwifi firmware-realtek firmware-atheros
+python3 python3-gi python3-gi-cairo python3-psutil
+zram-tools util-linux util-linux-extra
+pciutils usbutils inxi lm-sensors smartmontools spice-vdagent

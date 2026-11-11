@@ -1,0 +1,14 @@
+# Ignorar arquivos de build e pastas temporárias do live-build
+binary/
+chroot/
+cache/
+config/binary
+config/bootstrap
+config/chroot
+config/common
+config/source
+auto/
+.build/
+*.iso
+*.tar*
+*.deb

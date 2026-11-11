@@ -1,0 +1,49 @@
+name: Build LegacyOS ISO
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+      options: --privileged
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Liberar Espaço em Disco (CRÍTICO)
+        uses: easimon/maximize-build-space@v10
+        with:
+          root-reserve-mb: 5120
+          temp-reserve-mb: 2048
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+
+      - name: Instalar Dependências do Build
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            live-build debootstrap squashfs-tools xorriso \
+            isolinux syslinux-common mtools dosfstools rsync sudo
+
+      - name: Executar o Build da ISO
+        run: |
+          lb build
+
+      - name: Renomear a ISO
+        run: |
+          mv live-image-amd64.hybrid.iso LegacyOS_1.0.iso
+
+      - name: Fazer Upload da ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: LegacyOS-ISO-Fase-1
+          path: LegacyOS_1.0.iso
+          retention-days: 7
