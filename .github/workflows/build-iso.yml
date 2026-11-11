@@ -12,64 +12,64 @@ jobs:
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Liberar Espaço em Disco (Host)
-        uses: easimon/maximize-build-space@v10
+        uses: jlumbroso/free-disk-space@main
         with:
-          root-reserve-mb: 5120
-          temp-reserve-mb: 2048
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: true
+          swap-storage: true
 
       - name: Executar Build em Container Debian Trixie
         run: |
-          if [ ! -f "auto/config" ]; then
-            echo "ERRO FATAL: auto/config não encontrado no repositório!"
-            exit 1
-          fi
-          
           docker run --rm --privileged \
             -v "${{ github.workspace }}:/work" \
             -w /work \
             debian:trixie \
             bash -c "
+              set -e
+              
+              echo '[*] Atualizando pacotes...'
               apt-get update
+              
+              echo '[*] Instalando dependências...'
               apt-get install -y --no-install-recommends \
                 live-build debootstrap squashfs-tools xorriso \
                 isolinux syslinux-common mtools dosfstools rsync sudo
                 
-              echo '[*] Limpando ambiente de build...'
-              lb clean --purge || true
+              echo '[*] Listando arquivos no diretório de trabalho:'
+              ls -la
+              
+              echo '[*] Verificando se auto/config existe:'
+              if [ ! -f auto/config ]; then
+                echo 'ERRO CRÍTICO: auto/config não está no repositório!'
+                exit 1
+              fi
               
               echo '[*] Executando auto/config...'
               bash auto/config
               
-              echo '[*] Iniciando lb build (pode demorar de 30 a 50 min)...'
+              echo '[*] Iniciando lb build (vai demorar de 30 a 50 minutos)...'
               lb build
             "
 
       - name: Verificar Integridade da ISO
         run: |
           ISO_FILE=$(find . -maxdepth 1 -name "*.iso" | head -n 1)
-          
           if [ -z "$ISO_FILE" ]; then
             echo "ERRO FATAL: Nenhuma ISO foi gerada."
             exit 1
           fi
-          
           SIZE=$(stat -c%s "$ISO_FILE")
           echo "Tamanho da ISO gerada: $SIZE bytes"
-          
           if [ "$SIZE" -lt 1000000000 ]; then
             echo "ERRO FATAL: A ISO tem menos de 1GB. O build falhou silenciosamente."
             exit 1
           fi
-          
           echo "✅ ISO validada com sucesso!"
           mv "$ISO_FILE" LegacyOS_1.0.iso
 
