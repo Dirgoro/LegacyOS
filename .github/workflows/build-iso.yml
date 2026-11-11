@@ -29,11 +29,13 @@ jobs:
             -v "${{ github.workspace }}:/work" \
             -w /work \
             debian:trixie \
-            bash -c "
+                        bash -c "
               apt-get update && \
               apt-get install -y --no-install-recommends \
                 live-build debootstrap squashfs-tools xorriso \
                 isolinux syslinux-common mtools dosfstools rsync sudo && \
+              chmod +x auto/config && \
+              ./auto/config && \
               lb build
             "
       - name: Verificar Integridade da ISO
