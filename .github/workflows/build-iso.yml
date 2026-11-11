@@ -8,15 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: debian:trixie
-      options: --privileged
 
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
-      - name: Liberar Espaço em Disco (CRÍTICO)
+      - name: Liberar Espaço em Disco (No Host)
         uses: easimon/maximize-build-space@v10
         with:
           root-reserve-mb: 5120
@@ -26,20 +23,22 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
 
-      - name: Instalar Dependências do Build
+      - name: Executar Build em Container Debian Trixie
         run: |
-          apt-get update
-          apt-get install -y --no-install-recommends \
-            live-build debootstrap squashfs-tools xorriso \
-            isolinux syslinux-common mtools dosfstools rsync sudo
-
-      - name: Executar o Build da ISO
-        run: |
-          lb build
+          docker run --rm --privileged \
+            -v "${{ github.workspace }}:/work" \
+            -w /work \
+            debian:trixie \
+            bash -c "
+              apt-get update && \
+              apt-get install -y --no-install-recommends \
+                live-build debootstrap squashfs-tools xorriso \
+                isolinux syslinux-common mtools dosfstools rsync sudo && \
+              lb build
+            "
 
       - name: Renomear a ISO
-        run: |
-          mv live-image-amd64.hybrid.iso LegacyOS_1.0.iso
+        run: mv live-image-amd64.hybrid.iso LegacyOS_1.0.iso
 
       - name: Fazer Upload da ISO
         uses: actions/upload-artifact@v4
