@@ -1,0 +1,22 @@
+[Configuration]
+FontName=Geist Mono 11
+MiscAlwaysShowTabs=FALSE
+MiscBell=FALSE
+MiscBordersDefault=TRUE
+MiscCursorBlinks=TRUE
+MiscCursorShape=TERMINAL_CURSOR_SHAPE_BLOCK
+MiscDefaultGeometry=80x24
+MiscMenubarDefault=FALSE
+MiscMouseAutohide=FALSE
+MiscToolbarDefault=FALSE
+MiscConfirmClose=TRUE
+MiscCycleTabs=TRUE
+MiscTabCloseButtons=TRUE
+MiscTabCloseMiddleClick=TRUE
+MiscHighlightUrls=TRUE
+MiscScrollAlternateScreen=TRUE
+MiscRightClickAction=TERMINAL_RIGHT_CLICK_ACTION_CONTEXT_MENU
+ColorForeground=#E2E8F0
+ColorBackground=#141D29
+ColorCursor=#0066FF
+ColorPalette=#1A2238;#EF4444;#16A34A;#EAB308;#0066FF;#9333EA;#06B6D4;#E2E8F0;#4A5568;#F87171;#4ADE80;#FDE047;#60A5FA;#C084FC;#22D3EE;#F8FAFC
