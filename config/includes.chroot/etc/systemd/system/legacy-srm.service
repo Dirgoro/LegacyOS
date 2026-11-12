@@ -1,0 +1,12 @@
+[Unit]
+Description=Legacy Smart Resource Manager
+After=network.target zramswap.service
+Wants=zramswap.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/legacy-srm.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
