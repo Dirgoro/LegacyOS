@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=LegacyOS Default Layout
+Exec=sh -c "sleep 5 && /usr/bin/legacyos-move-icons.sh right"
+Terminal=false
+X-GNOME-Autostart-enabled=true
