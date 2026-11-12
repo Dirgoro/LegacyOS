@@ -5,20 +5,71 @@
     <property name="panel-1" type="empty">
       <property name="position" type="string" value="p=6;x=0;y=0"/>
       <property name="length" type="uint" value="100"/>
+      <property name="position-locked" type="bool" value="true"/>
       <property name="size" type="uint" value="32"/>
       <property name="background-style" type="uint" value="1"/>
+      <!-- Cor de fundo: #141D29 com 85% de opacidade (Dark Glass) -->
       <property name="background-rgba" type="array">
-        <value type="double" value="0.102"/><value type="double" value="0.133"/><value type="double" value="0.227"/><value type="double" value="0.95"/>
+        <value type="double" value="0.078"/>
+        <value type="double" value="0.113"/>
+        <value type="double" value="0.160"/>
+        <value type="double" value="0.85"/>
       </property>
       <property name="plugin-ids" type="array">
-        <value type="int" value="1"/><value type="int" value="2"/><value type="int" value="3"/><value type="int" value="4"/>
+        <value type="int" value="1"/> <!-- LegacyOS Logo -->
+        <value type="int" value="2"/> <!-- Aplicativos -->
+        <value type="int" value="3"/> <!-- Locais -->
+        <value type="int" value="4"/> <!-- Sistema -->
+        <value type="int" value="5"/> <!-- Separador (espaço) -->
+        <value type="int" value="6"/> <!-- Bandeja do Sistema (Wifi, Som, Bateria) -->
+        <value type="int" value="7"/> <!-- Relógio -->
+        <value type="int" value="8"/> <!-- Busca -->
       </property>
     </property>
   </property>
   <property name="plugins" type="empty">
-    <property name="plugin-1" type="string" value="whiskermenu"/>
-    <property name="plugin-2" type="string" value="separator"><property name="expand" type="bool" value="true"/></property>
-    <property name="plugin-3" type="string" value="systray"/>
-    <property name="plugin-4" type="string" value="clock"><property name="digital-format" type="string" value="%a, %d de %b | %H:%M"/></property>
+    <!-- Plugin 1: O Menu Principal (Whisker Menu) -->
+    <property name="plugin-1" type="string" value="whiskermenu">
+      <property name="button-icon" type="string" value="legacyos-logo"/>
+      <property name="show-button-title" type="bool" value="true"/>
+      <property name="button-title" type="string" value="LegacyOS"/>
+    </property>
+    
+    <!-- Plugin 2, 3 e 4: Launchers (Aplicativos, Locais, Sistema) -->
+    <property name="plugin-2" type="string" value="launcher">
+      <property name="items" type="array"><value type="string" value="aplicativos.desktop"/></property>
+    </property>
+    <property name="plugin-3" type="string" value="launcher">
+      <property name="items" type="array"><value type="string" value="locais.desktop"/></property>
+    </property>
+    <property name="plugin-4" type="string" value="launcher">
+      <property name="items" type="array"><value type="string" value="sistema.desktop"/></property>
+    </property>
+
+    <!-- Plugin 5: Separador -->
+    <property name="plugin-5" type="string" value="separator">
+      <property name="expand" type="bool" value="true"/>
+      <property name="style" type="uint" value="0"/>
+    </property>
+
+    <!-- Plugin 6: Bandeja do Sistema (Wifi, Som, Bateria) -->
+    <property name="plugin-6" type="string" value="systray">
+      <property name="names-visible" type="array">
+        <value type="string" value="network"/>
+        <value type="string" value="volume"/>
+        <value type="string" value="battery"/>
+        <value type="string" value="bluetooth"/>
+      </property>
+    </property>
+
+    <!-- Plugin 7: Relógio -->
+    <property name="plugin-7" type="string" value="clock">
+      <property name="digital-format" type="string" value="%a, %d de %b | %H:%M"/>
+    </property>
+
+    <!-- Plugin 8: Botão de Busca (Abre o App Finder) -->
+    <property name="plugin-8" type="string" value="launcher">
+      <property name="items" type="array"><value type="string" value="busca.desktop"/></property>
+    </property>
   </property>
 </channel>
