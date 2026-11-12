@@ -1,16 +1,18 @@
-# Base XFCE e Tema
+# Base XFCE e Tema (Adicionado o menu Whisker e o Sudo)
 xfce4 xfce4-terminal thunar thunar-archive-plugin thunar-volman
 xfce4-panel xfce4-settings xfce4-power-manager xfce4-notifyd
-lightdm lightdm-gtk-greeter plank arc-theme papirus-icon-theme
+xfce4-whiskermenu-plugin plank arc-theme papirus-icon-theme
+lightdm lightdm-gtk-greeter
+sudo
 
 # Rede e Firmware
 network-manager network-manager-gnome
 firmware-iwlwifi firmware-realtek firmware-atheros
 
 # Segurança e Utilitários
-ufw unattended-upgrades systemd-timesyncd zram-tools lm-sensors
+ufw unattended-upgrades systemd-timesyncd zram-tools lm-sensors openssl
 python3 python3-gi python3-gi-cairo python3-psutil gir1.2-gtk-3.0 gir1.2-notify-0.7 libnotify-bin
 
-# Ferramentas Legacy, Drivers e OpenSSL (Obrigatório para a senha)
-util-linux util-linux-extra pciutils usbutils inxi smartmontools spice-vdagent openssl
+# Ferramentas Legacy, Drivers e Integração VMware
+util-linux util-linux-extra pciutils usbutils inxi smartmontools spice-vdagent
 xserver-xorg xserver-xorg-video-vesa xserver-xorg-video-fbdev open-vm-tools open-vm-tools-desktop

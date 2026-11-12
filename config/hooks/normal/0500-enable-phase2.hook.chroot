@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+# Adiciona || true no final de cada chmod para não quebrar o build se o arquivo faltar
+chmod +x /usr/share/legacyos/src/guardian/guardian.py || true
+chmod +x /usr/share/legacyos/src/care-center/main.py || true
+chmod +x /usr/bin/legacy-srm.sh || true
+
+mkdir -p /etc/skel/.config/autostart
+chmod 644 /etc/skel/.config/autostart/legacy-guardian.desktop || true
+
+systemctl enable zramswap
+systemctl enable legacy-srm.service
+systemctl enable ufw
+
+echo 'APT::Periodic::Update-Package-Lists "1";' > /etc/apt/apt.conf.d/20auto-upgrades
+echo 'APT::Periodic::Unattended-Upgrade "1";' >> /etc/apt/apt.conf.d/20auto-upgrades
