@@ -4,5 +4,8 @@
     <property name="ThemeName" type="string" value="LegacyOS-Theme"/>
     <property name="IconThemeName" type="string" value="LegacyOS-Icons"/>
   </property>
-  <!-- ... resto do arquivo ... -->
+  <property name="Gtk" type="empty">
+    <property name="FontName" type="string" value="Geist 10"/>
+    <property name="MonospaceFontName" type="string" value="Geist Mono 10"/>
+  </property>
 </channel>
