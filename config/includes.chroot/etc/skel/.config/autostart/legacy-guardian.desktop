@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Legacy Guardian
+Exec=/usr/bin/python3 /usr/share/legacyos/src/guardian/guardian.py
+Icon=utilities-system-monitor
+Terminal=false
+X-GNOME-Autostart-enabled=true
