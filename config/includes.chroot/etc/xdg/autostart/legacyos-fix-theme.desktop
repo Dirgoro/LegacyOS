@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=LegacyOS Theme Fixer
+Comment=Apply custom theme and layout on boot
+Exec=/usr/bin/legacyos-fix-theme.sh
+Terminal=false
+X-GNOME-Autostart-enabled=true
