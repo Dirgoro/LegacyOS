@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=LegacyOS Control Center
+Comment=Central de configurações do desktop
+Exec=python3 /usr/share/legacyos/src/desktop-layout/main.py
+Icon=preferences-desktop
+Terminal=false
+Type=Application
+Categories=Settings;System;
