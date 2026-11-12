@@ -6,5 +6,11 @@
     <property name="title_alignment" type="string" value="center"/>
     <property name="title_font" type="string" value="Geist SemiBold 10"/>
     <property name="title_shadow" type="bool" value="false"/>
+    <property name="placement_mode" type="string" value="center"/>
+    <property name="snap_to_border" type="bool" value="true"/>
+    <property name="snap_to_windows" type="bool" value="true"/>
+    <property name="wrap_windows" type="bool" value="true"/>
+    <property name="maximize_on_drag" type="bool" value="true"/>
+    <property name="tile_on_move" type="bool" value="true"/>
   </property>
 </channel>
