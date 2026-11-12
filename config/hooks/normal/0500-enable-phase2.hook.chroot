@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
-chmod +x /usr/share/legacyos/src/guardian/guardian.py
-chmod +x /usr/share/legacyos/src/care-center/main.py
-chmod +x /usr/bin/legacy-srm.sh
+# Adiciona || true no final de cada chmod para não quebrar o build se o arquivo faltar
+chmod +x /usr/share/legacyos/src/guardian/guardian.py || true
+chmod +x /usr/share/legacyos/src/care-center/main.py || true
+chmod +x /usr/bin/legacy-srm.sh || true
 
 mkdir -p /etc/skel/.config/autostart
 chmod 644 /etc/skel/.config/autostart/legacy-guardian.desktop || true
