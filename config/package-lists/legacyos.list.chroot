@@ -1,7 +1,9 @@
-# Base XFCE e Tema
+# Base XFCE e Tema (Adicionado o menu Whisker e o Sudo)
 xfce4 xfce4-terminal thunar thunar-archive-plugin thunar-volman
 xfce4-panel xfce4-settings xfce4-power-manager xfce4-notifyd
-lightdm lightdm-gtk-greeter plank arc-theme papirus-icon-theme
+xfce4-whiskermenu-plugin plank arc-theme papirus-icon-theme
+lightdm lightdm-gtk-greeter
+sudo
 
 # Rede e Firmware
 network-manager network-manager-gnome
