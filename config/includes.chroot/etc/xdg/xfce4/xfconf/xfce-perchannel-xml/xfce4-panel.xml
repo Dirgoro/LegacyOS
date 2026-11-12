@@ -8,7 +8,6 @@
       <property name="position-locked" type="bool" value="true"/>
       <property name="size" type="uint" value="32"/>
       <property name="background-style" type="uint" value="1"/>
-      <!-- Cor de fundo: Dark Glass #141D29 com 85% de opacidade -->
       <property name="background-rgba" type="array">
         <value type="double" value="0.078"/>
         <value type="double" value="0.113"/>
@@ -28,35 +27,24 @@
     </property>
   </property>
   <property name="plugins" type="empty">
-    <!-- 1. Whisker Menu com o Logo LegacyOS -->
     <property name="plugin-1" type="string" value="whiskermenu">
       <property name="button-icon" type="string" value="legacyos-logo"/>
       <property name="show-button-title" type="bool" value="true"/>
       <property name="button-title" type="string" value="LegacyOS"/>
     </property>
-    
-    <!-- 2. Launcher: Aplicativos -->
     <property name="plugin-2" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="aplicativos.desktop"/></property>
     </property>
-    
-    <!-- 3. Launcher: Locais -->
     <property name="plugin-3" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="locais.desktop"/></property>
     </property>
-    
-    <!-- 4. Launcher: Sistema -->
     <property name="plugin-4" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="sistema.desktop"/></property>
     </property>
-
-    <!-- 5. Separador (Espaço entre os menus e os ícones da direita) -->
     <property name="plugin-5" type="string" value="separator">
       <property name="expand" type="bool" value="true"/>
       <property name="style" type="uint" value="0"/>
     </property>
-
-    <!-- 6. Bandeja do Sistema (Wi-Fi, Som, Bateria, Bluetooth) -->
     <property name="plugin-6" type="string" value="systray">
       <property name="names-visible" type="array">
         <value type="string" value="network"/>
@@ -65,13 +53,9 @@
         <value type="string" value="bluetooth"/>
       </property>
     </property>
-
-    <!-- 7. Relógio -->
     <property name="plugin-7" type="string" value="clock">
       <property name="digital-format" type="string" value="%a, %d de %b | %H:%M"/>
     </property>
-
-    <!-- 8. Botão de Busca (Abre o App Finder) -->
     <property name="plugin-8" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="busca.desktop"/></property>
     </property>
