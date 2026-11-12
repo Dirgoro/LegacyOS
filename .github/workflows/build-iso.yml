@@ -1,11 +1,10 @@
 name: Build LegacyOS ISO
 
-oon:
-  # Desativamos o gatilho automático de 'push' para esta branch
+on:
+  # Mantenha o push comentado para evitar builds automáticos
   # push:
-  #   branches: [ "main" ]
-  
-  # Mantemos apenas o gatilho manual
+  #   branches: [ "main", "Fase-4-Refinamento" ]
+
   workflow_dispatch:
 
 jobs:
