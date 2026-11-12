@@ -16,43 +16,47 @@
         <value type="double" value="0.85"/>
       </property>
       <property name="plugin-ids" type="array">
-        <value type="int" value="1"/> <!-- LegacyOS Logo -->
-        <value type="int" value="2"/> <!-- Aplicativos -->
-        <value type="int" value="3"/> <!-- Locais -->
-        <value type="int" value="4"/> <!-- Sistema -->
-        <value type="int" value="5"/> <!-- Separador (espaço) -->
-        <value type="int" value="6"/> <!-- Bandeja do Sistema (Wifi, Som, Bateria) -->
-        <value type="int" value="7"/> <!-- Relógio -->
-        <value type="int" value="8"/> <!-- Busca -->
+        <value type="int" value="1"/>
+        <value type="int" value="2"/>
+        <value type="int" value="3"/>
+        <value type="int" value="4"/>
+        <value type="int" value="5"/>
+        <value type="int" value="6"/>
+        <value type="int" value="7"/>
+        <value type="int" value="8"/>
       </property>
     </property>
   </property>
   <property name="plugins" type="empty">
-    <!-- Plugin 1: O Menu Principal (Whisker Menu) -->
+    <!-- 1. Whisker Menu com o Logo LegacyOS -->
     <property name="plugin-1" type="string" value="whiskermenu">
       <property name="button-icon" type="string" value="legacyos-logo"/>
       <property name="show-button-title" type="bool" value="true"/>
       <property name="button-title" type="string" value="LegacyOS"/>
     </property>
     
-    <!-- Plugin 2, 3 e 4: Launchers (Aplicativos, Locais, Sistema) -->
+    <!-- 2. Launcher: Aplicativos -->
     <property name="plugin-2" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="aplicativos.desktop"/></property>
     </property>
+    
+    <!-- 3. Launcher: Locais -->
     <property name="plugin-3" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="locais.desktop"/></property>
     </property>
+    
+    <!-- 4. Launcher: Sistema -->
     <property name="plugin-4" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="sistema.desktop"/></property>
     </property>
 
-    <!-- Plugin 5: Separador -->
+    <!-- 5. Separador (Espaço entre os menus e os ícones da direita) -->
     <property name="plugin-5" type="string" value="separator">
       <property name="expand" type="bool" value="true"/>
       <property name="style" type="uint" value="0"/>
     </property>
 
-    <!-- Plugin 6: Bandeja do Sistema (Wifi, Som, Bateria) -->
+    <!-- 6. Bandeja do Sistema (Wi-Fi, Som, Bateria, Bluetooth) -->
     <property name="plugin-6" type="string" value="systray">
       <property name="names-visible" type="array">
         <value type="string" value="network"/>
@@ -62,12 +66,12 @@
       </property>
     </property>
 
-    <!-- Plugin 7: Relógio -->
+    <!-- 7. Relógio -->
     <property name="plugin-7" type="string" value="clock">
       <property name="digital-format" type="string" value="%a, %d de %b | %H:%M"/>
     </property>
 
-    <!-- Plugin 8: Botão de Busca (Abre o App Finder) -->
+    <!-- 8. Botão de Busca (Abre o App Finder) -->
     <property name="plugin-8" type="string" value="launcher">
       <property name="items" type="array"><value type="string" value="busca.desktop"/></property>
     </property>
