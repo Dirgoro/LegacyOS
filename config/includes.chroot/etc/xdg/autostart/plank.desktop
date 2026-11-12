@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Plank
+Comment=Launch Plank Dock
+Exec=plank
+Icon=plank
+Terminal=false
+X-GNOME-Autostart-enabled=true
