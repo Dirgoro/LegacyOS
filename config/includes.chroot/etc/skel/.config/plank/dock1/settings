@@ -1,0 +1,14 @@
+[PlankDockPreferences]
+# 3 = Bottom, 2 = Center
+Position=3
+Alignment=2
+# Ativa o tema customizado
+Theme=LegacyOS-Dock
+# Tamanho dos ícones (ajuste conforme a tela)
+IconSize=48
+# Permite arrastar e soltar para adicionar/remover ícones
+LockItems=false
+# Sempre visível (não esconde)
+HideMode=0
+# Mostra indicadores de apps abertos
+ShowDockItem=true
