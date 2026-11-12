@@ -5,12 +5,10 @@ TopPadding=6
 IconShadowSize=2
 IconShadow=1
 MaxHeight=70
-# Define o formato de pílula
 TopRoundness=24
 BottomRoundness=24
 
 [PlankDockTheme]
-# Cor de fundo: #141D29 com transparência (RGBA)
 FillStart=20
 FillEnd=29
 FillStart=41
