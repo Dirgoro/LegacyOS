@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Busca
+Exec=xfce4-appfinder --collapsed
+Icon=system-search
+Terminal=false
