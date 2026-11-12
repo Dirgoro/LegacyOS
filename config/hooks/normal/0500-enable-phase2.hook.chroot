@@ -23,3 +23,6 @@ ufw default deny incoming
 ufw default allow outgoing
 ufw --force enable
 systemctl enable ufw
+
+# Permissão para o script de correção visual
+chmod +x /usr/bin/legacyos-fix-theme.sh
