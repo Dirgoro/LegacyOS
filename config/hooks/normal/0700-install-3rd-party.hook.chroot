@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+# 1. Instalar OnlyOffice
+wget -qO /tmp/onlyoffice.deb https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
+apt-get install -y /tmp/onlyoffice.deb || apt-get install -f -y
+rm -f /tmp/onlyoffice.deb
+
+# 2. Instalar Brave Browser
+wget -qO /tmp/brave.deb https://github.com/brave/brave-browser/releases/download/v1.63.162/brave-browser_1.63.162_amd64.deb
+apt-get install -y /tmp/brave.deb || apt-get install -f -y
+rm -f /tmp/brave.deb
+
+apt-get clean
