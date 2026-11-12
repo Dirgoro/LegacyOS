@@ -15,3 +15,11 @@ systemctl enable ufw
 
 echo 'APT::Periodic::Update-Package-Lists "1";' > /etc/apt/apt.conf.d/20auto-upgrades
 echo 'APT::Periodic::Unattended-Upgrade "1";' >> /etc/apt/apt.conf.d/20auto-upgrades
+
+# ... (código anterior) ...
+
+# Ativar o Firewall UFW por padrão
+ufw default deny incoming
+ufw default allow outgoing
+ufw --force enable
+systemctl enable ufw
