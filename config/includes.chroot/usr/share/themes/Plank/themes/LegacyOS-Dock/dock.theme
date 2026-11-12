@@ -1,0 +1,18 @@
+[PlankTheme]
+BottomPadding=4
+LineWidth=0
+TopPadding=4
+IconShadowSize=0
+IconShadow=0
+MaxHeight=70
+
+[PlankDockTheme]
+FillStart=20
+FillEnd=255
+FillStart=20
+FillEnd=255
+
+; Cores em hexadecimal (RGBA) para a pílula dark glass
+TopRoundness=20
+BottomRoundness=20
+BackgroundColor=20;29;41;0.85
