@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Aplicativos
+Exec=xfce4-popup-applicationsmenu
+Icon=applications-system
+Terminal=false
