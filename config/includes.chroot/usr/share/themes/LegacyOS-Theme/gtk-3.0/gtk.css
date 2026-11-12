@@ -1,0 +1,121 @@
+/* LegacyOS Theme - Global UI */
+
+@define-color bg_dark_glass #141D29;
+@define-color bg_sidebar #1E2B3A;
+@define-color bg_light_mode #F4F7FA;
+@define-color card_bg #FFFFFF;
+@define-color card_border #E2E8F0;
+@define-color primary_blue #0066FF;
+@define-color primary_hover #0A74DA;
+@define-color text_light #FFFFFF;
+@define-color text_dark #1E293B;
+
+/* Força a fonte global e cantos arredondados */
+* {
+    font-family: "Geist", "sans-serif";
+}
+
+window {
+    background-color: @bg_light_mode;
+    color: @text_dark;
+    border-radius: 14px;
+}
+
+/* Barras de Título (Headerbars) Escuras */
+headerbar, .titlebar, .titlebar.flat {
+    background-color: @bg_dark_glass;
+    color: @text_light;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    border-bottom: 1px solid #000000;
+    min-height: 38px;
+    box-shadow: none;
+}
+
+headerbar .title {
+    font-weight: bold;
+    color: @text_light;
+}
+
+/* Barra lateral escura para apps (Thunar, Configurações) */
+.sidebar, .thunar .sidebar, .xfce4-settings-manager .sidebar {
+    background-color: @bg_sidebar;
+    color: @text_light;
+}
+
+.sidebar row:selected, .thunar .sidebar row:selected {
+    background-color: @primary_blue;
+    color: white;
+    border-radius: 8px;
+}
+
+.sidebar row:hover, .thunar .sidebar row:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+/* Área de conteúdo clara */
+.thunar .standard-view, .view {
+    background-color: @bg_light_mode;
+}
+.thunar .standard-view row:selected, .view:selected {
+    background-color: #E2E8F0;
+    color: @text_dark;
+    border-radius: 8px;
+}
+
+/* Botões Gerais */
+button {
+    border-radius: 8px;
+    padding: 6px 12px;
+    border: 1px solid @card_border;
+    background-color: @card_bg;
+    color: @text_dark;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #E2E8F0;
+}
+
+/* Botões de Ação (Azul) */
+button.suggested-action {
+    background-color: @primary_blue;
+    color: @text_light;
+    border: none;
+    font-weight: bold;
+}
+button.suggested-action:hover {
+    background-color: @primary_hover;
+}
+
+/* Toggles / Switches */
+switch {
+    background-color: #CBD5E1;
+    border-radius: 14px;
+}
+switch:checked {
+    background-color: @primary_blue;
+}
+switch slider {
+    border-radius: 14px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Menus e Tooltips */
+menu, .menu {
+    background-color: @bg_dark_glass;
+    color: @text_light;
+    border-radius: 10px;
+    border: 1px solid @bg_sidebar;
+}
+menuitem:hover {
+    background-color: @primary_blue;
+    border-radius: 6px;
+}
+tooltip {
+    background-color: @bg_dark_glass;
+    color: @text_light;
+    border-radius: 6px;
+}
