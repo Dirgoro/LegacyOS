@@ -1,0 +1,17 @@
+[Icon Theme]
+Name=LegacyOS-Icons
+Comment=Ícones oficiais do LegacyOS
+Inherits=Papirus,hicolor
+Directories=apps/48,apps/scalable
+
+[apps/48]
+Size=48
+Context=Applications
+Type=Fixed
+
+[apps/scalable]
+Size=48
+Context=Applications
+Type=Scalable
+MinSize=16
+MaxSize=512
