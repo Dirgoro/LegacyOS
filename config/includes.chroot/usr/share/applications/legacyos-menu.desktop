@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=LegacyOS Menu
+Comment=Menu principal do sistema
+Exec=xfce4-popup-whiskermenu
+Icon=legacyos-logo
+Terminal=false
+Type=Application
