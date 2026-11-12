@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Legacy Care Center
+Comment=Diagnóstico e Manutenção
+Exec=python3 /usr/share/legacyos/src/care-center/main.py
+Icon=utilities-system-monitor
+Terminal=false
+Type=Application
+Categories=System;Utility;
