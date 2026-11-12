@@ -8,4 +8,10 @@
     <property name="FontName" type="string" value="Geist 10"/>
     <property name="MonospaceFontName" type="string" value="Geist Mono 10"/>
   </property>
+  <property name="Xft" type="empty">
+    <property name="Antialias" type="int" value="1"/>
+    <property name="Hinting" type="int" value="1"/>
+    <property name="HintStyle" type="string" value="hintslight"/>
+    <property name="RGBA" type="string" value="rgb"/>
+  </property>
 </channel>
