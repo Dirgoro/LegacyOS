@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Set Wallpaper
-Exec=sh -c "sleep 2 && xfconf-query -c xfce4-desktop -l | grep last-image | while read prop; do xfconf-query -c xfce4-desktop -p \"$prop\" -s /usr/share/backgrounds/legacyos-wallpaper.jpg; done"
+Exec=sh -c "sleep 3 && for prop in $(xfconf-query -c xfce4-desktop -l | grep last-image); do xfconf-query -c xfce4-desktop -p $prop -s /usr/share/backgrounds/legacyos-wallpaper.jpg; xfconf-query -c xfce4-desktop -p $(echo $prop | sed 's/last-image/image-style/') -s 5; done"
 Terminal=false
 X-GNOME-Autostart-enabled=true
