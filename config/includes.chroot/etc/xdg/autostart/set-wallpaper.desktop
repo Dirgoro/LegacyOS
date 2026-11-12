@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Set Wallpaper
+Exec=sh -c "sleep 2 && xfconf-query -c xfce4-desktop -l | grep last-image | while read prop; do xfconf-query -c xfce4-desktop -p \"$prop\" -s /usr/share/backgrounds/legacyos-wallpaper.jpg; done"
+Terminal=false
+X-GNOME-Autostart-enabled=true
