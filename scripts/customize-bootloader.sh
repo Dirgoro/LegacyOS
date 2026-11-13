@@ -1,7 +1,6 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - PERSONALIZAÇÃO COMPLETA DO BOOTLOADER (SYSLINUX / ISOLINUX / GRUB)
-# Gera splash screen 640x480 em PyCairo puro e configura as 3 opções de boot
 # ==============================================================================
 
 set -e
@@ -9,7 +8,6 @@ set -e
 echo "[LegacyOS Bootloader] Preparando templates em config/bootloaders..."
 mkdir -p config/bootloaders
 
-# Copia templates base do sistema caso ainda não existam no projeto
 for SUB in isolinux syslinux grub-pc grub-efi; do
     if [ ! -d "config/bootloaders/$SUB" ] && [ -d "/usr/share/live/build/bootloaders/$SUB" ]; then
         cp -r "/usr/share/live/build/bootloaders/$SUB" "config/bootloaders/$SUB"
@@ -41,14 +39,13 @@ ctx.set_source(radial)
 ctx.rectangle(0, 0, W, H)
 ctx.fill()
 
-# 2. Logotipo vetorial oficial do LegacyOS (duas pétalas curvas formando o L)
+# 2. Logotipo vetorial oficial do LegacyOS
 ctx.save()
 scale = 0.68
 logo_w = 100.0 * scale
 ctx.translate((W - logo_w) / 2.0, 26.0)
 ctx.scale(scale, scale)
 
-# Haste vertical azul
 grad_v = cairo.LinearGradient(65, 5, 20, 95)
 grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
 grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
@@ -63,7 +60,6 @@ ctx.curve_to(34, 73, 24, 81, 18, 92)
 ctx.close_path()
 ctx.fill()
 
-# Base horizontal branca/prata
 grad_h = cairo.LinearGradient(10, 90, 92, 55)
 grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
 grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
@@ -95,24 +91,20 @@ ctx.set_source_rgb(0.055, 0.647, 0.914)
 ctx.move_to(start_x + e1.width + 2, 122)
 ctx.show_text(t2)
 
-# 4. Subtítulo discreto no rodapé
+# 4. Subtítulo discreto acima das instruções de tecla (sem sobreposição)
 ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 ctx.set_font_size(11)
 sub = "Novas possibilidades para grandes historias"
 esub = ctx.text_extents(sub)
 ctx.set_source_rgb(0.580, 0.639, 0.722)
-ctx.move_to((W - esub.width) / 2.0, 448)
+ctx.move_to((W - esub.width) / 2.0, 388)
 ctx.show_text(sub)
 
 surface.write_to_png(out_png)
 PYEOF
 
-# ------------------------------------------------------------------------------
-# Aplica tema e entradas de boot no ISOLINUX / SYSLINUX
-# ------------------------------------------------------------------------------
 for DIR in config/bootloaders/isolinux config/bootloaders/syslinux; do
     if [ -d "$DIR" ]; then
-        echo "[LegacyOS Bootloader] Configurando $DIR..."
         rm -f "$DIR/splash.svg"
         cp "$SPLASH_PNG" "$DIR/splash.png"
 
@@ -131,11 +123,11 @@ menu color tabmsg       31;40      #ff64748b #00000000 std
 
 menu width 74
 menu margin 6
-menu rows 7
-menu tabmsgrow 21
-menu cmdlinerow 21
-menu endrow 23
-menu timeoutrow 20
+menu rows 6
+menu tabmsgrow 22
+menu cmdlinerow 22
+menu endrow 24
+menu timeoutrow 21
 menu vshift 7
 EOF
 
@@ -162,12 +154,8 @@ EOF
     fi
 done
 
-# ------------------------------------------------------------------------------
-# Aplica tema e entradas de boot no GRUB (UEFI / Hybrid)
-# ------------------------------------------------------------------------------
 for GDIR in config/bootloaders/grub-pc config/bootloaders/grub-efi; do
     if [ -d "$GDIR" ]; then
-        echo "[LegacyOS Bootloader] Configurando $GDIR..."
         rm -f "$GDIR/splash.svg"
         cp "$SPLASH_PNG" "$GDIR/splash.png"
 
@@ -203,5 +191,4 @@ EOF
 done
 
 rm -f "$SPLASH_PNG"
-echo "[LegacyOS Bootloader] Personalização concluída com sucesso."
 exit 0
