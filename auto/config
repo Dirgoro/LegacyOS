@@ -13,8 +13,9 @@ lb config noauto \
     --apt-indices false \
     --apt-recommends true \
     --memtest none \
-    --iso-application "LegacyOS" \
+    --image-name "LegacyOS-Alpha" \
+    --iso-application "LegacyOS Alpha" \
     --iso-publisher "LegacyOS Project" \
-    --iso-volume "LegacyOS-1.0-amd64" \
+    --iso-volume "LegacyOS Alpha" \
     --bootappend-live "boot=live components quiet splash noeject locales=pt_BR.UTF-8 keyboard-layouts=br" \
     "${@}"
