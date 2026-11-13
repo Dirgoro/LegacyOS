@@ -1,0 +1,171 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS - HOOK DE ATIVOS VISUAIS DA FASE 2 (CHROOT)
+# Gera bordas/botões XPM do xfwm4, atualiza cache da fonte Geist e limpa menus
+# ==============================================================================
+
+set -e
+
+XFWM_DIR="/usr/share/themes/LegacyOS-Theme/xfwm4"
+mkdir -p "$XFWM_DIR"
+
+echo "[LegacyOS Hook 0650] Gerando ativos de janela (xfwm4)..."
+
+# Barra de título (1x30px Dark Slate #0B1120 / #090E1A)
+cat << 'EOF' > "$XFWM_DIR/title-1-active.xpm"
+/* XPM */
+static char * title_1_active_xpm[] = {
+"1 30 2 1",
+" 	c #0B1120",
+".	c #1E293B",
+".",
+" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
+EOF
+
+cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-2-active.xpm"
+cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-3-active.xpm"
+cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-4-active.xpm"
+cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-5-active.xpm"
+
+cat << 'EOF' > "$XFWM_DIR/title-1-inactive.xpm"
+/* XPM */
+static char * title_1_inactive_xpm[] = {
+"1 30 2 1",
+" 	c #090E1A",
+".	c #111827",
+".",
+" "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
+EOF
+
+cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-2-inactive.xpm"
+cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-3-inactive.xpm"
+cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-4-inactive.xpm"
+cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-5-inactive.xpm"
+
+# Cantos superiores e bordas finas (1px)
+cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-left-active.xpm"
+cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-right-active.xpm"
+cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/top-left-inactive.xpm"
+cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/top-right-inactive.xpm"
+
+cat << 'EOF' > "$XFWM_DIR/left-active.xpm"
+/* XPM */
+static char * border_xpm[] = {
+"1 1 1 1",
+".	c #1E293B",
+"."};
+EOF
+
+for SIDE in right bottom bottom-left bottom-right; do
+    cp "$XFWM_DIR/left-active.xpm" "$XFWM_DIR/${SIDE}-active.xpm"
+done
+
+cat << 'EOF' > "$XFWM_DIR/left-inactive.xpm"
+/* XPM */
+static char * border_inact_xpm[] = {
+"1 1 1 1",
+".	c #111827",
+"."};
+EOF
+
+for SIDE in right bottom bottom-left bottom-right; do
+    cp "$XFWM_DIR/left-inactive.xpm" "$XFWM_DIR/${SIDE}-inactive.xpm"
+done
+
+# Botão Fechar (18x30)
+cat << 'EOF' > "$XFWM_DIR/close-active.xpm"
+/* XPM */
+static char * close_active_xpm[] = {
+"18 30 3 1",
+" 	c #0B1120",
+".	c #1E293B",
+"+	c #94A3B8",
+"..................","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"     +      +     ","      +    +      ","       +  +       ","        ++        ","        ++        ",
+"       +  +       ","      +    +      ","     +      +     ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  "};
+EOF
+
+sed 's/#94A3B8/#EF4444/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-prelight.xpm"
+sed 's/#94A3B8/#DC2626/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-pressed.xpm"
+sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-inactive.xpm"
+
+# Botão Maximizar (18x30)
+cat << 'EOF' > "$XFWM_DIR/maximize-active.xpm"
+/* XPM */
+static char * max_active_xpm[] = {
+"18 30 3 1",
+" 	c #0B1120",
+".	c #1E293B",
+"+	c #94A3B8",
+"..................","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"     ++++++++     ","     +      +     ","     +      +     ","     +      +     ","     +      +     ",
+"     +      +     ","     +      +     ","     ++++++++     ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  "};
+EOF
+
+sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-prelight.xpm"
+sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-pressed.xpm"
+sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-inactive.xpm"
+
+# Botão Minimizar (18x30)
+cat << 'EOF' > "$XFWM_DIR/hide-active.xpm"
+/* XPM */
+static char * hide_active_xpm[] = {
+"18 30 3 1",
+" 	c #0B1120",
+".	c #1E293B",
+"+	c #94A3B8",
+"..................","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","     ++++++++     ",
+"     ++++++++     ","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  "};
+EOF
+
+sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-prelight.xpm"
+sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-pressed.xpm"
+sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-inactive.xpm"
+
+# Botão de Menu da Janela (18x30)
+cat << 'EOF' > "$XFWM_DIR/menu-active.xpm"
+/* XPM */
+static char * menu_active_xpm[] = {
+"18 30 3 1",
+" 	c #0B1120",
+".	c #1E293B",
+"+	c #0284C7",
+"..................","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"       ++++       ","      ++++++      ","      ++++++      ","      ++++++      ","      ++++++      ",
+"       ++++       ","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  ",
+"                  ","                  ","                  ","                  ","                  "};
+EOF
+
+cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-prelight.xpm"
+cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
+sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#0284C7/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
+
+# ------------------------------------------------------------------------------
+# Atualiza cache das fontes (inclui a família Geist)
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
+fc-cache -f -v >/dev/null 2>&1 || true
+
+# ------------------------------------------------------------------------------
+# Oculta o atalho genérico de cliente de e-mail no menu de aplicativos
+# ------------------------------------------------------------------------------
+if [ -f "/usr/share/applications/exo-mail-reader.desktop" ]; then
+    if ! grep -q "NoDisplay=true" /usr/share/applications/exo-mail-reader.desktop; then
+        echo "NoDisplay=true" >> /usr/share/applications/exo-mail-reader.desktop
+    fi
+fi
+
+echo "[LegacyOS Hook 0650] Ativos visuais da Fase 2 concluídos."
+exit 0
