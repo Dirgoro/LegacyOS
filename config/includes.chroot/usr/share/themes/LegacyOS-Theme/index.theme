@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=LegacyOS-Theme
+Comment=Tema oficial Dark Slate e Glass do LegacyOS
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=LegacyOS-Theme
+MetacityTheme=LegacyOS-Theme
+IconTheme=Papirus-Dark
+CursorTheme=Adwaita
+ButtonLayout=close,minimize,maximize:
