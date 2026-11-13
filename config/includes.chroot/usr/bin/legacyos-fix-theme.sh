@@ -20,6 +20,12 @@ fi
 
 sleep 1.2
 
+# Garante o avatar oficial estilizado do LegacyOS no perfil do usuário ativo
+if [ -f "/usr/share/pixmaps/legacyos-avatar.png" ] && [ ! -f "$HOME/.face" ]; then
+    cp "/usr/share/pixmaps/legacyos-avatar.png" "$HOME/.face" 2>/dev/null || true
+    chmod 644 "$HOME/.face" 2>/dev/null || true
+fi
+
 # Corrige caminho absoluto do tema Qt5/Qt6 para o usuário ativo
 for QT_VER in qt5ct qt6ct; do
     QT_CONF="$HOME/.config/${QT_VER}/${QT_VER}.conf"
@@ -151,7 +157,6 @@ if [ -f "$WALLPAPER" ]; then
     done
 fi
 
-# Aparência e Comportamento Padrão dos Ícones da Área de Trabalho (32px / Fonte 8)
 xfconf-query -c xfce4-desktop -p /desktop-icons/style -n -t int -s 2
 xfconf-query -c xfce4-desktop -p /desktop-icons/icon-size -n -t uint -s 32
 xfconf-query -c xfce4-desktop -p /desktop-icons/use-custom-font-size -n -t bool -s true
