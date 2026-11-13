@@ -1,0 +1,11 @@
+[Unit]
+Description=LegacyOS SSD Swapfile Provisioning (2GB)
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/legacyos-setup-swap.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
