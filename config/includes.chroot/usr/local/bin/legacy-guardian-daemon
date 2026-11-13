@@ -1,0 +1,31 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACY GUARDIAN - DAEMON DE ANÁLISE DIÁRIA DE HARDWARE E CMOS
+# ==============================================================================
+
+STATE_DIR="$HOME/.config/legacyos"
+mkdir -p "$STATE_DIR"
+LAST_RUN="$STATE_DIR/.last_hardware_scan"
+
+# Executa apenas uma vez por dia
+if [ -f "$LAST_RUN" ]; then
+    LAST_DATE=$(cat "$LAST_RUN")
+    TODAY=$(date +%Y-%m-%d)
+    [ "$LAST_DATE" = "$TODAY" ] && exit 0
+fi
+
+date +%Y-%m-%d > "$LAST_RUN"
+
+# Verifica temperatura da CPU
+CPU_TEMP=$(sensors 2>/dev/null | awk '/Core 0/ {print +$3}' || echo "45")
+if (( $(echo "$CPU_TEMP > 80.0" | bc -l 2>/dev/null || echo 0) )); then
+    notify-send -i legacy-guardian "Legacy Guardian - Alerta de Temperatura" "A temperatura da CPU atingiu ${CPU_TEMP}°C. Verifique a ventilação."
+fi
+
+# Verifica espaço em livre na raiz
+FREE_GB=$(df / --output=avail -BG 2>/dev/null | tr -dc '0-9')
+if [ -n "$FREE_GB" ] && [ "$FREE_GB" -lt 5 ]; then
+    notify-send -i legacy-guardian "Legacy Guardian - Pouco espaço em disco" "Restam apenas ${FREE_GB}GB livres no sistema."
+fi
+
+exit 0
