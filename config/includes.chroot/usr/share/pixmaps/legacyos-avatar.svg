@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Fundo Circular Dark Slate -->
+    <linearGradient id="avatarBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="60%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#0B1120" />
+    </linearGradient>
+
+    <!-- Moldura Azul Translúcida -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#0284C7" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#94A3B8" stop-opacity="0.30" />
+    </linearGradient>
+
+    <!-- Degradê Azul LegacyOS para o Corpo -->
+    <linearGradient id="bodyGrad" x1="20%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="55%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0369A1" />
+    </linearGradient>
+
+    <!-- Degradê Prata/Azul Claro para a Cabeça -->
+    <linearGradient id="headGrad" x1="15%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="55%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#7DD3FC" />
+    </linearGradient>
+
+    <clipPath id="circleClip">
+      <circle cx="64" cy="64" r="56" />
+    </clipPath>
+  </defs>
+
+  <!-- Base Circular -->
+  <circle cx="64" cy="64" r="58" fill="url(#avatarBg)" stroke="url(#ringGrad)" stroke-width="3" />
+
+  <!-- Conteúdo Recortado no Círculo -->
+  <g clip-path="url(#circleClip)">
+    <!-- Halo luminoso sutil -->
+    <circle cx="64" cy="52" r="34" fill="#0284C7" opacity="0.16" />
+
+    <!-- Ombros / Busto Estilizado -->
+    <path d="M22 118
+             C22 93, 40 80, 64 80
+             C88 80, 106 93, 106 118 Z" fill="url(#bodyGrad)" />
+
+    <!-- Detalhe de gola/brilho estilizado no peito -->
+    <path d="M46 82
+             L64 98
+             L82 82
+             C76 80.5, 70 80, 64 80
+             C58 80, 52 80.5, 46 82 Z" fill="#E0F2FE" opacity="0.35" />
+
+    <!-- Cabeça Estilizada -->
+    <circle cx="64" cy="50" r="20" fill="url(#headGrad)" />
+  </g>
+</svg>
