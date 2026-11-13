@@ -1,0 +1,44 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS - GERENCIADOR DE POSIÇÃO DO PAINEL E AJUSTE DA DOCK
+# ==============================================================================
+
+POSITION="${1:-top}"
+
+panel-plugin-control --quit 2>/dev/null || true
+
+case "$POSITION" in
+    top)
+        xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=6;x=0;y=0"
+        xfconf-query -c xfce4-panel -p /panels/panel-1/mode -s 0
+        xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 32
+        # Restaura a dock na margem inferior padrão
+        gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ position 'bottom' 2>/dev/null || true
+        gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ alignment 'center' 2>/dev/null || true
+        ;;
+    bottom)
+        xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=12;x=0;y=0"
+        xfconf-query -c xfce4-panel -p /panels/panel-1/mode -s 0
+        xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 32
+        # Ajusta a dock para ficar acima da barra inferior
+        gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ position 'bottom' 2>/dev/null || true
+        gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ alignment 'center' 2>/dev/null || true
+        ;;
+    left)
+        xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=3;x=0;y=0"
+        xfconf-query -c xfce4-panel -p /panels/panel-1/mode -s 1
+        xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 42
+        ;;
+    right)
+        xfconf-query -c xfce4-panel -p /panels/panel-1/position -s "p=9;x=0;y=0"
+        xfconf-query -c xfce4-panel -p /panels/panel-1/mode -s 1
+        xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 42
+        ;;
+    *)
+        echo "Uso: legacyos-panel-position [top|bottom|left|right]"
+        exit 1
+        ;;
+esac
+
+xfce4-panel --restart >/dev/null 2>&1 &
+exit 0
