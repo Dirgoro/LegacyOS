@@ -1,7 +1,6 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - SCRIPT DE ESTABILIZAÇÃO VISUAL, ÍCONE DE INSTALAÇÃO E SESSÃO
-# Mantém a cortina de login ativa até painel, wallpaper e dock estarem prontos
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
@@ -19,7 +18,6 @@ if [ -f "$SPLASH_SCRIPT" ] && ! pgrep -f "login-splash/main.py" >/dev/null; then
     python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
 fi
 
-# Aguarda o servidor gráfico e o xfconfd estabilizarem atrás da cortina
 sleep 1.8
 
 # ------------------------------------------------------------------------------
@@ -150,10 +148,13 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 5. ÍCONE DE INSTALAÇÃO NA ÁREA DE TRABALHO (APENAS EM MODO LIVE)
+# 5. ÍCONE DE INSTALAÇÃO NA ÁREA DE TRABALHO (APENAS LEGACYOS EM MODO LIVE)
 # ------------------------------------------------------------------------------
 DESKTOP_DIR="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
 mkdir -p "$DESKTOP_DIR"
+
+# Remove qualquer atalho genérico "Install Debian" criado pelo calamares-settings-debian
+rm -f "$DESKTOP_DIR"/*debian*.desktop "$DESKTOP_DIR"/calamares.desktop
 
 if grep -q "boot=live" /proc/cmdline; then
     INSTALL_SRC="/usr/share/applications/legacyos-installer.desktop"
@@ -219,7 +220,6 @@ if [ -x "/usr/bin/legacyos-move-icons.sh" ]; then
     /usr/bin/legacyos-move-icons.sh >/dev/null 2>&1 || true
 fi
 
-# Aguarda até que painel, xfdesktop e plank estejam ativos antes de abrir a cortina
 for i in $(seq 1 15); do
     if pgrep -x xfce4-panel >/dev/null && pgrep -x xfdesktop >/dev/null && pgrep -x plank >/dev/null; then
         break
@@ -227,11 +227,9 @@ for i in $(seq 1 15); do
     sleep 0.3
 done
 
-# Margem extra para o compositor concluir o desenho do papel de parede e da dock
 sleep 1.4
 rm -f "$LOCK_FILE"
 
-# Se o usuário escolheu "Instalar o LegacyOS" no menu de boot, abre o instalador
 if grep -qw "legacyos-install" /proc/cmdline && [ -x "/usr/local/bin/legacyos-installer" ]; then
     sleep 0.8
     /usr/local/bin/legacyos-installer >/dev/null 2>&1 &
