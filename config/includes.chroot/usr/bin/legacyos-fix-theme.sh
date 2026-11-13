@@ -6,7 +6,7 @@
 export DISPLAY="${DISPLAY:-:0}"
 
 # ------------------------------------------------------------------------------
-# 0. ACIONAMENTO IMEDIATO DA CORTINA DE LOGIN (OCULTA MONTAGEM DO DESKTOP)
+# 0. MANTÉM A CORTINA DE CARREGAMENTO ATIVA ATÉ O DESKTOP ESTAR 100% PRONTO
 # ------------------------------------------------------------------------------
 LOCK_FILE="/tmp/legacyos-splash.lock"
 SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
@@ -18,7 +18,7 @@ if [ -f "$SPLASH_SCRIPT" ] && ! pgrep -f "login-splash/main.py" >/dev/null; then
     python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
 fi
 
-sleep 1.8
+sleep 1.2
 
 # Corrige caminho absoluto do tema Qt5/Qt6 para o usuário ativo
 for QT_VER in qt5ct qt6ct; do
@@ -72,7 +72,7 @@ xfconf-query -c xfwm4 -p /general/tile_on_move -n -t bool -s true
 # 3. CONSTRUÇÃO DA BARRA SUPERIOR (SÍMBOLO LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
 # ------------------------------------------------------------------------------
 pkill -x xfce4-panel 2>/dev/null || true
-sleep 0.5
+sleep 0.4
 
 xfconf-query -c xfce4-panel -p / -r -R 2>/dev/null || true
 
@@ -255,11 +255,12 @@ for i in $(seq 1 15); do
     sleep 0.3
 done
 
-sleep 1.4
+# Aguarda renderização completa do wallpaper e ícones antes de revelar o desktop
+sleep 2.2
 rm -f "$LOCK_FILE"
 
 if grep -qw "legacyos-install" /proc/cmdline && [ -x "/usr/local/bin/legacyos-installer" ]; then
-    sleep 0.8
+    sleep 0.6
     /usr/local/bin/legacyos-installer >/dev/null 2>&1 &
 fi
 
