@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Aplicativos
+GenericName=Grade de Aplicativos
+Comment=Visualiza e inicia todos os aplicativos instalados no LegacyOS
+Exec=/usr/local/bin/legacyos-apps
+Icon=view-app-grid-symbolic
+Terminal=false
+StartupNotify=true
+NoDisplay=true
+Categories=System;
