@@ -1,0 +1,29 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS - ORGANIZADOR DE ÍCONES DA ÁREA DE TRABALHO
+# Gravity codes do XFCE: 0 = Top-Left (Direita/Padrão), 1 = Top-Right, 2 = Bottom-Left, etc.
+# ==============================================================================
+
+ALIGN="${1:-right}"
+
+case "$ALIGN" in
+    right)
+        xfconf-query -c xfce4-desktop -p /desktop-icons/gravity -s 0
+        ;;
+    left)
+        xfconf-query -c xfce4-desktop -p /desktop-icons/gravity -s 1
+        ;;
+    above|acima)
+        xfconf-query -c xfce4-desktop -p /desktop-icons/gravity -s 2
+        ;;
+    below|abaixo)
+        xfconf-query -c xfce4-desktop -p /desktop-icons/gravity -s 3
+        ;;
+    *)
+        echo "Uso: legacyos-desktop-align [right|left|above|below]"
+        exit 1
+        ;;
+esac
+
+xfdesktop --reload 2>/dev/null || true
+exit 0
