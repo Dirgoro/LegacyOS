@@ -69,7 +69,7 @@ xfconf-query -c xfwm4 -p /general/snap_to_border -n -t bool -s true
 xfconf-query -c xfwm4 -p /general/tile_on_move -n -t bool -s true
 
 # ------------------------------------------------------------------------------
-# 3. CONSTRUÇÃO DA BARRA SUPERIOR (SÍMBOLO LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
+# 3. CONSTRUÇÃO DA BARRA SUPERIOR (SOMENTE SÍMBOLO LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
 # ------------------------------------------------------------------------------
 pkill -x xfce4-panel 2>/dev/null || true
 sleep 0.4
@@ -86,14 +86,21 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/background-style -n -t uint -s 1
 xfconf-query -c xfce4-panel -p /panels/panel-1/background-rgba -n \
     -t double -s 0.043 -t double -s 0.067 -t double -s 0.125 -t double -s 0.94
 
-# Plugin 1: Menu Principal
+# Plugin 1: Menu Principal (Somente o símbolo do LegacyOS, sem texto)
 xfconf-query -c xfce4-panel -p /plugins/plugin-1 -n -t string -s "whiskermenu"
-xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-title -n -t string -s "LegacyOS"
-xfconf-query -c xfce4-panel -p /plugins/plugin-1/show-button-title -n -t bool -s true
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-title -n -t string -s ""
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/show-button-title -n -t bool -s false
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/show-button-icon -n -t bool -s true
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-icon -n -t string -s "/usr/share/pixmaps/legacyos-logo.svg"
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/menu-width -n -t int -s "$WHISKER_WIDTH"
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/menu-height -n -t int -s "$WHISKER_HEIGHT"
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/display-command-settings -n -t bool -s true
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/display-command-lockscreen -n -t bool -s true
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/display-command-switchuser -n -t bool -s true
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/display-command-logoutuser -n -t bool -s true
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/display-command-restart -n -t bool -s true
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/display-command-shutdown -n -t bool -s true
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/display-command-suspend -n -t bool -s true
 
 # Plugin 2: Menu de Locais
 xfconf-query -c xfce4-panel -p /plugins/plugin-2 -n -t string -s "directorymenu"
@@ -116,18 +123,14 @@ xfconf-query -c xfce4-panel -p /plugins/plugin-5/enable-keyboard-shortcuts -n -t
 # Plugin 6: Gerenciador de Energia / Bateria
 xfconf-query -c xfce4-panel -p /plugins/plugin-6 -n -t string -s "power-manager-plugin"
 
-# Plugin 7: Relógio e Data
+# Plugin 7: Relógio e Data (Final da barra superior, sem o nome do usuário)
 xfconf-query -c xfce4-panel -p /plugins/plugin-7 -n -t string -s "clock"
 xfconf-query -c xfce4-panel -p /plugins/plugin-7/digital-layout -n -t uint -s 3
 xfconf-query -c xfce4-panel -p /plugins/plugin-7/digital-time-format -n -t string -s "%a, %d de %b  %H:%M"
 
-# Plugin 8: Menu Único de Sessão
-xfconf-query -c xfce4-panel -p /plugins/plugin-8 -n -t string -s "actions"
-xfconf-query -c xfce4-panel -p /plugins/plugin-8/appearance -n -t uint -s 1
-
 xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -n \
     -t int -s 1 -t int -s 2 -t int -s 3 -t int -s 4 \
-    -t int -s 5 -t int -s 6 -t int -s 7 -t int -s 8 --force-array
+    -t int -s 5 -t int -s 6 -t int -s 7 --force-array
 
 nohup xfce4-panel >/dev/null 2>&1 &
 
