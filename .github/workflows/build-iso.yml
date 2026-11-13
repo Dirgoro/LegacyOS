@@ -50,6 +50,9 @@ jobs:
       - name: Configurar e Personalizar Bootloader (lb config)
         run: |
           lb clean --purge
+          if [ -x "./scripts/customize-bootloader.sh" ]; then
+            ./scripts/customize-bootloader.sh
+          fi
           lb config
           if [ -x "./scripts/customize-bootloader.sh" ]; then
             ./scripts/customize-bootloader.sh
