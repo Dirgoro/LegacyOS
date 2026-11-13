@@ -1,14 +1,12 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - HOOK DE PERSONALIZAÇÃO COMPLETA DO INSTALADOR (CALAMARES)
-# Gera banner central oficial em PyCairo puro, aplica tema escuro QSS e 800x520
 # ==============================================================================
 
 set -e
 
 echo "[LegacyOS Hook 0680] Personalizando instalador gráfico LegacyOS..."
 
-# 1. Wrapper seguro com tema escuro Qt e repasse de display gráfico
 cat << 'EOF' > /usr/local/bin/legacyos-installer
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
@@ -20,7 +18,6 @@ fi
 EOF
 chmod 755 /usr/local/bin/legacyos-installer
 
-# 2. Cria atalho padrão no menu de aplicativos
 cat << 'EOF' > /usr/share/applications/legacyos-installer.desktop
 [Desktop Entry]
 Type=Application
@@ -36,19 +33,16 @@ Categories=System;Settings;
 EOF
 chmod 644 /usr/share/applications/legacyos-installer.desktop
 
-# Oculta o atalho genérico do Debian
 if [ -f "/usr/share/applications/install-debian.desktop" ]; then
     if ! grep -q "NoDisplay=true" /usr/share/applications/install-debian.desktop; then
         echo "NoDisplay=true" >> /usr/share/applications/install-debian.desktop
     fi
 fi
 
-# 3. Provisiona o atalho na área de trabalho padrão (/etc/skel/Desktop)
 mkdir -p /etc/skel/Desktop
 cp /usr/share/applications/legacyos-installer.desktop /etc/skel/Desktop/instalar-legacyos.desktop
 chmod 755 /etc/skel/Desktop/instalar-legacyos.desktop
 
-# 4. Gera banner oficial de boas-vindas do Calamares em PyCairo puro
 WELCOME_PNG="/usr/share/pixmaps/legacyos-calamares-welcome.png"
 python3 - "$WELCOME_PNG" << 'PYEOF'
 import sys
@@ -60,7 +54,6 @@ W, H = 420, 175
 surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
 ctx = cairo.Context(surface)
 
-# Fundo arredondado Dark Slate (#0B1120) com borda sutil
 r = 16
 ctx.new_sub_path()
 ctx.arc(W - r, r, r, -1.5708, 0)
@@ -79,7 +72,6 @@ ctx.set_source_rgba(0.055, 0.647, 0.914, 0.45)
 ctx.set_line_width(1.5)
 ctx.stroke()
 
-# Logotipo vetorial oficial à esquerda
 ctx.save()
 scale = 0.78
 ctx.translate(38.0, (H - 100.0 * scale) / 2.0)
@@ -114,7 +106,6 @@ ctx.close_path()
 ctx.fill()
 ctx.restore()
 
-# Marca e slogan à direita
 ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 ctx.set_font_size(28)
 ctx.set_source_rgb(0.973, 0.980, 0.988)
@@ -135,12 +126,12 @@ ctx.show_text("Seu equipamento ganhando nova vida")
 surface.write_to_png(out_png)
 PYEOF
 
-# 5. Personaliza branding.desc e folha de estilo escura (stylesheet.qss) do Calamares
 for BRAND_DIR in /etc/calamares/branding/debian /usr/share/calamares/branding/debian; do
     if [ -d "$BRAND_DIR" ]; then
         if [ -f "/usr/share/plymouth/themes/legacyos/logo.png" ]; then
-            cp /usr/share/plymouth/themes/legacyos/logo.png "$BRAND_DIR/logo.png" 2>/dev/null || true
-            cp /usr/share/plymouth/themes/legacyos/logo.png "$BRAND_DIR/squid.png" 2>/dev/null || true
+            for IMG_NAME in logo.png squid.png sidebar_logo.png; do
+                cp /usr/share/plymouth/themes/legacyos/logo.png "$BRAND_DIR/$IMG_NAME" 2>/dev/null || true
+            done
         fi
 
         cp "$WELCOME_PNG" "$BRAND_DIR/welcome.png" 2>/dev/null || true
@@ -223,6 +214,8 @@ replacements = [
     (r'(versionedName:\s*).*', r'\1"LegacyOS 1.0 Alpha"'),
     (r'(shortVersionedName:\s*).*', r'\1"LegacyOS 1.0"'),
     (r'(bootloaderEntryName:\s*).*', r'\1"LegacyOS"'),
+    (r'(productLogo:\s*).*', r'\1"logo.png"'),
+    (r'(productIcon:\s*).*', r'\1"logo.png"'),
     (r'(productUrl:\s*).*', r'\1"https://github.com"'),
     (r'(supportUrl:\s*).*', r'\1"https://github.com"'),
     (r'(knownIssuesUrl:\s*).*', r'\1"https://github.com"'),
