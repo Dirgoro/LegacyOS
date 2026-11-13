@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS E TRANSIÇÃO SEM TELA PRETA (CHROOT)
+# LEGACYOS - HOOK DE ATIVOS VISUAIS, TEMA UNIFICADO (GTK2/3/4 + QT) E BOOT
 # ==============================================================================
 
 set -e
@@ -10,7 +10,6 @@ mkdir -p "$XFWM_DIR"
 
 echo "[LegacyOS Hook 0650] Gerando ativos de janela (xfwm4)..."
 
-# Barra de título (1x30px Dark Slate #0B1120 / #090E1A)
 cat << 'EOF' > "$XFWM_DIR/title-1-active.xpm"
 /* XPM */
 static char * title_1_active_xpm[] = {
@@ -41,7 +40,6 @@ cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-3-inactive.xpm"
 cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-4-inactive.xpm"
 cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-5-inactive.xpm"
 
-# Cantos superiores e bordas finas (1px)
 cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-left-active.xpm"
 cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-right-active.xpm"
 cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/top-left-inactive.xpm"
@@ -71,7 +69,6 @@ for SIDE in right bottom bottom-left bottom-right; do
     cp "$XFWM_DIR/left-inactive.xpm" "$XFWM_DIR/${SIDE}-inactive.xpm"
 done
 
-# Botão Fechar (18x30)
 cat << 'EOF' > "$XFWM_DIR/close-active.xpm"
 /* XPM */
 static char * close_active_xpm[] = {
@@ -91,7 +88,6 @@ sed 's/#94A3B8/#EF4444/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-preligh
 sed 's/#94A3B8/#DC2626/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-pressed.xpm"
 sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-inactive.xpm"
 
-# Botão Maximizar (18x30)
 cat << 'EOF' > "$XFWM_DIR/maximize-active.xpm"
 /* XPM */
 static char * max_active_xpm[] = {
@@ -111,7 +107,6 @@ sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-p
 sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-pressed.xpm"
 sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-inactive.xpm"
 
-# Botão Minimizar (18x30)
 cat << 'EOF' > "$XFWM_DIR/hide-active.xpm"
 /* XPM */
 static char * hide_active_xpm[] = {
@@ -131,7 +126,6 @@ sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-prelight.
 sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-pressed.xpm"
 sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-inactive.xpm"
 
-# Botão de Menu da Janela (18x30)
 cat << 'EOF' > "$XFWM_DIR/menu-active.xpm"
 /* XPM */
 static char * menu_active_xpm[] = {
@@ -152,6 +146,56 @@ cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#0284C7/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
+# Variáveis de ambiente globais (força Dark Slate em GTK2/3/4 e Qt5/6)
+# ------------------------------------------------------------------------------
+cat << 'EOF' > /etc/environment
+GTK_THEME=LegacyOS-Theme
+GTK2_RC_FILES=/usr/share/themes/LegacyOS-Theme/gtk-2.0/gtkrc
+QT_QPA_PLATFORMTHEME=qt5ct
+ADW_DEBUG_COLOR_SCHEME=prefer-dark
+EOF
+
+mkdir -p /etc/skel/.config/gtk-3.0 /etc/skel/.config/gtk-4.0
+cat << 'EOF' > /etc/skel/.config/gtk-3.0/settings.ini
+[Settings]
+gtk-theme-name=LegacyOS-Theme
+gtk-icon-theme-name=Papirus-Dark
+gtk-font-name=Geist 9.5
+gtk-application-prefer-dark-theme=1
+gtk-decoration-layout=menu:minimize,maximize,close
+EOF
+cp /etc/skel/.config/gtk-3.0/settings.ini /etc/skel/.config/gtk-4.0/settings.ini
+
+cat << 'EOF' > /etc/skel/.gtkrc-2.0
+include "/usr/share/themes/LegacyOS-Theme/gtk-2.0/gtkrc"
+gtk-icon-theme-name="Papirus-Dark"
+gtk-font-name="Geist 9.5"
+EOF
+
+mkdir -p /etc/skel/.config/qt5ct/colors /etc/skel/.config/qt6ct/colors
+cat << 'EOF' > /etc/skel/.config/qt5ct/colors/LegacyOS.conf
+[ColorScheme]
+active_colors=#fff8fafc, #ff1e293b, #ff273549, #ff1e293b, #ff0b1120, #ff1e293b, #fff8fafc, #ffffffff, #fff8fafc, #ff0b1120, #ff111827, #ff090e1a, #ff0284c7, #ffffffff, #ff38bdf8, #ff0284c7, #ff1e293b, #ff0b1120, #ff0b1120, #fff8fafc
+disabled_colors=#ff64748b, #ff1e293b, #ff273549, #ff1e293b, #ff0b1120, #ff1e293b, #ff64748b, #ffffffff, #ff64748b, #ff0b1120, #ff111827, #ff090e1a, #ff1e293b, #ff94a3b8, #ff38bdf8, #ff0284c7, #ff1e293b, #ff0b1120, #ff0b1120, #ff64748b
+inactive_colors=#fff8fafc, #ff1e293b, #ff273549, #ff1e293b, #ff0b1120, #ff1e293b, #fff8fafc, #ffffffff, #fff8fafc, #ff0b1120, #ff111827, #ff090e1a, #ff0369a1, #ffffffff, #ff38bdf8, #ff0284c7, #ff1e293b, #ff0b1120, #ff0b1120, #fff8fafc
+EOF
+cp /etc/skel/.config/qt5ct/colors/LegacyOS.conf /etc/skel/.config/qt6ct/colors/LegacyOS.conf
+
+cat << 'EOF' > /etc/skel/.config/qt5ct/qt5ct.conf
+[Appearance]
+color_scheme_path=/etc/skel/.config/qt5ct/colors/LegacyOS.conf
+custom_palette=true
+icon_theme=Papirus-Dark
+standard_dialogs=gtk3
+style=Fusion
+
+[Fonts]
+fixed="Monospace,9.5,-1,5,50,0,0,0,0,0"
+general="Geist,9.5,-1,5,50,0,0,0,0,0"
+EOF
+sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
+
+# ------------------------------------------------------------------------------
 # Remove gnome-calculator (GTK4 fixo >600px) e mantém apenas Galculator (GTK3)
 # ------------------------------------------------------------------------------
 echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
@@ -159,7 +203,6 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get purge -y gnome-calculator >/dev/null 2>&1 || true
 apt-get autoremove -y >/dev/null 2>&1 || true
 
-# Garante que o atalho padrão "Calculadora" do XFCE aponte para o galculator
 if [ -f "/usr/share/applications/galculator.desktop" ]; then
     sed -i 's/^Name=.*/Name=Calculadora/' /usr/share/applications/galculator.desktop
     if ! grep -q "^Name\[pt_BR\]=" /usr/share/applications/galculator.desktop; then
@@ -180,7 +223,7 @@ fi
 # ------------------------------------------------------------------------------
 # Cria tema Plymouth oficial e imagem de transição contínua X11
 # ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Configurando boot splash contínuo do LegacyOS..."
+echo "[LegacyOS Hook 0650] Configurando boot splash contínuo sem piscadas pretas..."
 PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
 mkdir -p "$PLYMOUTH_DIR"
 
@@ -277,14 +320,66 @@ EOF
 plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Oculta mensagem de console "piix4_smbus: SMBus Host Controller not enabled"
+# Retém o framebuffer do Plymouth até o X11 assumir (evita piscada preta no TTY)
 # ------------------------------------------------------------------------------
+mkdir -p /etc/systemd/system/plymouth-quit.service.d
+cat << 'EOF' > /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
+[Service]
+ExecStart=
+ExecStart=-/bin/plymouth quit --retain-splash
+EOF
+
+mkdir -p /etc/systemd/system/plymouth-quit-wait.service.d
+cat << 'EOF' > /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
+[Service]
+ExecStart=
+ExecStart=-/bin/plymouth --wait
+EOF
+
+# ------------------------------------------------------------------------------
+# Script do LightDM: desenha o mesmo Logo no root window do X11 no milissegundo 0
+# ------------------------------------------------------------------------------
+cat << 'EOF' > /usr/local/bin/legacyos-x11-hold
+#!/bin/bash
+export DISPLAY="${DISPLAY:-:0}"
+
+# Pinta imediatamente o fundo raiz do X11 com Dark Slate (#0B1120)
+xsetroot -solid "#0B1120" 2>/dev/null || true
+
+# Desenha o logotipo centralizado no root window do X11 via PyCairo/GDK
+python3 - << 'PYEOF' 2>/dev/null || true
+import gi
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk, GdkPixbuf
+
+disp = Gdk.Display.get_default()
+if disp:
+    scr = disp.get_default_screen()
+    root = scr.get_root_window()
+    w, h = root.get_width(), root.get_height()
+    pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+        "/usr/share/plymouth/themes/legacyos/boot-screen.png", w, h, False
+    )
+    surf = Gdk.cairo_surface_create_from_pixbuf(pb, 1, root)
+    pat = cairo.SurfacePattern(surf) if "cairo" in globals() else None
+    root.set_background_pattern(Gdk.cairo_set_source_pixbuf.__self__ if False else None)
+PYEOF
+
+# Abre imediatamente a cortina de carregamento antes mesmo da sessão iniciar
+LOCK_FILE="/tmp/legacyos-splash.lock"
+SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
+touch "$LOCK_FILE"
+if [ -f "$SPLASH_SCRIPT" ] && ! pgrep -f "login-splash/main.py" >/dev/null; then
+    nohup python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
+fi
+
+exit 0
+EOF
+chmod 755 /usr/local/bin/legacyos-x11-hold
+
 mkdir -p /etc/modprobe.d
 echo "blacklist i2c_piix4" > /etc/modprobe.d/blacklist-piix4.conf
 
-# ------------------------------------------------------------------------------
-# Intercepta o arranque da sessão XFCE para cobrir a tela ANTES do painel subir
-# ------------------------------------------------------------------------------
 cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
@@ -295,7 +390,7 @@ LOCK_FILE="/tmp/legacyos-splash.lock"
 SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
 
 touch "$LOCK_FILE"
-if [ -f "$SPLASH_SCRIPT" ]; then
+if [ -f "$SPLASH_SCRIPT" ] && ! pgrep -f "login-splash/main.py" >/dev/null; then
     python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
 fi
 
@@ -307,9 +402,6 @@ if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
     sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
 fi
 
-# ------------------------------------------------------------------------------
-# Substitui o papel de parede fallback do Debian 13 pelo do LegacyOS
-# ------------------------------------------------------------------------------
 if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
     mkdir -p /usr/share/images/desktop-base
     ln -sf /usr/share/backgrounds/legacyos-wallpaper.jpg /usr/share/images/desktop-base/default
@@ -317,20 +409,19 @@ if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
     update-alternatives --set desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg >/dev/null 2>&1 || true
 fi
 
-# ------------------------------------------------------------------------------
-# Atualiza cache das fontes (inclui a família Geist)
-# ------------------------------------------------------------------------------
 echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
 fc-cache -f -v >/dev/null 2>&1 || true
 
-# ------------------------------------------------------------------------------
-# Oculta o atalho genérico de cliente de e-mail no menu de aplicativos
-# ------------------------------------------------------------------------------
 if [ -f "/usr/share/applications/exo-mail-reader.desktop" ]; then
     if ! grep -q "NoDisplay=true" /usr/share/applications/exo-mail-reader.desktop; then
         echo "NoDisplay=true" >> /usr/share/applications/exo-mail-reader.desktop
     fi
 fi
+
+chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
+chmod 755 /usr/local/bin/legacyos-window-fit 2>/dev/null || true
+chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
+chmod 644 /usr/share/applications/legacyos-settings.desktop 2>/dev/null || true
 
 echo "[LegacyOS Hook 0650] Ativos visuais concluídos."
 exit 0
