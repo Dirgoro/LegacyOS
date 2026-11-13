@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - SCRIPT DE ESTABILIZAÇÃO VISUAL E ADAPTATIVA (FASE 2)
-# Aciona cortina de boas-vindas imediatamente e prepara desktop em segundo plano
+# Aciona cortina de boas-vindas, popula Dock completa e limpa barra superior
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
@@ -118,9 +118,9 @@ xfconf-query -c xfce4-panel -p /plugins/plugin-7 -n -t string -s "clock"
 xfconf-query -c xfce4-panel -p /plugins/plugin-7/digital-layout -n -t uint -s 3
 xfconf-query -c xfce4-panel -p /plugins/plugin-7/digital-time-format -n -t string -s "%a, %d de %b  %H:%M"
 
-# Plugin 8: Menu de Sistema / Sessão
+# Plugin 8: Menu Único de Sessão (evita vários botões coloridos no canto direito)
 xfconf-query -c xfce4-panel -p /plugins/plugin-8 -n -t string -s "actions"
-xfconf-query -c xfce4-panel -p /plugins/plugin-8/appearance -n -t uint -s 0
+xfconf-query -c xfce4-panel -p /plugins/plugin-8/appearance -n -t uint -s 1
 
 xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -n \
     -t int -s 1 -t int -s 2 -t int -s 3 -t int -s 4 \
@@ -153,12 +153,19 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 5. CONFIGURAÇÃO E INICIALIZAÇÃO ADAPTATIVA DA DOCK (PLANK)
+# 5. CONFIGURAÇÃO E INICIALIZAÇÃO COMPLETA DA DOCK (PLANK)
 # ------------------------------------------------------------------------------
+CONFIG_DIR="$HOME/.config/legacyos"
+DOCK_FLAG="$CONFIG_DIR/.dock_initialized"
 DOCK_DIR="$HOME/.config/plank/dock1/launchers"
-mkdir -p "$DOCK_DIR"
 
-if [ -z "$(ls -A "$DOCK_DIR" 2>/dev/null)" ]; then
+mkdir -p "$CONFIG_DIR" "$DOCK_DIR"
+
+if [ ! -f "$DOCK_FLAG" ]; then
+    pkill -x plank 2>/dev/null || true
+    sleep 0.3
+    rm -f "$DOCK_DIR"/*.dockitem
+
     for APP in \
         legacy-care-center.desktop \
         brave-browser.desktop \
@@ -172,11 +179,14 @@ if [ -z "$(ls -A "$DOCK_DIR" 2>/dev/null)" ]; then
             echo "Launcher=file:///usr/share/applications/${APP}" >> "${DOCK_DIR}/${APP%.desktop}.dockitem"
         fi
     done
+
+    touch "$DOCK_FLAG"
 fi
 
-if [ -d "/usr/share/plank/themes/LegacyOS-Dock" ]; then
-    gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ theme 'LegacyOS-Dock' 2>/dev/null || true
-fi
+gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ theme 'LegacyOS-Dock' 2>/dev/null || true
+gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ position 'bottom' 2>/dev/null || true
+gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ alignment 'center' 2>/dev/null || true
+gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ items-alignment 'center' 2>/dev/null || true
 gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ icon-size "$DOCK_ICON_SIZE" 2>/dev/null || true
 gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ hide-mode "$DOCK_HIDE_MODE" 2>/dev/null || true
 gsettings set net.launchpad.plank.dock.settings:/net/launchpad/plank/docks/dock1/ zoom-enabled true 2>/dev/null || true
@@ -193,7 +203,6 @@ if [ -x "/usr/bin/legacyos-move-icons.sh" ]; then
     /usr/bin/legacyos-move-icons.sh >/dev/null 2>&1 || true
 fi
 
-# Pequena margem para Plank e wallpaper terminarem de renderizar atrás da cortina
 sleep 0.5
 rm -f "$LOCK_FILE"
 
