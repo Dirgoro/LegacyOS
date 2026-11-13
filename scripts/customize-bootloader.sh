@@ -1,8 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - PERSONALIZAÇÃO COMPLETA DO BOOTLOADER (SYSLINUX / ISOLINUX / GRUB)
-# Copia os templates oficiais do live-build para config/bootloaders e aplica
-# fundo Dark Slate (#0B1120), logotipo LegacyOS e as 3 opções de boot
+# Gera splash screen 640x480 em PyCairo puro e configura as 3 opções de boot
 # ==============================================================================
 
 set -e
@@ -19,46 +18,68 @@ done
 
 echo "[LegacyOS Bootloader] Gerando splash screen 640x480..."
 SPLASH_PNG="/tmp/legacyos-boot-splash.png"
-SVG_LOGO="config/includes.chroot/usr/share/pixmaps/legacyos-logo.svg"
 
-python3 - "$SVG_LOGO" "$SPLASH_PNG" << 'PYEOF'
-import os
+python3 - "$SPLASH_PNG" << 'PYEOF'
 import sys
-import gi
-gi.require_version("GdkPixbuf", "2.0")
-gi.require_version("Gdk", "3.0")
-from gi.repository import GdkPixbuf, Gdk
 import cairo
 
-svg_path = sys.argv[1]
-out_png = sys.argv[2]
+out_png = sys.argv[1]
 
 W, H = 640, 480
 surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
 ctx = cairo.Context(surface)
 
-# Fundo Dark Slate (#0B1120) com brilho radial azul sutil no topo
+# 1. Fundo Dark Slate (#0B1120) com brilho radial azul sutil no topo
 ctx.set_source_rgb(0.043, 0.067, 0.125)
 ctx.rectangle(0, 0, W, H)
 ctx.fill()
 
-radial = cairo.RadialGradient(W / 2.0, 90, 10, W / 2.0, 90, 340)
+radial = cairo.RadialGradient(W / 2.0, 88, 10, W / 2.0, 88, 340)
 radial.add_color_stop_rgba(0.0, 0.008, 0.518, 0.780, 0.24)
 radial.add_color_stop_rgba(1.0, 0.043, 0.067, 0.125, 0.0)
 ctx.set_source(radial)
 ctx.rectangle(0, 0, W, H)
 ctx.fill()
 
-# Logotipo oficial no topo central
-if os.path.isfile(svg_path):
-    try:
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(svg_path, 66, 66, True)
-        Gdk.cairo_set_source_pixbuf(ctx, pixbuf, (W - 66) / 2.0, 30)
-        ctx.paint()
-    except Exception:
-        pass
+# 2. Logotipo vetorial oficial do LegacyOS (duas pétalas curvas formando o L)
+ctx.save()
+scale = 0.68
+logo_w = 100.0 * scale
+ctx.translate((W - logo_w) / 2.0, 26.0)
+ctx.scale(scale, scale)
 
-# Marca LegacyOS abaixo do ícone
+# Haste vertical azul
+grad_v = cairo.LinearGradient(65, 5, 20, 95)
+grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
+grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
+grad_v.add_color_stop_rgb(0.72, 0.008, 0.518, 0.780)
+grad_v.add_color_stop_rgb(1.0, 0.000, 0.278, 0.671)
+ctx.set_source(grad_v)
+ctx.move_to(18, 92)
+ctx.line_to(18, 42)
+ctx.curve_to(18, 24, 30, 12, 46, 8)
+ctx.line_to(46, 68)
+ctx.curve_to(34, 73, 24, 81, 18, 92)
+ctx.close_path()
+ctx.fill()
+
+# Base horizontal branca/prata
+grad_h = cairo.LinearGradient(10, 90, 92, 55)
+grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
+grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
+grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
+grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
+ctx.set_source(grad_h)
+ctx.move_to(18, 92)
+ctx.curve_to(26, 75, 38, 66, 56, 66)
+ctx.line_to(92, 66)
+ctx.curve_to(88, 82, 76, 92, 58, 92)
+ctx.line_to(18, 92)
+ctx.close_path()
+ctx.fill()
+ctx.restore()
+
+# 3. Marca LegacyOS abaixo do ícone
 ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 ctx.set_font_size(22)
 t1, t2 = "Legacy", "OS"
@@ -74,7 +95,7 @@ ctx.set_source_rgb(0.055, 0.647, 0.914)
 ctx.move_to(start_x + e1.width + 2, 122)
 ctx.show_text(t2)
 
-# Subtítulo discreto no rodapé
+# 4. Subtítulo discreto no rodapé
 ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 ctx.set_font_size(11)
 sub = "Novas possibilidades para grandes historias"
