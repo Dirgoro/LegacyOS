@@ -1,7 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS DA FASE 2 (CHROOT)
-# Gera bordas/botões XPM do xfwm4, registra logotipo SVG, fontes e limpa menus
+# LEGACYOS - HOOK DE ATIVOS VISUAIS E TRANSIÇÃO SEM TELA PRETA (CHROOT)
 # ==============================================================================
 
 set -e
@@ -153,6 +152,22 @@ cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#0284C7/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
+# Remove gnome-calculator (GTK4 fixo >600px) e mantém apenas Galculator (GTK3)
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
+export DEBIAN_FRONTEND=noninteractive
+apt-get purge -y gnome-calculator >/dev/null 2>&1 || true
+apt-get autoremove -y >/dev/null 2>&1 || true
+
+# Garante que o atalho padrão "Calculadora" do XFCE aponte para o galculator
+if [ -f "/usr/share/applications/galculator.desktop" ]; then
+    sed -i 's/^Name=.*/Name=Calculadora/' /usr/share/applications/galculator.desktop
+    if ! grep -q "^Name\[pt_BR\]=" /usr/share/applications/galculator.desktop; then
+        echo "Name[pt_BR]=Calculadora" >> /usr/share/applications/galculator.desktop
+    fi
+fi
+
+# ------------------------------------------------------------------------------
 # Registra o logotipo SVG oficial no tema de ícones hicolor
 # ------------------------------------------------------------------------------
 if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
@@ -160,6 +175,146 @@ if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
     cp /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
     chmod 644 /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
     gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
+fi
+
+# ------------------------------------------------------------------------------
+# Cria tema Plymouth oficial e imagem de transição contínua X11
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0650] Configurando boot splash contínuo do LegacyOS..."
+PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
+mkdir -p "$PLYMOUTH_DIR"
+
+python3 - "$PLYMOUTH_DIR/logo.png" "$PLYMOUTH_DIR/boot-screen.png" << 'PYEOF'
+import sys
+import cairo
+
+out_logo = sys.argv[1]
+out_screen = sys.argv[2]
+
+def draw_legacyos_mark(ctx, cx, cy, scale):
+    ctx.save()
+    ctx.translate(cx - 50.0 * scale, cy - 50.0 * scale)
+    ctx.scale(scale, scale)
+
+    grad_v = cairo.LinearGradient(65, 5, 20, 95)
+    grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
+    grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
+    grad_v.add_color_stop_rgb(0.72, 0.008, 0.518, 0.780)
+    grad_v.add_color_stop_rgb(1.0, 0.000, 0.278, 0.671)
+    ctx.set_source(grad_v)
+    ctx.move_to(18, 92)
+    ctx.line_to(18, 42)
+    ctx.curve_to(18, 24, 30, 12, 46, 8)
+    ctx.line_to(46, 68)
+    ctx.curve_to(34, 73, 24, 81, 18, 92)
+    ctx.close_path()
+    ctx.fill()
+
+    grad_h = cairo.LinearGradient(10, 90, 92, 55)
+    grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
+    grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
+    grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
+    grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
+    ctx.set_source(grad_h)
+    ctx.move_to(18, 92)
+    ctx.curve_to(26, 75, 38, 66, 56, 66)
+    ctx.line_to(92, 66)
+    ctx.curve_to(88, 82, 76, 92, 58, 92)
+    ctx.line_to(18, 92)
+    ctx.close_path()
+    ctx.fill()
+    ctx.restore()
+
+s_logo = cairo.ImageSurface(cairo.FORMAT_ARGB32, 120, 120)
+c_logo = cairo.Context(s_logo)
+draw_legacyos_mark(c_logo, 60.0, 60.0, 1.15)
+s_logo.write_to_png(out_logo)
+
+W, H = 1920, 1080
+s_scr = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+c_scr = cairo.Context(s_scr)
+c_scr.set_source_rgb(0.043, 0.067, 0.125)
+c_scr.rectangle(0, 0, W, H)
+c_scr.fill()
+draw_legacyos_mark(c_scr, W / 2.0, H / 2.0 - 40.0, 1.35)
+s_scr.write_to_png(out_screen)
+PYEOF
+
+cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.plymouth"
+[Plymouth Theme]
+Name=LegacyOS
+Description=Tela de inicialização oficial do LegacyOS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/legacyos
+ScriptFile=/usr/share/plymouth/themes/legacyos/legacyos.script
+EOF
+
+cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.script"
+Window.SetBackgroundTopColor(0.043, 0.067, 0.125);
+Window.SetBackgroundBottomColor(0.043, 0.067, 0.125);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 40);
+logo.sprite.SetOpacity(1);
+
+fun refresh_callback () {
+    logo.sprite.SetOpacity(1);
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+EOF
+
+mkdir -p /etc/plymouth
+cat << 'EOF' > /etc/plymouth/plymouthd.conf
+[Daemon]
+Theme=legacyos
+ShowDelay=0
+EOF
+
+plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
+
+# ------------------------------------------------------------------------------
+# Oculta mensagem de console "piix4_smbus: SMBus Host Controller not enabled"
+# ------------------------------------------------------------------------------
+mkdir -p /etc/modprobe.d
+echo "blacklist i2c_piix4" > /etc/modprobe.d/blacklist-piix4.conf
+
+# ------------------------------------------------------------------------------
+# Intercepta o arranque da sessão XFCE para cobrir a tela ANTES do painel subir
+# ------------------------------------------------------------------------------
+cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
+#!/bin/bash
+export DISPLAY="${DISPLAY:-:0}"
+
+xsetroot -solid "#0B1120" 2>/dev/null || true
+
+LOCK_FILE="/tmp/legacyos-splash.lock"
+SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
+
+touch "$LOCK_FILE"
+if [ -f "$SPLASH_SCRIPT" ]; then
+    python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
+fi
+
+exec /usr/bin/xfce4-session
+EOF
+chmod 755 /usr/local/bin/legacyos-session-wrapper
+
+if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
+    sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# Substitui o papel de parede fallback do Debian 13 pelo do LegacyOS
+# ------------------------------------------------------------------------------
+if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
+    mkdir -p /usr/share/images/desktop-base
+    ln -sf /usr/share/backgrounds/legacyos-wallpaper.jpg /usr/share/images/desktop-base/default
+    update-alternatives --install /usr/share/images/desktop-base/desktop-background desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg 90 >/dev/null 2>&1 || true
+    update-alternatives --set desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg >/dev/null 2>&1 || true
 fi
 
 # ------------------------------------------------------------------------------
@@ -177,5 +332,11 @@ if [ -f "/usr/share/applications/exo-mail-reader.desktop" ]; then
     fi
 fi
 
-echo "[LegacyOS Hook 0650] Ativos visuais da Fase 2 concluídos."
+# ------------------------------------------------------------------------------
+# Permissões do Lançador de Aplicativos (legacyos-apps)
+# ------------------------------------------------------------------------------
+chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
+chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
+
+echo "[LegacyOS Hook 0650] Ativos visuais concluídos."
 exit 0
