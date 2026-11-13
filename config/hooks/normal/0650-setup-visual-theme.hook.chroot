@@ -14,8 +14,8 @@ cat << 'EOF' > "$XFWM_DIR/title-1-active.xpm"
 /* XPM */
 static char * title_1_active_xpm[] = {
 "1 30 2 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 ".",
 " "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
 EOF
@@ -29,8 +29,8 @@ cat << 'EOF' > "$XFWM_DIR/title-1-inactive.xpm"
 /* XPM */
 static char * title_1_inactive_xpm[] = {
 "1 30 2 1",
-" 	c #090E1A",
-".	c #111827",
+" 	c #0B0F16",
+".	c #141A23",
 ".",
 " "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
 EOF
@@ -49,7 +49,7 @@ cat << 'EOF' > "$XFWM_DIR/left-active.xpm"
 /* XPM */
 static char * border_xpm[] = {
 "1 1 1 1",
-".	c #1E293B",
+".	c #19212D",
 "."};
 EOF
 
@@ -61,7 +61,7 @@ cat << 'EOF' > "$XFWM_DIR/left-inactive.xpm"
 /* XPM */
 static char * border_inact_xpm[] = {
 "1 1 1 1",
-".	c #111827",
+".	c #141A23",
 "."};
 EOF
 
@@ -73,8 +73,8 @@ cat << 'EOF' > "$XFWM_DIR/close-active.xpm"
 /* XPM */
 static char * close_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 "+	c #94A3B8",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
@@ -86,14 +86,14 @@ EOF
 
 sed 's/#94A3B8/#EF4444/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-prelight.xpm"
 sed 's/#94A3B8/#DC2626/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-inactive.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-inactive.xpm"
 
 cat << 'EOF' > "$XFWM_DIR/maximize-active.xpm"
 /* XPM */
 static char * max_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 "+	c #94A3B8",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
@@ -104,15 +104,15 @@ static char * max_active_xpm[] = {
 EOF
 
 sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-prelight.xpm"
-sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-inactive.xpm"
+sed 's/#94A3B8/#137FEC/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-pressed.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-inactive.xpm"
 
 cat << 'EOF' > "$XFWM_DIR/hide-active.xpm"
 /* XPM */
 static char * hide_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 "+	c #94A3B8",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
@@ -123,16 +123,16 @@ static char * hide_active_xpm[] = {
 EOF
 
 sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-prelight.xpm"
-sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-inactive.xpm"
+sed 's/#94A3B8/#137FEC/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-pressed.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-inactive.xpm"
 
 cat << 'EOF' > "$XFWM_DIR/menu-active.xpm"
 /* XPM */
 static char * menu_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
-"+	c #0284C7",
+" 	c #0F141C",
+".	c #19212D",
+"+	c #137FEC",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
 "       ++++       ","      ++++++      ","      ++++++      ","      ++++++      ","      ++++++      ",
@@ -143,7 +143,7 @@ EOF
 
 cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-prelight.xpm"
 cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#0284C7/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#137FEC/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
 # Variáveis de ambiente globais (força Dark Slate em GTK2/3/4 e Qt5/6)
@@ -175,9 +175,9 @@ EOF
 mkdir -p /etc/skel/.config/qt5ct/colors /etc/skel/.config/qt6ct/colors
 cat << 'EOF' > /etc/skel/.config/qt5ct/colors/LegacyOS.conf
 [ColorScheme]
-active_colors=#fff8fafc, #ff1e293b, #ff273549, #ff1e293b, #ff0b1120, #ff1e293b, #fff8fafc, #ffffffff, #fff8fafc, #ff0b1120, #ff111827, #ff090e1a, #ff0284c7, #ffffffff, #ff38bdf8, #ff0284c7, #ff1e293b, #ff0b1120, #ff0b1120, #fff8fafc
-disabled_colors=#ff64748b, #ff1e293b, #ff273549, #ff1e293b, #ff0b1120, #ff1e293b, #ff64748b, #ffffffff, #ff64748b, #ff0b1120, #ff111827, #ff090e1a, #ff1e293b, #ff94a3b8, #ff38bdf8, #ff0284c7, #ff1e293b, #ff0b1120, #ff0b1120, #ff64748b
-inactive_colors=#fff8fafc, #ff1e293b, #ff273549, #ff1e293b, #ff0b1120, #ff1e293b, #fff8fafc, #ffffffff, #fff8fafc, #ff0b1120, #ff111827, #ff090e1a, #ff0369a1, #ffffffff, #ff38bdf8, #ff0284c7, #ff1e293b, #ff0b1120, #ff0b1120, #fff8fafc
+active_colors=#fff8fafc, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #fff8fafc, #ffffffff, #fff8fafc, #ff0f141c, #ff141a23, #ff0b0f16, #ff137fec, #ffffffff, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #fff8fafc
+disabled_colors=#ff64748b, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #ff64748b, #ffffffff, #ff64748b, #ff0f141c, #ff141a23, #ff0b0f16, #ff19212d, #ff94a3b8, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #ff64748b
+inactive_colors=#fff8fafc, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #fff8fafc, #ffffffff, #fff8fafc, #ff0f141c, #ff141a23, #ff0b0f16, #ff0b66c3, #ffffffff, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #fff8fafc
 EOF
 cp /etc/skel/.config/qt5ct/colors/LegacyOS.conf /etc/skel/.config/qt6ct/colors/LegacyOS.conf
 
@@ -238,42 +238,37 @@ W, H = 128, 128
 surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
 ctx = cairo.Context(surf)
 
-# Fundo circular Dark Slate
 grad_bg = cairo.LinearGradient(0, 0, W, H)
-grad_bg.add_color_stop_rgb(0.0, 0.118, 0.161, 0.231)  # #1E293B
-grad_bg.add_color_stop_rgb(0.6, 0.059, 0.090, 0.165)  # #0F172A
-grad_bg.add_color_stop_rgb(1.0, 0.043, 0.067, 0.125)  # #0B1120
+grad_bg.add_color_stop_rgb(0.0, 0.098, 0.129, 0.176)  # #19212D
+grad_bg.add_color_stop_rgb(0.6, 0.059, 0.078, 0.110)  # #0F141C
+grad_bg.add_color_stop_rgb(1.0, 0.043, 0.059, 0.086)  # #0B0F16
 
 ctx.arc(64, 64, 58, 0, 2 * math.pi)
 ctx.set_source(grad_bg)
 ctx.fill_preserve()
 
-# Borda azul sutil
 grad_ring = cairo.LinearGradient(0, 0, W, H)
-grad_ring.add_color_stop_rgba(0.0, 0.220, 0.741, 0.973, 0.85)
-grad_ring.add_color_stop_rgba(1.0, 0.008, 0.518, 0.780, 0.45)
+grad_ring.add_color_stop_rgba(0.0, 0.075, 0.498, 0.925, 0.90)
+grad_ring.add_color_stop_rgba(1.0, 0.043, 0.400, 0.765, 0.50)
 ctx.set_source(grad_ring)
 ctx.set_line_width(3.0)
 ctx.stroke()
 
-# Recorte interno circular
 ctx.save()
 ctx.arc(64, 64, 56, 0, 2 * math.pi)
 ctx.clip()
 
-# Halo luminoso
 rad = cairo.RadialGradient(64, 52, 4, 64, 52, 40)
-rad.add_color_stop_rgba(0.0, 0.008, 0.518, 0.780, 0.25)
-rad.add_color_stop_rgba(1.0, 0.008, 0.518, 0.780, 0.0)
+rad.add_color_stop_rgba(0.0, 0.075, 0.498, 0.925, 0.25)
+rad.add_color_stop_rgba(1.0, 0.075, 0.498, 0.925, 0.0)
 ctx.set_source(rad)
 ctx.rectangle(0, 0, W, H)
 ctx.fill()
 
-# Ombros / Busto estilizado em Azul LegacyOS
 grad_body = cairo.LinearGradient(24, 80, 104, 120)
-grad_body.add_color_stop_rgb(0.0, 0.220, 0.741, 0.973)  # #38BDF8
-grad_body.add_color_stop_rgb(0.55, 0.008, 0.518, 0.780) # #0284C7
-grad_body.add_color_stop_rgb(1.0, 0.012, 0.412, 0.631)  # #0369A1
+grad_body.add_color_stop_rgb(0.0, 0.220, 0.741, 0.973)
+grad_body.add_color_stop_rgb(0.55, 0.075, 0.498, 0.925) # #137FEC
+grad_body.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)  # #0B66C3
 
 ctx.move_to(22, 118)
 ctx.curve_to(22, 93, 40, 80, 64, 80)
@@ -282,7 +277,6 @@ ctx.close_path()
 ctx.set_source(grad_body)
 ctx.fill()
 
-# Detalhe estilizado da gola
 ctx.move_to(46, 82)
 ctx.line_to(64, 98)
 ctx.line_to(82, 82)
@@ -292,11 +286,10 @@ ctx.close_path()
 ctx.set_source_rgba(0.878, 0.949, 0.996, 0.35)
 ctx.fill()
 
-# Cabeça estilizada em Prata / Azul Claro
 grad_head = cairo.LinearGradient(44, 30, 84, 70)
-grad_head.add_color_stop_rgb(0.0, 0.973, 0.980, 0.988)  # #F8FAFC
-grad_head.add_color_stop_rgb(0.55, 0.796, 0.835, 0.882) # #CBD5E1
-grad_head.add_color_stop_rgb(1.0, 0.490, 0.827, 0.988)  # #7DD3FC
+grad_head.add_color_stop_rgb(0.0, 0.973, 0.980, 0.988)
+grad_head.add_color_stop_rgb(0.55, 0.796, 0.835, 0.882)
+grad_head.add_color_stop_rgb(1.0, 0.490, 0.827, 0.988)
 
 ctx.arc(64, 50, 20, 0, 2 * math.pi)
 ctx.set_source(grad_head)
@@ -310,10 +303,6 @@ chmod 644 "$AVATAR_PNG"
 cp "$AVATAR_PNG" /etc/skel/.face
 chmod 644 /etc/skel/.face
 
-# Substitui o ícone de rosto padrão do desktop-base (que exibia a espiral Debian)
-if [ -d "/usr/share/images/desktop-base" ]; then
-    ln -sf "$AVATAR_PNG" /usr/share/images/desktop-base/login-background.svg 2>/dev/null || true
-fi
 mkdir -p /var/lib/AccountsService/icons
 cp "$AVATAR_PNG" /var/lib/AccountsService/icons/user 2>/dev/null || true
 
@@ -339,8 +328,8 @@ def draw_legacyos_mark(ctx, cx, cy, scale):
     grad_v = cairo.LinearGradient(65, 5, 20, 95)
     grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
     grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
-    grad_v.add_color_stop_rgb(0.72, 0.008, 0.518, 0.780)
-    grad_v.add_color_stop_rgb(1.0, 0.000, 0.278, 0.671)
+    grad_v.add_color_stop_rgb(0.72, 0.075, 0.498, 0.925)
+    grad_v.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)
     ctx.set_source(grad_v)
     ctx.move_to(18, 92)
     ctx.line_to(18, 42)
@@ -373,7 +362,7 @@ s_logo.write_to_png(out_logo)
 W, H = 1920, 1080
 s_scr = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
 c_scr = cairo.Context(s_scr)
-c_scr.set_source_rgb(0.043, 0.067, 0.125)
+c_scr.set_source_rgb(0.059, 0.078, 0.110)
 c_scr.rectangle(0, 0, W, H)
 c_scr.fill()
 draw_legacyos_mark(c_scr, W / 2.0, H / 2.0 - 40.0, 1.35)
@@ -392,8 +381,8 @@ ScriptFile=/usr/share/plymouth/themes/legacyos/legacyos.script
 EOF
 
 cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.script"
-Window.SetBackgroundTopColor(0.043, 0.067, 0.125);
-Window.SetBackgroundBottomColor(0.043, 0.067, 0.125);
+Window.SetBackgroundTopColor(0.059, 0.078, 0.110);
+Window.SetBackgroundBottomColor(0.059, 0.078, 0.110);
 
 logo.image = Image("logo.png");
 logo.sprite = Sprite(logo.image);
@@ -434,7 +423,7 @@ cat << 'EOF' > /usr/local/bin/legacyos-x11-hold
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 
-xsetroot -solid "#0B1120" 2>/dev/null || true
+xsetroot -solid "#0F141C" 2>/dev/null || true
 
 LOCK_FILE="/tmp/legacyos-splash.lock"
 SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
@@ -454,7 +443,7 @@ cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 
-xsetroot -solid "#0B1120" 2>/dev/null || true
+xsetroot -solid "#0F141C" 2>/dev/null || true
 
 LOCK_FILE="/tmp/legacyos-splash.lock"
 SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
