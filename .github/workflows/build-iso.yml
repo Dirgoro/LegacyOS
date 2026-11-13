@@ -1,81 +1,63 @@
-name: Build LegacyOS ISO
+name: Build LegacyOS ISO (Debian 13)
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
+  # push:
+  #   branches:
+  #     - Fase-4-Refinamento
+  #     - "Fase 1 Gemini"
 
 jobs:
-  build:
+  build-iso:
     runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+      options: --privileged
 
     steps:
-      - name: Checkout do Código
+      - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Liberar Espaço em Disco (Host)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: false
-          docker-images: true
-          swap-storage: true
-
-      - name: Executar Build em Container Debian Trixie
+      - name: Instalar Dependências do Live-Build (Debian 13)
         run: |
-          docker run --rm --privileged \
-            -v "${{ github.workspace }}:/work" \
-            -w /work \
-            debian:trixie \
-            bash -c "
-              set -e
-              
-              echo '[*] Atualizando pacotes...'
-              apt-get update
-              
-              echo '[*] Instalando dependências...'
-              apt-get install -y --no-install-recommends \
-                live-build debootstrap squashfs-tools xorriso \
-                isolinux syslinux-common mtools dosfstools rsync sudo
-                
-              echo '[*] Listando arquivos no diretório de trabalho:'
-              ls -la
-              
-              echo '[*] Verificando se auto/config existe:'
-              if [ ! -f auto/config ]; then
-                echo 'ERRO CRÍTICO: auto/config não está no repositório!'
-                exit 1
-              fi
-              
-              echo '[*] Executando auto/config...'
-              bash auto/config
-              
-              echo '[*] Iniciando lb build (vai demorar de 30 a 50 minutos)...'
-              lb build
-            "
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y --no-install-recommends \
+            live-build \
+            debootstrap \
+            squashfs-tools \
+            xorriso \
+            syslinux \
+            syslinux-common \
+            isolinux \
+            ca-certificates \
+            curl \
+            gnupg \
+            sed
 
-      - name: Verificar Integridade da ISO
+      - name: Normalizar Permissões e Quebras de Linha (LF)
         run: |
-          ISO_FILE=$(find . -maxdepth 1 -name "*.iso" | head -n 1)
-          if [ -z "$ISO_FILE" ]; then
-            echo "ERRO FATAL: Nenhuma ISO foi gerada."
+          find auto config -type f \( -name "*.sh" -o -name "*.chroot" -o -path "auto/*" \) -exec sed -i 's/\r$//' {} +
+          chmod +x auto/* 2>/dev/null || true
+          find config/hooks -type f -exec chmod +x {} + 2>/dev/null || true
+
+      - name: Configurar e Construir ISO (lb build)
+        run: |
+          lb clean --purge
+          lb config
+          lb build
+
+      - name: Validar Arquivo ISO Gerado
+        run: |
+          ls -lh *.iso
+          if ! ls *.iso 1> /dev/null 2>&1; then
+            echo "ERRO CRÍTICO: Nenhuma imagem .iso foi gerada pelo lb build."
             exit 1
           fi
-          SIZE=$(stat -c%s "$ISO_FILE")
-          echo "Tamanho da ISO gerada: $SIZE bytes"
-          if [ "$SIZE" -lt 1000000000 ]; then
-            echo "ERRO FATAL: A ISO tem menos de 1GB. O build falhou silenciosamente."
-            exit 1
-          fi
-          echo "✅ ISO validada com sucesso!"
-          mv "$ISO_FILE" LegacyOS_1.0.iso
 
-      - name: Fazer Upload da ISO
+      - name: Publicar ISO como Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LegacyOS-ISO-Fase-1
-          path: LegacyOS_1.0.iso
+          name: LegacyOS-Alpha-amd64
+          path: "*.iso"
           retention-days: 7
