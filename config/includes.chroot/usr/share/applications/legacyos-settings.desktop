@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Configurações do LegacyOS
+GenericName=Configurações do Sistema
+Comment=Configurações de tela, energia, rede, teclado e aparência do LegacyOS
+Exec=xfce4-settings-manager
+Icon=/usr/share/pixmaps/legacyos-logo.svg
+Terminal=false
+StartupNotify=true
+NoDisplay=true
+Categories=System;Settings;
