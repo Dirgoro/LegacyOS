@@ -1,4 +1,62 @@
+# ==========================================
+# RELAÇÃO DE PACOTES BASE - LEGACYOS (DEBIAN 13)
+# ==========================================
+
+# 1. Sistema Base e Hardware
+linux-image-amd64
 live-boot
 live-config
-live-config-systemd
 systemd-sysv
+network-manager
+network-manager-gnome
+pipewire-audio
+pavucontrol
+upower
+ufw
+sudo
+curl
+wget
+gnupg
+
+# 2. Ambiente Gráfico (XFCE Minimalista)
+xfce4
+xfce4-panel
+xfce4-session
+xfce4-settings
+xfwm4
+xfdesktop4
+thunar
+thunar-archive-plugin
+thunar-volman
+xfce4-power-manager
+xfce4-notifyd
+xfce4-pulseaudio-plugin
+xfce4-whiskermenu-plugin
+
+# 3. Personalização e UI (Essenciais para o visual LegacyOS)
+plank
+xdotool
+gtk2-engines-murrine
+gnome-themes-extra
+
+# 4. Programas de Terceiros (Base do Usuário)
+firefox-esr
+vlc
+atril
+ristretto
+xarchiver
+mousepad
+gnome-calculator
+gnome-system-monitor
+
+# 5. Dependências para os Apps Nativos (Python/GTK3/Cairo)
+python3
+python3-gi
+python3-gi-cairo
+python3-psutil
+gir1.2-gtk-3.0
+gir1.2-glib-2.0
+gir1.2-notify-0.7
+gir1.2-pango-1.0
+libcairo2-dev
+libgirepository1.0-dev
