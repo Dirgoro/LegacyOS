@@ -1,21 +1,21 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE CONFIGURAÇÃO DO INSTALADOR GRÁFICO (CALAMARES)
-# Aplica identidade visual LegacyOS, ajusta janela para 1024x600 e cria atalho
+# LEGACYOS - HOOK DE PERSONALIZAÇÃO COMPLETA DO INSTALADOR (CALAMARES)
+# Gera banner central oficial, aplica tema escuro QSS e ajusta janela 800x520
 # ==============================================================================
 
 set -e
 
-echo "[LegacyOS Hook 0680] Configurando lançador e tema do instalador..."
+echo "[LegacyOS Hook 0680] Personalizando instalador gráfico LegacyOS..."
 
-# 1. Wrapper seguro com repasse de display gráfico para o Calamares
+# 1. Wrapper seguro com tema escuro Qt e repasse de display gráfico
 cat << 'EOF' > /usr/local/bin/legacyos-installer
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 export XAUTHORITY="${XAUTHORITY:-$HOME/.Xauthority}"
 
 if command -v calamares >/dev/null 2>&1; then
-    pkexec env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" /usr/bin/calamares
+    pkexec env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" QT_STYLE_OVERRIDE=Fusion /usr/bin/calamares
 fi
 EOF
 chmod 755 /usr/local/bin/legacyos-installer
@@ -36,7 +36,7 @@ Categories=System;Settings;
 EOF
 chmod 644 /usr/share/applications/legacyos-installer.desktop
 
-# Oculta o atalho genérico do Debian caso tenha sido criado
+# Oculta o atalho genérico do Debian
 if [ -f "/usr/share/applications/install-debian.desktop" ]; then
     if ! grep -q "NoDisplay=true" /usr/share/applications/install-debian.desktop; then
         echo "NoDisplay=true" >> /usr/share/applications/install-debian.desktop
@@ -48,13 +48,143 @@ mkdir -p /etc/skel/Desktop
 cp /usr/share/applications/legacyos-installer.desktop /etc/skel/Desktop/instalar-legacyos.desktop
 chmod 755 /etc/skel/Desktop/instalar-legacyos.desktop
 
-# 4. Personaliza a marca e dimensões do Calamares (compatível com 1024x600)
+# 4. Gera banner oficial de boas-vindas do Calamares (substitui o card azul do Debian)
+WELCOME_PNG="/usr/share/pixmaps/legacyos-calamares-welcome.png"
+python3 - "$WELCOME_PNG" << 'PYEOF'
+import os
+import sys
+import gi
+gi.require_version("GdkPixbuf", "2.0")
+gi.require_version("Gdk", "3.0")
+from gi.repository import GdkPixbuf, Gdk
+import cairo
+
+out_png = sys.argv[1]
+svg_path = "/usr/share/pixmaps/legacyos-logo.svg"
+
+W, H = 420, 175
+surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+ctx = cairo.Context(surface)
+
+# Fundo arredondado Dark Slate (#0B1120) com borda sutil
+r = 16
+ctx.new_sub_path()
+ctx.arc(W - r, r, r, -1.5708, 0)
+ctx.arc(W - r, H - r, r, 0, 1.5708)
+ctx.arc(r, H - r, r, 1.5708, 3.1416)
+ctx.arc(r, r, r, 3.1416, 4.7124)
+ctx.close_path()
+
+grad = cairo.LinearGradient(0, 0, W, H)
+grad.add_color_stop_rgb(0.0, 0.043, 0.067, 0.125)
+grad.add_color_stop_rgb(1.0, 0.086, 0.145, 0.255)
+ctx.set_source(grad)
+ctx.fill_preserve()
+
+ctx.set_source_rgba(0.055, 0.647, 0.914, 0.45)
+ctx.set_line_width(1.5)
+ctx.stroke()
+
+# Logotipo oficial à esquerda
+if os.path.isfile(svg_path):
+    try:
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(svg_path, 76, 76, True)
+        Gdk.cairo_set_source_pixbuf(ctx, pixbuf, 42, (H - 76) / 2.0)
+        ctx.paint()
+    except Exception:
+        pass
+
+# Marca e slogan à direita
+ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+ctx.set_font_size(28)
+ctx.set_source_rgb(0.973, 0.980, 0.988)
+ctx.move_to(138, 84)
+ctx.show_text("Legacy")
+
+ext_l = ctx.text_extents("Legacy")
+ctx.set_source_rgb(0.055, 0.647, 0.914)
+ctx.move_to(138 + ext_l.width + 2, 84)
+ctx.show_text("OS")
+
+ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+ctx.set_font_size(11)
+ctx.set_source_rgb(0.580, 0.639, 0.722)
+ctx.move_to(138, 108)
+ctx.show_text("Seu equipamento ganhando nova vida")
+
+surface.write_to_png(out_png)
+PYEOF
+
+# 5. Personaliza branding.desc e folha de estilo escura (stylesheet.qss) do Calamares
 for BRAND_DIR in /etc/calamares/branding/debian /usr/share/calamares/branding/debian; do
     if [ -d "$BRAND_DIR" ]; then
         if [ -f "/usr/share/plymouth/themes/legacyos/logo.png" ]; then
             cp /usr/share/plymouth/themes/legacyos/logo.png "$BRAND_DIR/logo.png" 2>/dev/null || true
             cp /usr/share/plymouth/themes/legacyos/logo.png "$BRAND_DIR/squid.png" 2>/dev/null || true
         fi
+
+        cp "$WELCOME_PNG" "$BRAND_DIR/welcome.png" 2>/dev/null || true
+
+        cat << 'EOF' > "$BRAND_DIR/stylesheet.qss"
+QWidget {
+    background-color: #111827;
+    color: #F8FAFC;
+    font-family: "Geist", "Inter", "Sans";
+    font-size: 10pt;
+}
+
+#sidebarApp, #sidebarMenuApp {
+    background-color: #0B1120;
+    color: #94A3B8;
+    border-right: 1px solid #1E293B;
+}
+
+QPushButton {
+    background-color: #1E293B;
+    color: #F8FAFC;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 6px 14px;
+    min-height: 24px;
+}
+
+QPushButton:hover {
+    background-color: #273549;
+    border-color: #0284C7;
+}
+
+QPushButton:default, QPushButton#nextButton {
+    background-color: #0284C7;
+    color: #FFFFFF;
+    border-color: #0284C7;
+    font-weight: bold;
+}
+
+QPushButton:default:hover, QPushButton#nextButton:hover {
+    background-color: #0369A1;
+}
+
+QComboBox, QLineEdit, QSpinBox, QTreeView, QListView {
+    background-color: #0B1120;
+    color: #F8FAFC;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+QProgressBar {
+    background-color: #1E293B;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    color: #F8FAFC;
+}
+
+QProgressBar::chunk {
+    background-color: #0284C7;
+    border-radius: 4px;
+}
+EOF
 
         if [ -f "$BRAND_DIR/branding.desc" ]; then
             python3 - "$BRAND_DIR/branding.desc" << 'PYEOF'
@@ -73,11 +203,16 @@ replacements = [
     (r'(versionedName:\s*).*', r'\1"LegacyOS 1.0 Alpha"'),
     (r'(shortVersionedName:\s*).*', r'\1"LegacyOS 1.0"'),
     (r'(bootloaderEntryName:\s*).*', r'\1"LegacyOS"'),
+    (r'(productUrl:\s*).*', r'\1"https://github.com"'),
+    (r'(supportUrl:\s*).*', r'\1"https://github.com"'),
+    (r'(knownIssuesUrl:\s*).*', r'\1"https://github.com"'),
+    (r'(releaseNotesUrl:\s*).*', r'\1"https://github.com"'),
     (r'(windowSize:\s*).*', r'\1"800px,520px"'),
     (r'(windowExpanding:\s*).*', r'\1"normal"'),
     (r'(sidebarBackground:\s*).*', r'\1"#0B1120"'),
-    (r'(sidebarText:\s*).*', r'\1"#F8FAFC"'),
-    (r'(sidebarTextCurrent:\s*).*', r'\1"#0284C7"'),
+    (r'(sidebarText:\s*).*', r'\1"#94A3B8"'),
+    (r'(sidebarTextCurrent:\s*).*', r'\1"#38BDF8"'),
+    (r'(sidebarBackgroundCurrent:\s*).*', r'\1"#1E293B"'),
 ]
 
 for pattern, repl in replacements:
@@ -90,5 +225,5 @@ PYEOF
     fi
 done
 
-echo "[LegacyOS Hook 0680] Instalador configurado com sucesso."
+echo "[LegacyOS Hook 0680] Instalador gráfico personalizado com sucesso."
 exit 0
