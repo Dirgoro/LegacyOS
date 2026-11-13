@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Espaço de trabalho
+GenericName=Terminal e Navegador
+Comment=Abra o terminal e o navegador lado a lado em uma única janela integrada
+Exec=/usr/local/bin/legacyos-workspace
+Icon=/usr/share/pixmaps/legacyos-workspace.svg
+Terminal=false
+StartupNotify=true
+Categories=System;Utility;Development;
