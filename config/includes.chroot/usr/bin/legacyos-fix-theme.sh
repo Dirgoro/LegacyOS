@@ -180,10 +180,14 @@ xfdesktop --reload 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
 # 6. CONFIGURAÇÃO E INICIALIZAÇÃO COMPLETA DA DOCK (PLANK)
-# Inclui a Grade de Aplicativos (legacyos-apps) como primeiro ícone da Dock
+# Ordem:
+#   1. Logo LegacyOS -> Configurações do Sistema (legacyos-settings.desktop)
+#   2. Grade de Aplicativos (legacyos-apps.desktop)
+#   3. Legacy Care Center (legacy-care-center.desktop)
+#   4. Demais aplicativos essenciais
 # ------------------------------------------------------------------------------
 CONFIG_DIR="$HOME/.config/legacyos"
-DOCK_FLAG="$CONFIG_DIR/.dock_initialized_v2"
+DOCK_FLAG="$CONFIG_DIR/.dock_initialized_v3"
 DOCK_DIR="$HOME/.config/plank/dock1/launchers"
 
 mkdir -p "$CONFIG_DIR" "$DOCK_DIR"
@@ -193,18 +197,21 @@ if [ ! -f "$DOCK_FLAG" ]; then
     sleep 0.4
     rm -f "$DOCK_DIR"/*.dockitem
 
+    IDX=1
     for APP in \
+        legacyos-settings.desktop \
         legacyos-apps.desktop \
         legacy-care-center.desktop \
         brave-browser.desktop \
         firefox-esr.desktop \
         onlyoffice-desktopeditors.desktop \
         thunar.desktop \
-        xfce4-terminal.desktop \
-        xfce-settings-manager.desktop; do
+        xfce4-terminal.desktop; do
         if [ -f "/usr/share/applications/${APP}" ]; then
-            echo "[PlankDockItemPreferences]" > "${DOCK_DIR}/${APP%.desktop}.dockitem"
-            echo "Launcher=file:///usr/share/applications/${APP}" >> "${DOCK_DIR}/${APP%.desktop}.dockitem"
+            PREFIX=$(printf "%02d" "$IDX")
+            echo "[PlankDockItemPreferences]" > "${DOCK_DIR}/${PREFIX}-${APP%.desktop}.dockitem"
+            echo "Launcher=file:///usr/share/applications/${APP}" >> "${DOCK_DIR}/${PREFIX}-${APP%.desktop}.dockitem"
+            IDX=$((IDX + 1))
         fi
     done
 
