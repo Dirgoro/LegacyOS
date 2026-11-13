@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - SCRIPT DE ESTABILIZAÇÃO VISUAL E ADAPTATIVA (FASE 2)
-# Adapta automaticamente painel, dock, menus e janelas para telas 1024x600+
+# Aplica símbolo oficial na barra superior, tema escuro e modo 1024x600+
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
@@ -51,7 +51,7 @@ xfconf-query -c xfwm4 -p /general/snap_to_border -n -t bool -s true
 xfconf-query -c xfwm4 -p /general/tile_on_move -n -t bool -s true
 
 # ------------------------------------------------------------------------------
-# 2. CONSTRUÇÃO DA BARRA SUPERIOR (LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
+# 2. CONSTRUÇÃO DA BARRA SUPERIOR (SÍMBOLO LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
 # ------------------------------------------------------------------------------
 pkill -x xfce4-panel 2>/dev/null || true
 sleep 0.5
@@ -68,12 +68,12 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/background-style -n -t uint -s 1
 xfconf-query -c xfce4-panel -p /panels/panel-1/background-rgba -n \
     -t double -s 0.043 -t double -s 0.067 -t double -s 0.125 -t double -s 0.94
 
-# Plugin 1: Menu Principal (Whisker Menu com dimensões adaptativas)
+# Plugin 1: Menu Principal (Símbolo oficial LegacyOS no canto superior esquerdo)
 xfconf-query -c xfce4-panel -p /plugins/plugin-1 -n -t string -s "whiskermenu"
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-title -n -t string -s "LegacyOS"
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/show-button-title -n -t bool -s true
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/show-button-icon -n -t bool -s true
-xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-icon -n -t string -s "distributor-logo"
+xfconf-query -c xfce4-panel -p /plugins/plugin-1/button-icon -n -t string -s "/usr/share/pixmaps/legacyos-logo.svg"
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/menu-width -n -t int -s "$WHISKER_WIDTH"
 xfconf-query -c xfce4-panel -p /plugins/plugin-1/menu-height -n -t int -s "$WHISKER_HEIGHT"
 
