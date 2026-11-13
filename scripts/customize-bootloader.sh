@@ -1,13 +1,23 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - PERSONALIZAÇÃO DO BOOTLOADER (SYSLINUX / ISOLINUX / GRUB)
-# Gera splash screen 640x480 e configura 3 opções de boot com tema Dark Slate
+# LEGACYOS - PERSONALIZAÇÃO COMPLETA DO BOOTLOADER (SYSLINUX / ISOLINUX / GRUB)
+# Copia os templates oficiais do live-build para config/bootloaders e aplica
+# fundo Dark Slate (#0B1120), logotipo LegacyOS e as 3 opções de boot
 # ==============================================================================
 
 set -e
 
-echo "[LegacyOS Bootloader] Gerando imagem de fundo do menu de boot (640x480)..."
+echo "[LegacyOS Bootloader] Preparando templates em config/bootloaders..."
+mkdir -p config/bootloaders
 
+# Copia templates base do sistema caso ainda não existam no projeto
+for SUB in isolinux syslinux grub-pc grub-efi; do
+    if [ ! -d "config/bootloaders/$SUB" ] && [ -d "/usr/share/live/build/bootloaders/$SUB" ]; then
+        cp -r "/usr/share/live/build/bootloaders/$SUB" "config/bootloaders/$SUB"
+    fi
+done
+
+echo "[LegacyOS Bootloader] Gerando splash screen 640x480..."
 SPLASH_PNG="/tmp/legacyos-boot-splash.png"
 SVG_LOGO="config/includes.chroot/usr/share/pixmaps/legacyos-logo.svg"
 
@@ -16,7 +26,8 @@ import os
 import sys
 import gi
 gi.require_version("GdkPixbuf", "2.0")
-from gi.repository import GdkPixbuf
+gi.require_version("Gdk", "3.0")
+from gi.repository import GdkPixbuf, Gdk
 import cairo
 
 svg_path = sys.argv[1]
@@ -31,8 +42,8 @@ ctx.set_source_rgb(0.043, 0.067, 0.125)
 ctx.rectangle(0, 0, W, H)
 ctx.fill()
 
-radial = cairo.RadialGradient(W / 2.0, 95, 10, W / 2.0, 95, 340)
-radial.add_color_stop_rgba(0.0, 0.008, 0.518, 0.780, 0.22)
+radial = cairo.RadialGradient(W / 2.0, 90, 10, W / 2.0, 90, 340)
+radial.add_color_stop_rgba(0.0, 0.008, 0.518, 0.780, 0.24)
 radial.add_color_stop_rgba(1.0, 0.043, 0.067, 0.125, 0.0)
 ctx.set_source(radial)
 ctx.rectangle(0, 0, W, H)
@@ -41,9 +52,8 @@ ctx.fill()
 # Logotipo oficial no topo central
 if os.path.isfile(svg_path):
     try:
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(svg_path, 64, 64, True)
-        from gi.repository import Gdk
-        Gdk.cairo_set_source_pixbuf(ctx, pixbuf, (W - 64) / 2.0, 34)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(svg_path, 66, 66, True)
+        Gdk.cairo_set_source_pixbuf(ctx, pixbuf, (W - 66) / 2.0, 30)
         ctx.paint()
     except Exception:
         pass
@@ -57,11 +67,11 @@ e2 = ctx.text_extents(t2)
 start_x = (W - (e1.width + e2.width + 2)) / 2.0
 
 ctx.set_source_rgb(0.973, 0.980, 0.988)
-ctx.move_to(start_x, 124)
+ctx.move_to(start_x, 122)
 ctx.show_text(t1)
 
 ctx.set_source_rgb(0.055, 0.647, 0.914)
-ctx.move_to(start_x + e1.width + 2, 124)
+ctx.move_to(start_x + e1.width + 2, 122)
 ctx.show_text(t2)
 
 # Subtítulo discreto no rodapé
@@ -132,7 +142,7 @@ EOF
 done
 
 # ------------------------------------------------------------------------------
-# Aplica tema e entradas de boot no GRUB (UEFI / Hybrid) se presente
+# Aplica tema e entradas de boot no GRUB (UEFI / Hybrid)
 # ------------------------------------------------------------------------------
 for GDIR in config/bootloaders/grub-pc config/bootloaders/grub-efi; do
     if [ -d "$GDIR" ]; then
