@@ -24,7 +24,11 @@ polkitd
 pkexec
 mate-polkit
 
-# 2. Ambiente Gráfico (XFCE Minimalista)
+# 2. Instalador Gráfico do Sistema (Calamares)
+calamares
+calamares-settings-debian
+
+# 3. Ambiente Gráfico (XFCE Minimalista)
 xfce4
 xfce4-panel
 xfce4-session
@@ -39,7 +43,7 @@ xfce4-notifyd
 xfce4-pulseaudio-plugin
 xfce4-whiskermenu-plugin
 
-# 3. Personalização, Ícones e UI (Visual LegacyOS)
+# 4. Personalização, Ícones e UI (Visual LegacyOS)
 plank
 xdotool
 gtk2-engines-murrine
@@ -47,7 +51,7 @@ gnome-themes-extra
 papirus-icon-theme
 librsvg2-common
 
-# 4. Programas de Terceiros e Utilitários Leves (0 MB em segundo plano)
+# 5. Programas de Terceiros e Utilitários Leves (0 MB em segundo plano)
 firefox-esr
 vlc
 atril
@@ -63,12 +67,12 @@ xfce4-screenshooter
 synaptic
 gdebi
 
-# 5. Compatibilidade de Fontes (Office) e Codecs Multimídia
+# 6. Compatibilidade de Fontes (Office) e Codecs Multimídia
 fonts-crosextra-carlito
 fonts-crosextra-caladea
 libavcodec-extra
 
-# 6. Dependências para os Apps Nativos (Python/GTK3/Cairo)
+# 7. Dependências para os Apps Nativos (Python/GTK3/Cairo)
 python3
 python3-gi
 python3-gi-cairo
