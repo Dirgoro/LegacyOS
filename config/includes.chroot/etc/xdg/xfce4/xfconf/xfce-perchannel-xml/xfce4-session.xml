@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-session" version="1.0">
+  <property name="general" type="empty">
+    <property name="FailsafeSessionName" type="string" value="LegacyOS"/>
+  </property>
+  <property name="sessions" type="empty">
+    <property name="Failsafe" type="empty">
+      <property name="IsFailsafe" type="bool" value="true"/>
+      <property name="Count" type="int" value="1"/>
+      <property name="Client0_Command" type="array">
+        <value type="string" value="sh"/>
+        <value type="string" value="-c"/>
+        <value type="string" value="sleep 5 && /usr/bin/legacyos-fix-theme.sh"/>
+      </property>
+    </property>
+  </property>
+</channel>
