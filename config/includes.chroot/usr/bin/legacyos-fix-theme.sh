@@ -150,24 +150,36 @@ fi
 # ------------------------------------------------------------------------------
 # 5. ÍCONE DE INSTALAÇÃO NA ÁREA DE TRABALHO (APENAS LEGACYOS EM MODO LIVE)
 # ------------------------------------------------------------------------------
-DESKTOP_DIR="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
-mkdir -p "$DESKTOP_DIR"
+xdg-user-dirs-update 2>/dev/null || true
+XDG_DESKTOP="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
+mkdir -p "$HOME/Desktop" "$XDG_DESKTOP"
 
-# Remove qualquer atalho genérico "Install Debian" criado pelo calamares-settings-debian
-rm -f "$DESKTOP_DIR"/*debian*.desktop "$DESKTOP_DIR"/calamares.desktop
+# Garante que os 3 ícones padrão da área de trabalho estejam visíveis
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-home -n -t bool -s true
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-filesystem -n -t bool -s true
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-trash -n -t bool -s true
 
-if grep -q "boot=live" /proc/cmdline; then
-    INSTALL_SRC="/usr/share/applications/legacyos-installer.desktop"
-    INSTALL_DST="$DESKTOP_DIR/instalar-legacyos.desktop"
-    if [ -f "$INSTALL_SRC" ]; then
-        cp "$INSTALL_SRC" "$INSTALL_DST"
-        chmod 755 "$INSTALL_DST"
-        CHECKSUM=$(sha256sum "$INSTALL_DST" | awk '{print $1}')
-        gio set "$INSTALL_DST" metadata::xfce-exe-checksum "$CHECKSUM" 2>/dev/null || true
+for TARGET_DIR in "$HOME/Desktop" "$XDG_DESKTOP"; do
+    [ -d "$TARGET_DIR" ] || continue
+
+    # Remove qualquer atalho genérico do Debian
+    rm -f "$TARGET_DIR"/*debian*.desktop "$TARGET_DIR"/calamares.desktop
+
+    if grep -q "boot=live" /proc/cmdline; then
+        INSTALL_SRC="/usr/share/applications/legacyos-installer.desktop"
+        INSTALL_DST="$TARGET_DIR/instalar-legacyos.desktop"
+        if [ -f "$INSTALL_SRC" ]; then
+            cp "$INSTALL_SRC" "$INSTALL_DST"
+            chmod 755 "$INSTALL_DST"
+            CHECKSUM=$(sha256sum "$INSTALL_DST" | awk '{print $1}')
+            gio set "$INSTALL_DST" metadata::xfce-exe-checksum "$CHECKSUM" 2>/dev/null || true
+        fi
+    else
+        rm -f "$TARGET_DIR/instalar-legacyos.desktop"
     fi
-else
-    rm -f "$DESKTOP_DIR/instalar-legacyos.desktop"
-fi
+done
+
+xfdesktop --reload 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
 # 6. CONFIGURAÇÃO E INICIALIZAÇÃO COMPLETA DA DOCK (PLANK)
