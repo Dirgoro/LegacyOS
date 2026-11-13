@@ -5,7 +5,7 @@ on:
   # push:
   #   branches:
   #     - Fase-4-Refinamento
-  #     - "Fase 1 Gemini"
+  #     - "Fase-1---Gemini"
 
 jobs:
   build-iso:
@@ -33,18 +33,30 @@ jobs:
             ca-certificates \
             curl \
             gnupg \
-            sed
+            sed \
+            python3 \
+            python3-gi \
+            python3-gi-cairo \
+            gir1.2-gdkpixbuf-2.0 \
+            librsvg2-common
 
       - name: Normalizar Permissões e Quebras de Linha (LF)
         run: |
-          find auto config -type f \( -name "*.sh" -o -name "*.chroot" -o -path "auto/*" \) -exec sed -i 's/\r$//' {} +
+          find auto config scripts -type f \( -name "*.sh" -o -name "*.chroot" -o -path "auto/*" \) -exec sed -i 's/\r$//' {} + 2>/dev/null || true
           chmod +x auto/* 2>/dev/null || true
+          chmod +x scripts/*.sh 2>/dev/null || true
           find config/hooks -type f -exec chmod +x {} + 2>/dev/null || true
 
-      - name: Configurar e Construir ISO (lb build)
+      - name: Configurar e Personalizar Bootloader (lb config)
         run: |
           lb clean --purge
           lb config
+          if [ -x "./scripts/customize-bootloader.sh" ]; then
+            ./scripts/customize-bootloader.sh
+          fi
+
+      - name: Construir ISO (lb build)
+        run: |
           lb build
 
       - name: Validar Arquivo ISO Gerado
