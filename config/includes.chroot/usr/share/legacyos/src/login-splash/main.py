@@ -23,8 +23,8 @@ LOGO_PATH = "/usr/share/pixmaps/legacyos-logo.svg"
 FLAG_DIR = os.path.expanduser("~/.config/legacyos")
 FIRST_LOGIN_FLAG = os.path.join(FLAG_DIR, ".first_login_done")
 
-MIN_DISPLAY_SECONDS = 2.8
-MAX_TIMEOUT_SECONDS = 10.0
+MIN_DISPLAY_SECONDS = 4.2
+MAX_TIMEOUT_SECONDS = 14.0
 
 
 def resolve_boot_messages():
@@ -54,7 +54,6 @@ class LegacyLoginSplash(Gtk.Window):
 
         self.primary_msg, self.secondary_msg = resolve_boot_messages()
         self.start_time = time.monotonic()
-        self.spinner_angle = 0.0
         self.progress_value = 0.08
         self.fading_out = False
         self.opacity_level = 1.0
@@ -73,7 +72,6 @@ class LegacyLoginSplash(Gtk.Window):
             self.set_visual(visual)
         self.set_app_paintable(True)
 
-        # Detecta resolução do monitor primário (suporte nativo a 1024x600+)
         display = Gdk.Display.get_default()
         monitor = display.get_primary_monitor() if display else None
         if monitor:
@@ -88,7 +86,6 @@ class LegacyLoginSplash(Gtk.Window):
         self.set_default_size(self.screen_w, self.screen_h)
         self.fullscreen()
 
-        # Carrega o logotipo vetorial com escala proporcional à tela
         self.is_compact = self.screen_h <= 650
         logo_size = 92 if self.is_compact else 118
         self.logo_pixbuf = None
@@ -104,18 +101,15 @@ class LegacyLoginSplash(Gtk.Window):
         self.drawing_area.connect("draw", self.on_draw)
         self.add(self.drawing_area)
 
-        # Loop de animação (30 FPS) e verificação de conclusão do desktop
         GLib.timeout_add(33, self.on_tick)
 
     def _draw_fallback_logo(self, ctx, cx, cy, size):
-        """Desenho vetorial de reserva caso o SVG não esteja acessível."""
         half = size / 2.0
         x0 = cx - half + 10
         y0 = cy - half + 8
         w = size - 20
         h = size - 16
 
-        # Haste vertical azul
         ctx.save()
         grad_v = cairo.LinearGradient(x0, y0, x0, y0 + h)
         grad_v.add_color_stop_rgb(0.0, 0.22, 0.74, 0.97)
@@ -124,7 +118,6 @@ class LegacyLoginSplash(Gtk.Window):
         ctx.rectangle(x0, y0, w * 0.34, h)
         ctx.fill()
 
-        # Base horizontal clara
         grad_h = cairo.LinearGradient(x0, y0 + h, x0 + w, y0 + h)
         grad_h.add_color_stop_rgb(0.0, 0.58, 0.64, 0.72)
         grad_h.add_color_stop_rgb(1.0, 0.97, 0.98, 0.99)
@@ -174,11 +167,11 @@ class LegacyLoginSplash(Gtk.Window):
         total_brand_w = ext_legacy.width + ext_os.width + 2
         start_brand_x = cx - total_brand_w / 2.0
 
-        ctx.set_source_rgb(0.973, 0.980, 0.988)  # #F8FAFC
+        ctx.set_source_rgb(0.973, 0.980, 0.988)
         ctx.move_to(start_brand_x, brand_y)
         ctx.show_text(legacy_text)
 
-        ctx.set_source_rgb(0.055, 0.647, 0.914)  # #0EA5E9
+        ctx.set_source_rgb(0.055, 0.647, 0.914)
         ctx.move_to(start_brand_x + ext_legacy.width + 2, brand_y)
         ctx.show_text(os_text)
 
@@ -189,12 +182,10 @@ class LegacyLoginSplash(Gtk.Window):
         bar_y = brand_y + (24 if self.is_compact else 30)
         radius = bar_h / 2.0
 
-        # Trilha da barra
         ctx.set_source_rgba(1.0, 1.0, 1.0, 0.12)
         self._rounded_rect(ctx, bar_x, bar_y, bar_w, bar_h, radius)
         ctx.fill()
 
-        # Preenchimento azul ativo
         fill_w = max(16.0, bar_w * min(1.0, self.progress_value))
         grad_bar = cairo.LinearGradient(bar_x, bar_y, bar_x + fill_w, bar_y)
         grad_bar.add_color_stop_rgb(0.0, 0.008, 0.518, 0.780)
@@ -203,12 +194,12 @@ class LegacyLoginSplash(Gtk.Window):
         self._rounded_rect(ctx, bar_x, bar_y, fill_w, bar_h, radius)
         ctx.fill()
 
-        # 5. Frase principal dinâmica (1º login vs logins seguintes)
+        # 5. Frase principal dinâmica
         msg_y = bar_y + (32 if self.is_compact else 38)
         ctx.select_font_face("Geist", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
         ctx.set_font_size(14 if self.is_compact else 16)
         ext_msg = ctx.text_extents(self.primary_msg)
-        ctx.set_source_rgb(0.945, 0.961, 0.976)  # #F1F5F9
+        ctx.set_source_rgb(0.945, 0.961, 0.976)
         ctx.move_to(cx - ext_msg.width / 2.0, msg_y)
         ctx.show_text(self.primary_msg)
 
@@ -217,7 +208,7 @@ class LegacyLoginSplash(Gtk.Window):
         ctx.select_font_face("Geist", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
         ctx.set_font_size(11 if self.is_compact else 12)
         ext_sub = ctx.text_extents(self.secondary_msg)
-        ctx.set_source_rgb(0.580, 0.639, 0.722)  # #94A3B8
+        ctx.set_source_rgb(0.580, 0.639, 0.722)
         ctx.move_to(cx - ext_sub.width / 2.0, sub_y)
         ctx.show_text(self.secondary_msg)
 
@@ -233,17 +224,19 @@ class LegacyLoginSplash(Gtk.Window):
         ctx.close_path()
 
     def on_tick(self):
+        # Mantém a janela no topo caso o painel ou a dock recém-iniciados tentem sobrepor
+        if not self.fading_out:
+            self.present()
+
         elapsed = time.monotonic() - self.start_time
         lock_exists = os.path.exists(LOCK_FILE)
 
-        # Avança a barra suavemente até 92% enquanto aguarda o script concluir
         if lock_exists and elapsed < MAX_TIMEOUT_SECONDS:
-            target = min(0.92, 0.12 + (elapsed / 4.2) * 0.80)
+            target = min(0.92, 0.12 + (elapsed / 5.5) * 0.80)
             self.progress_value += (target - self.progress_value) * 0.15
             self.drawing_area.queue_draw()
             return True
 
-        # Completa 100% da barra antes de iniciar o fade-out
         self.progress_value += (1.0 - self.progress_value) * 0.35
 
         if elapsed >= MIN_DISPLAY_SECONDS and self.progress_value >= 0.98:
