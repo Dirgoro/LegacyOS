@@ -135,7 +135,7 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -n \
 nohup xfce4-panel >/dev/null 2>&1 &
 
 # ------------------------------------------------------------------------------
-# 4. APLICAÇÃO DO PAPEL DE PAREDE OFICIAL
+# 4. PAPEL DE PAREDE E APARÊNCIA/COMPORTAMENTO DOS ÍCONES DA ÁREA DE TRABALHO
 # ------------------------------------------------------------------------------
 WALLPAPER="/usr/share/backgrounds/legacyos-wallpaper.jpg"
 
@@ -151,6 +151,25 @@ if [ -f "$WALLPAPER" ]; then
     done
 fi
 
+# Aparência e Comportamento Padrão dos Ícones da Área de Trabalho (32px / Fonte 8)
+xfconf-query -c xfce4-desktop -p /desktop-icons/style -n -t int -s 2
+xfconf-query -c xfce4-desktop -p /desktop-icons/icon-size -n -t uint -s 32
+xfconf-query -c xfce4-desktop -p /desktop-icons/use-custom-font-size -n -t bool -s true
+xfconf-query -c xfce4-desktop -p /desktop-icons/font-size -n -t double -s 8.0
+xfconf-query -c xfce4-desktop -p /desktop-icons/use-custom-label-color -n -t bool -s false
+xfconf-query -c xfce4-desktop -p /desktop-icons/use-custom-label-background-color -n -t bool -s false
+xfconf-query -c xfce4-desktop -p /desktop-icons/show-tooltips -n -t bool -s true
+xfconf-query -c xfce4-desktop -p /desktop-icons/tooltip-size -n -t double -s 64.0
+xfconf-query -c xfce4-desktop -p /desktop-icons/gravity -n -t int -s 0
+xfconf-query -c xfce4-desktop -p /desktop-icons/primary -n -t bool -s false
+xfconf-query -c xfce4-desktop -p /desktop-icons/single-click -n -t bool -s true
+xfconf-query -c xfce4-desktop -p /desktop-icons/single-click-underline -n -t bool -s false
+xfconf-query -c xfce4-desktop -p /desktop-icons/confirm-sorting -n -t bool -s true
+
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-home -n -t bool -s true
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-filesystem -n -t bool -s true
+xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-trash -n -t bool -s true
+
 if ! pgrep -x xfdesktop >/dev/null; then
     nohup xfdesktop >/dev/null 2>&1 &
     sleep 1.0
@@ -164,10 +183,6 @@ fi
 xdg-user-dirs-update 2>/dev/null || true
 XDG_DESKTOP="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
 mkdir -p "$HOME/Desktop" "$XDG_DESKTOP"
-
-xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-home -n -t bool -s true
-xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-filesystem -n -t bool -s true
-xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-trash -n -t bool -s true
 
 for TARGET_DIR in "$HOME/Desktop" "$XDG_DESKTOP"; do
     [ -d "$TARGET_DIR" ] || continue
@@ -258,7 +273,6 @@ for i in $(seq 1 15); do
     sleep 0.3
 done
 
-# Aguarda renderização completa do wallpaper e ícones antes de revelar o desktop
 sleep 2.2
 rm -f "$LOCK_FILE"
 
