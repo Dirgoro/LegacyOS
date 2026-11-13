@@ -1,0 +1,59 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS - HOOK DE INSTALAÇÃO DE APLICATIVOS DE TERCEIROS (DEBIAN 13 / TRIXIE)
+# Instala Brave Browser e OnlyOffice Desktop Editors com chaves GPG modernas
+# ==============================================================================
+
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+
+echo "[LegacyOS Hook 0700] Preparando dependências de repositório e certificados..."
+apt-get update -qq
+apt-get install -y --no-install-recommends ca-certificates curl gnupg
+
+mkdir -p /usr/share/keyrings
+mkdir -p /etc/apt/sources.list.d
+
+# ------------------------------------------------------------------------------
+# 1. BRAVE BROWSER (Chave binária oficial + Repositório estável)
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0700] Configurando repositório do Brave Browser..."
+curl -fsSL https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg \
+    -o /usr/share/keyrings/brave-browser-archive-keyring.gpg
+chmod 644 /usr/share/keyrings/brave-browser-archive-keyring.gpg
+
+cat << 'EOF' > /etc/apt/sources.list.d/brave-browser-release.list
+deb [arch=amd64 signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main
+EOF
+
+# ------------------------------------------------------------------------------
+# 2. ONLYOFFICE DESKTOP EDITORS (Chave HTTPS + Repositório oficial Debian)
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0700] Configurando repositório do OnlyOffice..."
+rm -f /usr/share/keyrings/onlyoffice.gpg
+curl -fsSL https://download.onlyoffice.com/GPG-KEY-ONLYOFFICE \
+    | gpg --dearmor -o /usr/share/keyrings/onlyoffice.gpg
+chmod 644 /usr/share/keyrings/onlyoffice.gpg
+
+cat << 'EOF' > /etc/apt/sources.list.d/onlyoffice.list
+deb [arch=amd64 signed-by=/usr/share/keyrings/onlyoffice.gpg] https://download.onlyoffice.com/repo/debian squeeze main
+EOF
+
+# ------------------------------------------------------------------------------
+# 3. ATUALIZAÇÃO E INSTALAÇÃO NÃO-INTERATIVA
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0700] Instalando Brave Browser e OnlyOffice Desktop Editors..."
+apt-get update -qq
+apt-get install -y --no-install-recommends \
+    brave-browser \
+    onlyoffice-desktopeditors
+
+# ------------------------------------------------------------------------------
+# 4. LIMPEZA DE CACHE TEMPORÁRIO
+# ------------------------------------------------------------------------------
+apt-get clean
+rm -rf /tmp/* /var/tmp/*
+
+echo "[LegacyOS Hook 0700] Brave Browser e OnlyOffice instalados com sucesso."
+exit 0
