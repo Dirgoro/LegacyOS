@@ -1,16 +1,17 @@
 /* ==========================================================================
-   LEGACYOS OFFICIAL GTK 3.24 STYLESHEET (100% DARK SLATE + COMPACTO 1024x600)
-   Paleta: Dark Slate (#0B1120 / #111827 / #1E293B) + Accent Blue (#0284C7)
+   LEGACYOS OFFICIAL GTK 3.24 STYLESHEET (ESTILO EXPLORADOR DE ARQUIVOS)
+   Paleta: #0F141C (Sidebar/Top) | #141A23 (Canvas) | #19212D (Cards) | #137FEC (Accent)
    ========================================================================== */
 
-@define-color bg_dark #0B1120;
-@define-color bg_surface #111827;
-@define-color bg_elevated #1E293B;
-@define-color bg_hover #273549;
-@define-color border_subtle rgba(255, 255, 255, 0.09);
-@define-color border_focus #0284C7;
-@define-color accent_primary #0284C7;
-@define-color accent_hover #0369A1;
+@define-color bg_dark #0F141C;
+@define-color bg_surface #141A23;
+@define-color bg_elevated #19212D;
+@define-color bg_hover #202A39;
+@define-color border_subtle rgba(255, 255, 255, 0.07);
+@define-color border_card rgba(255, 255, 255, 0.09);
+@define-color accent_primary #137FEC;
+@define-color accent_hover #1D8BF8;
+@define-color accent_deep #0B66C3;
 @define-color text_primary #F8FAFC;
 @define-color text_secondary #94A3B8;
 @define-color text_muted #64748B;
@@ -24,7 +25,7 @@
 * {
     -GtkScrollbar-has-backward-stepper: false;
     -GtkScrollbar-has-forward-stepper: false;
-    outline-color: alpha(@accent_primary, 0.5);
+    outline-color: alpha(@accent_primary, 0.45);
     outline-offset: -2px;
     outline-style: dashed;
     outline-width: 1px;
@@ -43,13 +44,13 @@ assistant,
 
 window.csd,
 dialog.csd {
-    border-radius: 10px;
-    border: 1px solid @border_subtle;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    border-radius: 12px;
+    border: 1px solid @border_card;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.60);
 }
 
 /* --------------------------------------------------------------------------
-   2. HEADERBARS E BARRAS DE FERRAMENTAS (ALTURA COMPACTA)
+   2. HEADERBARS, MENUBARS E TOOLBARS (TOPO #0F141C)
    -------------------------------------------------------------------------- */
 headerbar,
 .titlebar {
@@ -57,13 +58,13 @@ headerbar,
     background-image: none;
     color: @text_primary;
     border-bottom: 1px solid @border_subtle;
-    min-height: 28px;
-    padding: 2px 8px;
+    min-height: 32px;
+    padding: 3px 10px;
 }
 
 headerbar:backdrop,
 .titlebar:backdrop {
-    background-color: #090E1A;
+    background-color: #0B0F16;
     color: @text_secondary;
 }
 
@@ -77,14 +78,14 @@ headerbar .subtitle {
     color: @text_secondary;
 }
 
+menubar,
 toolbar,
 .primary-toolbar,
-menubar,
 infobar {
-    background-color: @bg_dark;
+    background-color: @bg_surface;
     color: @text_primary;
     border-bottom: 1px solid @border_subtle;
-    padding: 2px 4px;
+    padding: 4px 8px;
 }
 
 /* --------------------------------------------------------------------------
@@ -92,7 +93,7 @@ infobar {
    -------------------------------------------------------------------------- */
 .xfce4-panel,
 .xfce4-panel.background {
-    background-color: rgba(11, 17, 32, 0.92);
+    background-color: rgba(15, 20, 28, 0.94);
     color: @text_primary;
     border-bottom: 1px solid @border_subtle;
     font-weight: 500;
@@ -113,14 +114,14 @@ infobar {
     background-color: transparent;
     background-image: none;
     border: none;
-    border-radius: 6px;
-    padding: 1px 7px;
+    border-radius: 8px;
+    padding: 2px 8px;
     margin: 1px;
     box-shadow: none;
 }
 
 .xfce4-panel button:hover {
-    background-color: rgba(255, 255, 255, 0.10);
+    background-color: @bg_elevated;
     color: #FFFFFF;
 }
 
@@ -134,18 +135,18 @@ infobar {
    4. WHISKER MENU (MENU DE APLICATIVOS LEGACYOS)
    -------------------------------------------------------------------------- */
 #whiskermenu-window {
-    background-color: rgba(15, 23, 42, 0.96);
+    background-color: rgba(15, 20, 28, 0.97);
     color: @text_primary;
-    border: 1px solid @border_subtle;
-    border-radius: 10px;
+    border: 1px solid @border_card;
+    border-radius: 12px;
 }
 
 #whiskermenu-window entry {
     background-color: @bg_elevated;
     color: @text_primary;
-    border: 1px solid @border_subtle;
-    border-radius: 8px;
-    padding: 4px 8px;
+    border: 1px solid @border_card;
+    border-radius: 10px;
+    padding: 5px 10px;
 }
 
 #whiskermenu-window entry:focus {
@@ -155,32 +156,37 @@ infobar {
 #whiskermenu-window treeview {
     background-color: transparent;
     color: @text_primary;
-    padding: 2px;
+    padding: 3px;
 }
 
 #whiskermenu-window treeview:hover {
-    background-color: @bg_hover;
-    border-radius: 6px;
+    background-color: @bg_elevated;
+    border-radius: 8px;
 }
 
 #whiskermenu-window treeview:selected {
-    background-color: @accent_primary;
+    background-image: linear-gradient(to right, @accent_primary, @accent_deep);
     color: #FFFFFF;
-    border-radius: 6px;
+    border-radius: 8px;
 }
 
 #whiskermenu-window button {
     background-color: transparent;
     color: @text_secondary;
     border: none;
-    border-radius: 6px;
-    padding: 4px 8px;
+    border-radius: 8px;
+    padding: 5px 10px;
 }
 
-#whiskermenu-window button:hover,
+#whiskermenu-window button:hover {
+    background-color: @bg_elevated;
+    color: @text_primary;
+}
+
 #whiskermenu-window button:checked {
-    background-color: @accent_primary;
+    background-image: linear-gradient(to right, @accent_primary, @accent_deep);
     color: #FFFFFF;
+    font-weight: 600;
 }
 
 /* --------------------------------------------------------------------------
@@ -191,18 +197,18 @@ menu,
 .context-menu,
 popover,
 popover.background {
-    background-color: @bg_surface;
+    background-color: @bg_elevated;
     color: @text_primary;
-    border: 1px solid @border_subtle;
-    border-radius: 8px;
-    padding: 4px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid @border_card;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
 }
 
 menuitem {
     color: @text_primary;
-    border-radius: 6px;
-    padding: 4px 10px;
+    border-radius: 7px;
+    padding: 5px 10px;
 }
 
 menuitem:hover {
@@ -218,49 +224,49 @@ separator {
     background-color: @border_subtle;
     min-height: 1px;
     min-width: 1px;
-    margin: 2px 0;
+    margin: 3px 0;
 }
 
 /* --------------------------------------------------------------------------
-   6. BOTÕES, CAMPOS DE TEXTO E CONTROLES (OTIMIZADO PARA 1024x600)
+   6. BOTÕES, CAMPOS DE TEXTO E BARRAS DE NAVEGAÇÃO (ESTILO ARQUIVOS)
    -------------------------------------------------------------------------- */
 button {
     background-color: @bg_elevated;
     background-image: none;
     color: @text_primary;
-    border: 1px solid @border_subtle;
-    border-radius: 7px;
-    padding: 3px 9px;
-    min-height: 20px;
+    border: 1px solid @border_card;
+    border-radius: 9px;
+    padding: 4px 11px;
+    min-height: 22px;
     box-shadow: none;
 }
 
 button:hover {
     background-color: @bg_hover;
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.16);
 }
 
 button:active,
 button:checked {
-    background-color: @accent_primary;
+    background-image: linear-gradient(to bottom, @accent_primary, @accent_deep);
     color: #FFFFFF;
     border-color: @accent_primary;
 }
 
 button:disabled {
-    background-color: rgba(30, 41, 59, 0.45);
+    background-color: rgba(25, 33, 45, 0.45);
     color: @text_muted;
 }
 
 button.suggested-action {
-    background-color: @accent_primary;
+    background-image: linear-gradient(to bottom, @accent_primary, @accent_deep);
     color: #FFFFFF;
     border-color: @accent_primary;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 button.suggested-action:hover {
-    background-color: @accent_hover;
+    background-image: linear-gradient(to bottom, @accent_hover, @accent_primary);
 }
 
 button.destructive-action {
@@ -269,21 +275,44 @@ button.destructive-action {
     border-color: @status_danger;
 }
 
+/* Botões unidos (Voltar/Avançar e Barra de Caminho do Thunar) */
+.linked > button,
+.path-bar button {
+    background-color: @bg_elevated;
+    border: 1px solid @border_card;
+    color: @text_secondary;
+}
+
+.linked > button:hover,
+.path-bar button:hover {
+    background-color: @bg_hover;
+    color: @text_primary;
+}
+
+.linked > button:checked,
+.path-bar button:checked {
+    background-color: @accent_primary;
+    color: #FFFFFF;
+    border-color: @accent_primary;
+    font-weight: 700;
+}
+
 entry,
 spinbutton,
 combobox button {
-    background-color: @bg_dark;
+    background-color: @bg_elevated;
     color: @text_primary;
-    border: 1px solid @border_subtle;
-    border-radius: 7px;
-    padding: 3px 8px;
-    min-height: 20px;
+    border: 1px solid @border_card;
+    border-radius: 9px;
+    padding: 4px 10px;
+    min-height: 22px;
     caret-color: @accent_primary;
 }
 
 entry:focus,
 spinbutton:focus {
     border-color: @accent_primary;
+    background-color: #1C2533;
 }
 
 /* Calculadora (Galculator) */
@@ -297,17 +326,17 @@ spinbutton:focus {
 #galculator button {
     padding: 2px 6px;
     min-height: 20px;
-    border-radius: 6px;
+    border-radius: 7px;
     font-weight: 600;
 }
 
 /* Switches */
 switch {
     background-color: @bg_elevated;
-    border: 1px solid @border_subtle;
+    border: 1px solid @border_card;
     border-radius: 12px;
-    min-width: 38px;
-    min-height: 18px;
+    min-width: 40px;
+    min-height: 20px;
 }
 
 switch:checked {
@@ -318,8 +347,8 @@ switch:checked {
 switch slider {
     background-color: #FFFFFF;
     border-radius: 50%;
-    min-width: 14px;
-    min-height: 14px;
+    min-width: 16px;
+    min-height: 16px;
     margin: 2px;
 }
 
@@ -328,8 +357,8 @@ check,
 radio {
     background-color: @bg_dark;
     border: 1px solid rgba(255, 255, 255, 0.25);
-    min-width: 14px;
-    min-height: 14px;
+    min-width: 15px;
+    min-height: 15px;
 }
 
 check {
@@ -348,8 +377,23 @@ radio:checked {
 }
 
 /* --------------------------------------------------------------------------
-   7. GERENCIADOR DE ARQUIVOS (THUNAR), CONFIGURAÇÕES XFCE, SIDEBARS E LISTAS
+   7. EXPLORADOR DE ARQUIVOS (THUNAR), SIDEBARS E VISUALIZAÇÃO DE PASTAS
    -------------------------------------------------------------------------- */
+.thunar toolbar,
+.thunar .location-bar {
+    background-color: @bg_surface;
+    border-bottom: 1px solid @border_subtle;
+    padding: 6px 10px;
+}
+
+.thunar statusbar {
+    background-color: @bg_dark;
+    color: @text_secondary;
+    border-top: 1px solid @border_subtle;
+    font-size: 8.5pt;
+    padding: 2px 8px;
+}
+
 .sidebar,
 .sidebar row,
 placessidebar,
@@ -362,23 +406,27 @@ stacksidebar list {
 }
 
 placessidebar row,
-stacksidebar row {
-    border-radius: 7px;
-    margin: 1px 4px;
-    padding: 4px 8px;
+stacksidebar row,
+.thunar .shortcuts-pane row {
+    border-radius: 10px;
+    margin: 2px 8px;
+    padding: 6px 10px;
 }
 
 placessidebar row:hover,
-stacksidebar row:hover {
+stacksidebar row:hover,
+.thunar .shortcuts-pane row:hover {
     background-color: @bg_elevated;
     color: @text_primary;
 }
 
 placessidebar row:selected,
-stacksidebar row:selected {
-    background-color: @accent_primary;
+stacksidebar row:selected,
+.thunar .shortcuts-pane row:selected {
+    background-image: linear-gradient(to right, @accent_primary, @accent_deep);
     color: #FFFFFF;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(19, 127, 236, 0.28);
 }
 
 treeview.view,
@@ -390,13 +438,20 @@ row {
     color: @text_primary;
 }
 
+iconview.view:hover,
+treeview.view:hover {
+    background-color: @bg_elevated;
+    border-radius: 10px;
+}
+
 treeview.view:selected,
 iconview.view:selected,
 .view:selected,
 row:selected {
-    background-color: @accent_primary;
+    background-color: alpha(@accent_primary, 0.22);
+    border: 1px solid @accent_primary;
     color: #FFFFFF;
-    border-radius: 6px;
+    border-radius: 10px;
 }
 
 treeview.view header button {
@@ -418,7 +473,7 @@ scrolledwindow > border,
    -------------------------------------------------------------------------- */
 dialog .dialog-action-area,
 messagedialog .dialog-action-area {
-    padding: 5px 8px;
+    padding: 6px 10px;
     border-top: 1px solid @border_subtle;
     background-color: @bg_dark;
 }
@@ -431,7 +486,7 @@ notebook > header {
 notebook > header tab {
     background-color: transparent;
     color: @text_secondary;
-    padding: 4px 9px;
+    padding: 5px 10px;
     border-bottom: 2px solid transparent;
 }
 
@@ -442,7 +497,7 @@ notebook > header tab:hover {
 notebook > header tab:checked {
     color: @text_primary;
     border-bottom: 2px solid @accent_primary;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 progressbar trough,
@@ -471,7 +526,7 @@ scrollbar {
 }
 
 scrollbar slider {
-    background-color: rgba(148, 163, 184, 0.35);
+    background-color: rgba(148, 163, 184, 0.30);
     border-radius: 6px;
     min-width: 6px;
     min-height: 6px;
@@ -479,17 +534,17 @@ scrollbar slider {
 }
 
 scrollbar slider:hover {
-    background-color: rgba(148, 163, 184, 0.60);
+    background-color: rgba(148, 163, 184, 0.55);
 }
 
 /* --------------------------------------------------------------------------
    9. NOTIFICAÇÕES DO SISTEMA (XFCE4-NOTIFYD)
    -------------------------------------------------------------------------- */
 #XfceNotifyWindow {
-    background-color: rgba(15, 23, 42, 0.96);
+    background-color: rgba(20, 26, 35, 0.97);
     color: @text_primary;
-    border: 1px solid @border_subtle;
-    border-radius: 10px;
+    border: 1px solid @border_card;
+    border-radius: 12px;
 }
 
 #XfceNotifyWindow label#summary {
@@ -519,7 +574,7 @@ XfdesktopIconView.view:active {
    11. TELA DE LOGIN / BLOQUEIO (LIGHTDM GTK GREETER)
    -------------------------------------------------------------------------- */
 #panel_window {
-    background-color: rgba(11, 17, 32, 0.88);
+    background-color: rgba(15, 20, 28, 0.90);
     color: @text_primary;
     border-bottom: 1px solid @border_subtle;
 }
@@ -532,21 +587,21 @@ XfdesktopIconView.view:active {
 }
 
 #login_window {
-    background-color: rgba(15, 23, 42, 0.94);
+    background-color: rgba(20, 26, 35, 0.95);
     color: @text_primary;
-    border: 1px solid @border_subtle;
+    border: 1px solid @border_card;
     border-radius: 14px;
     padding: 16px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
 }
 
 #login_window #login_button {
-    background-color: @accent_primary;
+    background-image: linear-gradient(to bottom, @accent_primary, @accent_deep);
     color: #FFFFFF;
     border-color: @accent_primary;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 #login_window #login_button:hover {
-    background-color: @accent_hover;
+    background-image: linear-gradient(to bottom, @accent_hover, @accent_primary);
 }
