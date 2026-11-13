@@ -214,13 +214,108 @@ fi
 # Registra os ícones SVG oficiais no tema de ícones hicolor
 # ------------------------------------------------------------------------------
 mkdir -p /usr/share/icons/hicolor/scalable/apps
-for ICON_SVG in legacyos-logo.svg legacy-care-center.svg; do
+for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg; do
     if [ -f "/usr/share/pixmaps/$ICON_SVG" ]; then
         cp "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
         chmod 644 "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
     fi
 done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
+
+# ------------------------------------------------------------------------------
+# Gera o avatar padrão do usuário (.face em PNG) substituindo o ícone Debian
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0650] Gerando avatar oficial do usuário (.face)..."
+AVATAR_PNG="/usr/share/pixmaps/legacyos-avatar.png"
+
+python3 - "$AVATAR_PNG" << 'PYEOF'
+import sys
+import math
+import cairo
+
+out_png = sys.argv[1]
+W, H = 128, 128
+surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+ctx = cairo.Context(surf)
+
+# Fundo circular Dark Slate
+grad_bg = cairo.LinearGradient(0, 0, W, H)
+grad_bg.add_color_stop_rgb(0.0, 0.118, 0.161, 0.231)  # #1E293B
+grad_bg.add_color_stop_rgb(0.6, 0.059, 0.090, 0.165)  # #0F172A
+grad_bg.add_color_stop_rgb(1.0, 0.043, 0.067, 0.125)  # #0B1120
+
+ctx.arc(64, 64, 58, 0, 2 * math.pi)
+ctx.set_source(grad_bg)
+ctx.fill_preserve()
+
+# Borda azul sutil
+grad_ring = cairo.LinearGradient(0, 0, W, H)
+grad_ring.add_color_stop_rgba(0.0, 0.220, 0.741, 0.973, 0.85)
+grad_ring.add_color_stop_rgba(1.0, 0.008, 0.518, 0.780, 0.45)
+ctx.set_source(grad_ring)
+ctx.set_line_width(3.0)
+ctx.stroke()
+
+# Recorte interno circular
+ctx.save()
+ctx.arc(64, 64, 56, 0, 2 * math.pi)
+ctx.clip()
+
+# Halo luminoso
+rad = cairo.RadialGradient(64, 52, 4, 64, 52, 40)
+rad.add_color_stop_rgba(0.0, 0.008, 0.518, 0.780, 0.25)
+rad.add_color_stop_rgba(1.0, 0.008, 0.518, 0.780, 0.0)
+ctx.set_source(rad)
+ctx.rectangle(0, 0, W, H)
+ctx.fill()
+
+# Ombros / Busto estilizado em Azul LegacyOS
+grad_body = cairo.LinearGradient(24, 80, 104, 120)
+grad_body.add_color_stop_rgb(0.0, 0.220, 0.741, 0.973)  # #38BDF8
+grad_body.add_color_stop_rgb(0.55, 0.008, 0.518, 0.780) # #0284C7
+grad_body.add_color_stop_rgb(1.0, 0.012, 0.412, 0.631)  # #0369A1
+
+ctx.move_to(22, 118)
+ctx.curve_to(22, 93, 40, 80, 64, 80)
+ctx.curve_to(88, 80, 106, 93, 106, 118)
+ctx.close_path()
+ctx.set_source(grad_body)
+ctx.fill()
+
+# Detalhe estilizado da gola
+ctx.move_to(46, 82)
+ctx.line_to(64, 98)
+ctx.line_to(82, 82)
+ctx.curve_to(76, 80.5, 70, 80, 64, 80)
+ctx.curve_to(58, 80, 52, 80.5, 46, 82)
+ctx.close_path()
+ctx.set_source_rgba(0.878, 0.949, 0.996, 0.35)
+ctx.fill()
+
+# Cabeça estilizada em Prata / Azul Claro
+grad_head = cairo.LinearGradient(44, 30, 84, 70)
+grad_head.add_color_stop_rgb(0.0, 0.973, 0.980, 0.988)  # #F8FAFC
+grad_head.add_color_stop_rgb(0.55, 0.796, 0.835, 0.882) # #CBD5E1
+grad_head.add_color_stop_rgb(1.0, 0.490, 0.827, 0.988)  # #7DD3FC
+
+ctx.arc(64, 50, 20, 0, 2 * math.pi)
+ctx.set_source(grad_head)
+ctx.fill()
+
+ctx.restore()
+surf.write_to_png(out_png)
+PYEOF
+
+chmod 644 "$AVATAR_PNG"
+cp "$AVATAR_PNG" /etc/skel/.face
+chmod 644 /etc/skel/.face
+
+# Substitui o ícone de rosto padrão do desktop-base (que exibia a espiral Debian)
+if [ -d "/usr/share/images/desktop-base" ]; then
+    ln -sf "$AVATAR_PNG" /usr/share/images/desktop-base/login-background.svg 2>/dev/null || true
+fi
+mkdir -p /var/lib/AccountsService/icons
+cp "$AVATAR_PNG" /var/lib/AccountsService/icons/user 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
 # Cria tema Plymouth oficial e imagem de transição contínua X11
@@ -321,9 +416,6 @@ EOF
 
 plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
 
-# ------------------------------------------------------------------------------
-# Retém o framebuffer do Plymouth até o X11 assumir (evita piscada preta no TTY)
-# ------------------------------------------------------------------------------
 mkdir -p /etc/systemd/system/plymouth-quit.service.d
 cat << 'EOF' > /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 [Service]
@@ -338,9 +430,6 @@ ExecStart=
 ExecStart=-/bin/plymouth --wait
 EOF
 
-# ------------------------------------------------------------------------------
-# Script do LightDM: desenha o mesmo Logo no root window do X11 no milissegundo 0
-# ------------------------------------------------------------------------------
 cat << 'EOF' > /usr/local/bin/legacyos-x11-hold
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
