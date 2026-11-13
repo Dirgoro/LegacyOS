@@ -152,6 +152,22 @@ cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#0284C7/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
+# Remove gnome-calculator (GTK4 fixo >600px) e mantém apenas Galculator (GTK3)
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
+export DEBIAN_FRONTEND=noninteractive
+apt-get purge -y gnome-calculator >/dev/null 2>&1 || true
+apt-get autoremove -y >/dev/null 2>&1 || true
+
+# Garante que o atalho padrão "Calculadora" do XFCE aponte para o galculator
+if [ -f "/usr/share/applications/galculator.desktop" ]; then
+    sed -i 's/^Name=.*/Name=Calculadora/' /usr/share/applications/galculator.desktop
+    if ! grep -q "^Name\[pt_BR\]=" /usr/share/applications/galculator.desktop; then
+        echo "Name[pt_BR]=Calculadora" >> /usr/share/applications/galculator.desktop
+    fi
+fi
+
+# ------------------------------------------------------------------------------
 # Registra o logotipo SVG oficial no tema de ícones hicolor
 # ------------------------------------------------------------------------------
 if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
@@ -209,13 +225,11 @@ def draw_legacyos_mark(ctx, cx, cy, scale):
     ctx.fill()
     ctx.restore()
 
-# 1. Logo transparente 120x120 para Plymouth e Calamares
 s_logo = cairo.ImageSurface(cairo.FORMAT_ARGB32, 120, 120)
 c_logo = cairo.Context(s_logo)
 draw_legacyos_mark(c_logo, 60.0, 60.0, 1.15)
 s_logo.write_to_png(out_logo)
 
-# 2. Tela cheia 1920x1080 para continuidade visual entre Plymouth, X11 e Sessão
 W, H = 1920, 1080
 s_scr = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
 c_scr = cairo.Context(s_scr)
@@ -275,10 +289,8 @@ cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 
-# Pinta imediatamente o fundo raiz do X11 com Dark Slate (#0B1120)
 xsetroot -solid "#0B1120" 2>/dev/null || true
 
-# Dispara a cortina antes mesmo do xfce4-session iniciar o painel e o xfdesktop
 LOCK_FILE="/tmp/legacyos-splash.lock"
 SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
 
