@@ -2,11 +2,13 @@
 # RELAÇÃO DE PACOTES BASE - LEGACYOS (DEBIAN 13)
 # ==========================================
 
-# 1. Sistema Base, Hardware e Memória Virtual
+# 1. Sistema Base, Boot Gráfico, Hardware e Memória Virtual
 linux-image-amd64
 live-boot
 live-config
 systemd-sysv
+plymouth
+plymouth-themes
 zram-tools
 network-manager
 network-manager-gnome
@@ -43,6 +45,7 @@ xdotool
 gtk2-engines-murrine
 gnome-themes-extra
 papirus-icon-theme
+librsvg2-common
 
 # 4. Programas de Terceiros e Utilitários Leves (0 MB em segundo plano)
 firefox-esr
