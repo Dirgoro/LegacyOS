@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <channel name="xfce4-session" version="1.0">
   <property name="general" type="empty">
-    <property name="FailsafeSessionName" type="string" value="LegacyOS"/>
+    <!-- O nome da sessão de segurança DEVE ser "Failsafe" -->
+    <property name="FailsafeSessionName" type="string" value="Failsafe"/>
   </property>
   <property name="sessions" type="empty">
     <property name="Failsafe" type="empty">
