@@ -33,13 +33,34 @@ Categories=System;Settings;
 EOF
 chmod 644 /usr/share/applications/legacyos-installer.desktop
 
-if [ -f "/usr/share/applications/install-debian.desktop" ]; then
-    if ! grep -q "NoDisplay=true" /usr/share/applications/install-debian.desktop; then
-        echo "NoDisplay=true" >> /usr/share/applications/install-debian.desktop
+# Oculta atalhos genéricos do Debian no menu de aplicativos
+for GEN_DESKTOP in \
+    /usr/share/applications/install-debian.desktop \
+    /usr/share/applications/calamares.desktop; do
+    if [ -f "$GEN_DESKTOP" ]; then
+        if ! grep -q "NoDisplay=true" "$GEN_DESKTOP"; then
+            echo "NoDisplay=true" >> "$GEN_DESKTOP"
+        fi
     fi
+done
+
+# Bloqueia o autostart do calamares-settings-debian que cria o ícone "Install Debian"
+for AUTO_FILE in /etc/xdg/autostart/*calamares*.desktop /etc/xdg/autostart/*install-debian*.desktop; do
+    if [ -f "$AUTO_FILE" ]; then
+        if ! grep -q "Hidden=true" "$AUTO_FILE"; then
+            echo "Hidden=true" >> "$AUTO_FILE"
+        fi
+    fi
+done
+
+if [ -f "/usr/bin/add-calamares-desktop-icon" ]; then
+    printf '#!/bin/sh\nexit 0\n' > /usr/bin/add-calamares-desktop-icon
+    chmod 755 /usr/bin/add-calamares-desktop-icon
 fi
 
+# Provisiona apenas o atalho oficial do LegacyOS na área de trabalho padrão
 mkdir -p /etc/skel/Desktop
+rm -f /etc/skel/Desktop/*debian*.desktop /etc/skel/Desktop/calamares.desktop
 cp /usr/share/applications/legacyos-installer.desktop /etc/skel/Desktop/instalar-legacyos.desktop
 chmod 755 /etc/skel/Desktop/instalar-legacyos.desktop
 
