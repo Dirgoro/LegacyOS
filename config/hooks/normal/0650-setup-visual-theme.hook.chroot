@@ -211,14 +211,16 @@ if [ -f "/usr/share/applications/galculator.desktop" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Registra o logotipo SVG oficial no tema de ícones hicolor
+# Registra os ícones SVG oficiais no tema de ícones hicolor
 # ------------------------------------------------------------------------------
-if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
-    mkdir -p /usr/share/icons/hicolor/scalable/apps
-    cp /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
-    chmod 644 /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
-    gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
-fi
+mkdir -p /usr/share/icons/hicolor/scalable/apps
+for ICON_SVG in legacyos-logo.svg legacy-care-center.svg; do
+    if [ -f "/usr/share/pixmaps/$ICON_SVG" ]; then
+        cp "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
+        chmod 644 "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
+    fi
+done
+gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
 # Cria tema Plymouth oficial e imagem de transição contínua X11
@@ -343,29 +345,8 @@ cat << 'EOF' > /usr/local/bin/legacyos-x11-hold
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 
-# Pinta imediatamente o fundo raiz do X11 com Dark Slate (#0B1120)
 xsetroot -solid "#0B1120" 2>/dev/null || true
 
-# Desenha o logotipo centralizado no root window do X11 via PyCairo/GDK
-python3 - << 'PYEOF' 2>/dev/null || true
-import gi
-gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk, GdkPixbuf
-
-disp = Gdk.Display.get_default()
-if disp:
-    scr = disp.get_default_screen()
-    root = scr.get_root_window()
-    w, h = root.get_width(), root.get_height()
-    pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-        "/usr/share/plymouth/themes/legacyos/boot-screen.png", w, h, False
-    )
-    surf = Gdk.cairo_surface_create_from_pixbuf(pb, 1, root)
-    pat = cairo.SurfacePattern(surf) if "cairo" in globals() else None
-    root.set_background_pattern(Gdk.cairo_set_source_pixbuf.__self__ if False else None)
-PYEOF
-
-# Abre imediatamente a cortina de carregamento antes mesmo da sessão iniciar
 LOCK_FILE="/tmp/legacyos-splash.lock"
 SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
 touch "$LOCK_FILE"
@@ -420,8 +401,10 @@ fi
 
 chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-window-fit 2>/dev/null || true
+chmod 755 /usr/local/bin/legacy-care-center 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-settings.desktop 2>/dev/null || true
+chmod 644 /usr/share/applications/legacy-care-center.desktop 2>/dev/null || true
 
 echo "[LegacyOS Hook 0650] Ativos visuais concluídos."
 exit 0
