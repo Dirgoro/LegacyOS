@@ -1,0 +1,70 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS WINDOW FIT - AJUSTE AUTOMÁTICO DE JANELAS PARA TELAS 1024x600
+# Garante que nenhuma janela ultrapasse a largura/altura útil do monitor.
+# ==============================================================================
+
+export DISPLAY="${DISPLAY:-:0}"
+
+command -v wmctrl >/dev/null 2>&1 || exit 0
+command -v xrandr >/dev/null 2>&1 || exit 0
+
+RES=$(xrandr --current 2>/dev/null | awk '/\*/ {print $1; exit}')
+SCR_W="${RES%x*}"
+SCR_H="${RES#*x}"
+SCR_W="${SCR_W:-1024}"
+SCR_H="${SCR_H:-600}"
+
+# Área útil descontando barra superior (26-30px) e margem de conforto inferior
+MAX_W=$((SCR_W - 24))
+MAX_H=$((SCR_H - 64))
+
+fit_all_windows() {
+    wmctrl -lG 2>/dev/null | while read -r WIN_ID DESK X Y W H HOST TITLE; do
+        # Ignora desktop, painel superior e dock (desktop -1 ou títulos de sistema)
+        [ "$DESK" = "-1" ] && continue
+        case "$TITLE" in
+            "xfce4-panel"|"Desktop"|"Área de Trabalho"|"plank"|"legacyos-splash") continue ;;
+        esac
+
+        NEW_W="$W"
+        NEW_H="$H"
+        NEW_X="$X"
+        NEW_Y="$Y"
+        CHANGED=0
+
+        if [ "$W" -gt "$MAX_W" ]; then
+            NEW_W="$MAX_W"
+            CHANGED=1
+        fi
+
+        if [ "$H" -gt "$MAX_H" ]; then
+            NEW_H="$MAX_H"
+            CHANGED=1
+        fi
+
+        # Centraliza se extrapolou os limites ou se foi redimensionada
+        if [ "$CHANGED" -eq 1 ] || [ $((NEW_X + NEW_W)) -gt "$SCR_W" ] || [ $((NEW_Y + NEW_H)) -gt $((SCR_H - 28)) ]; then
+            NEW_X=$(( (SCR_W - NEW_W) / 2 ))
+            NEW_Y=$(( 32 + (MAX_H - NEW_H) / 2 ))
+            [ "$NEW_X" -lt 8 ] && NEW_X=8
+            [ "$NEW_Y" -lt 30 ] && NEW_Y=30
+            CHANGED=1
+        fi
+
+        if [ "$CHANGED" -eq 1 ]; then
+            wmctrl -i -r "$WIN_ID" -b remove,maximized_vert,maximized_horz 2>/dev/null || true
+            wmctrl -i -r "$WIN_ID" -e "0,${NEW_X},${NEW_Y},${NEW_W},${NEW_H}" 2>/dev/null || true
+        fi
+    done
+}
+
+if [ "$1" = "--daemon" ]; then
+    # Monitora continuamente novas janelas abertas na sessão (consumo < 2 MB RAM)
+    while true; do
+        fit_all_windows
+        sleep 1.2
+    done
+else
+    fit_all_windows
+fi
