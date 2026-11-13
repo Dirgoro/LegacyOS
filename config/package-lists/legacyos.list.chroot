@@ -1,88 +1,70 @@
-# ==========================================
-# RELAÇÃO DE PACOTES BASE - LEGACYOS (DEBIAN 13)
-# ==========================================
+# ==============================================================================
+# LEGACYOS 1.0 - LISTA DE PACOTES DO SISTEMA (DEBIAN BASE + XFCE OTIMIZADO)
+# ==============================================================================
 
-# 1. Sistema Base, Boot Gráfico, Hardware e Memória Virtual
-linux-image-amd64
+# Sistema Base & Kernel / Boot
 live-boot
 live-config
+live-config-systemd
 systemd-sysv
 plymouth
 plymouth-themes
 zram-tools
-network-manager
-network-manager-gnome
-pipewire-audio
-pavucontrol
-upower
-ufw
-sudo
-curl
-wget
-gnupg
-polkitd
-pkexec
-mate-polkit
+earlyoom
+preload
 
-# 2. Instalador Gráfico do Sistema (Calamares)
-calamares
-calamares-settings-debian
-
-# 3. Ambiente Gráfico (XFCE Minimalista)
+# Ambiente Gráfico XFCE Leve & Gerenciamento de Janelas
+xorg
+xserver-xorg-core
+x11-xserver-utils
 xfce4
-xfce4-panel
-xfce4-session
-xfce4-settings
-xfwm4
-xfdesktop4
-thunar
-thunar-archive-plugin
-thunar-volman
+xfce4-goodies
+xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
 xfce4-power-manager
 xfce4-notifyd
-xfce4-pulseaudio-plugin
-xfce4-whiskermenu-plugin
-
-# 4. Personalização, Ícones e UI (GTK2, GTK3, Qt5/Qt6)
 plank
-xdotool
-wmctrl
-gtk2-engines-murrine
-gnome-themes-extra
+lightdm
+lightdm-gtk-greeter
+
+# Temas, Ícones e Fontes
 papirus-icon-theme
-librsvg2-common
 qt5ct
 qt6ct
+fonts-inter
+fonts-noto-core
+fonts-noto-color-emoji
 
-# 5. Programas de Terceiros e Utilitários Leves (0 MB em segundo plano)
-firefox-esr
-vlc
-atril
-ristretto
-xarchiver
-p7zip-full
-unzip
-mousepad
-galculator
-gnome-system-monitor
-gnome-disk-utility
-xfce4-screenshooter
-synaptic
-gdebi
-
-# 6. Compatibilidade de Fontes (Office) e Codecs Multimídia
-fonts-crosextra-carlito
-fonts-crosextra-caladea
-libavcodec-extra
-
-# 7. Dependências para os Apps Nativos (Python/GTK3/Cairo)
+# Bibliotecas Gráficas e Motores dos Aplicativos Exclusivos LegacyOS
 python3
 python3-gi
 python3-gi-cairo
 python3-psutil
 gir1.2-gtk-3.0
-gir1.2-glib-2.0
-gir1.2-notify-0.7
+gir1.2-gdkpixbuf-2.0
 gir1.2-pango-1.0
-libcairo2-dev
-libgirepository1.0-dev
+gir1.2-vte-2.91
+gir1.2-webkit2-4.1
+
+# Utilitários Essenciais de Sistema & Hardware Legado
+thunar
+thunar-archive-plugin
+thunar-volman
+gvfs
+gvfs-backends
+file-roller
+galculator
+mousepad
+ristretto
+xfce4-screenshooter
+network-manager
+network-manager-gnome
+blueman
+pavucontrol
+gparted
+htop
+neofetch
+curl
+wget
+git
+ca-certificates
