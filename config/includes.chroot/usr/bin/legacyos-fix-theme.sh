@@ -20,6 +20,14 @@ fi
 
 sleep 1.8
 
+# Corrige caminho absoluto do tema Qt5/Qt6 para o usuário ativo
+for QT_VER in qt5ct qt6ct; do
+    QT_CONF="$HOME/.config/${QT_VER}/${QT_VER}.conf"
+    if [ -f "$QT_CONF" ]; then
+        sed -i "s|/etc/skel/.config/${QT_VER}|$HOME/.config/${QT_VER}|g" "$QT_CONF"
+    fi
+done
+
 # ------------------------------------------------------------------------------
 # 1. DETECÇÃO DE RESOLUÇÃO DE TELA (MODO COMPACTO PARA NETBOOKS COMO D260)
 # ------------------------------------------------------------------------------
@@ -180,11 +188,6 @@ xfdesktop --reload 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
 # 6. CONFIGURAÇÃO E INICIALIZAÇÃO COMPLETA DA DOCK (PLANK)
-# Ordem:
-#   1. Logo LegacyOS -> Configurações do Sistema (legacyos-settings.desktop)
-#   2. Grade de Aplicativos (legacyos-apps.desktop)
-#   3. Legacy Care Center (legacy-care-center.desktop)
-#   4. Demais aplicativos essenciais
 # ------------------------------------------------------------------------------
 CONFIG_DIR="$HOME/.config/legacyos"
 DOCK_FLAG="$CONFIG_DIR/.dock_initialized_v3"
@@ -231,7 +234,14 @@ if ! pgrep -x plank >/dev/null; then
 fi
 
 # ------------------------------------------------------------------------------
-# 7. SINCRONIZAÇÃO FINAL: AGUARDA PAINEL, DESKTOP E DOCK RENDERIZAREM
+# 7. INICIA GUARDIÃO DE TAMANHO DE JANELAS PARA TELAS 1024x600
+# ------------------------------------------------------------------------------
+if [ -x "/usr/local/bin/legacyos-window-fit" ] && ! pgrep -f "legacyos-window-fit" >/dev/null; then
+    nohup /usr/local/bin/legacyos-window-fit --daemon >/dev/null 2>&1 &
+fi
+
+# ------------------------------------------------------------------------------
+# 8. SINCRONIZAÇÃO FINAL: AGUARDA PAINEL, DESKTOP E DOCK RENDERIZAREM
 # ------------------------------------------------------------------------------
 if [ -x "/usr/bin/legacyos-move-icons.sh" ]; then
     sleep 0.6
