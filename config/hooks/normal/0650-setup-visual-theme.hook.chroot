@@ -1,7 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS DA FASE 2 (CHROOT)
-# Gera tema de janela xfwm4, boot splash Plymouth, logotipo SVG e fontes
+# LEGACYOS - HOOK DE ATIVOS VISUAIS E TRANSIÇÃO SEM TELA PRETA (CHROOT)
 # ==============================================================================
 
 set -e
@@ -163,41 +162,68 @@ if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Cria tema Plymouth oficial do LegacyOS (substitui a tela inicial debian 13)
+# Cria tema Plymouth oficial e imagem de transição contínua X11
 # ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Configurando boot splash Plymouth do LegacyOS..."
+echo "[LegacyOS Hook 0650] Configurando boot splash contínuo do LegacyOS..."
 PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
 mkdir -p "$PLYMOUTH_DIR"
 
-python3 - << 'PYEOF'
-import os
-import gi
-gi.require_version("GdkPixbuf", "2.0")
-from gi.repository import GdkPixbuf
+python3 - "$PLYMOUTH_DIR/logo.png" "$PLYMOUTH_DIR/boot-screen.png" << 'PYEOF'
+import sys
 import cairo
 
-out_png = "/usr/share/plymouth/themes/legacyos/logo.png"
-svg_path = "/usr/share/pixmaps/legacyos-logo.svg"
+out_logo = sys.argv[1]
+out_screen = sys.argv[2]
 
-rendered = False
-if os.path.isfile(svg_path):
-    try:
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(svg_path, 112, 112, True)
-        pixbuf.savev(out_png, "png", [], [])
-        rendered = True
-    except Exception:
-        rendered = False
+def draw_legacyos_mark(ctx, cx, cy, scale):
+    ctx.save()
+    ctx.translate(cx - 50.0 * scale, cy - 50.0 * scale)
+    ctx.scale(scale, scale)
 
-if not rendered:
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 112, 112)
-    ctx = cairo.Context(surface)
-    ctx.set_source_rgb(0.055, 0.647, 0.914)
-    ctx.rectangle(24, 16, 24, 80)
+    grad_v = cairo.LinearGradient(65, 5, 20, 95)
+    grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
+    grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
+    grad_v.add_color_stop_rgb(0.72, 0.008, 0.518, 0.780)
+    grad_v.add_color_stop_rgb(1.0, 0.000, 0.278, 0.671)
+    ctx.set_source(grad_v)
+    ctx.move_to(18, 92)
+    ctx.line_to(18, 42)
+    ctx.curve_to(18, 24, 30, 12, 46, 8)
+    ctx.line_to(46, 68)
+    ctx.curve_to(34, 73, 24, 81, 18, 92)
+    ctx.close_path()
     ctx.fill()
-    ctx.set_source_rgb(0.945, 0.961, 0.976)
-    ctx.rectangle(24, 74, 64, 22)
+
+    grad_h = cairo.LinearGradient(10, 90, 92, 55)
+    grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
+    grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
+    grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
+    grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
+    ctx.set_source(grad_h)
+    ctx.move_to(18, 92)
+    ctx.curve_to(26, 75, 38, 66, 56, 66)
+    ctx.line_to(92, 66)
+    ctx.curve_to(88, 82, 76, 92, 58, 92)
+    ctx.line_to(18, 92)
+    ctx.close_path()
     ctx.fill()
-    surface.write_to_png(out_png)
+    ctx.restore()
+
+# 1. Logo transparente 120x120 para Plymouth e Calamares
+s_logo = cairo.ImageSurface(cairo.FORMAT_ARGB32, 120, 120)
+c_logo = cairo.Context(s_logo)
+draw_legacyos_mark(c_logo, 60.0, 60.0, 1.15)
+s_logo.write_to_png(out_logo)
+
+# 2. Tela cheia 1920x1080 para continuidade visual entre Plymouth, X11 e Sessão
+W, H = 1920, 1080
+s_scr = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+c_scr = cairo.Context(s_scr)
+c_scr.set_source_rgb(0.043, 0.067, 0.125)
+c_scr.rectangle(0, 0, W, H)
+c_scr.fill()
+draw_legacyos_mark(c_scr, W / 2.0, H / 2.0 - 40.0, 1.35)
+s_scr.write_to_png(out_screen)
 PYEOF
 
 cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.plymouth"
@@ -218,7 +244,7 @@ Window.SetBackgroundBottomColor(0.043, 0.067, 0.125);
 logo.image = Image("logo.png");
 logo.sprite = Sprite(logo.image);
 logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 20);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 40);
 logo.sprite.SetOpacity(1);
 
 fun refresh_callback () {
@@ -235,6 +261,39 @@ ShowDelay=0
 EOF
 
 plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
+
+# ------------------------------------------------------------------------------
+# Oculta mensagem de console "piix4_smbus: SMBus Host Controller not enabled"
+# ------------------------------------------------------------------------------
+mkdir -p /etc/modprobe.d
+echo "blacklist i2c_piix4" > /etc/modprobe.d/blacklist-piix4.conf
+
+# ------------------------------------------------------------------------------
+# Intercepta o arranque da sessão XFCE para cobrir a tela ANTES do painel subir
+# ------------------------------------------------------------------------------
+cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
+#!/bin/bash
+export DISPLAY="${DISPLAY:-:0}"
+
+# Pinta imediatamente o fundo raiz do X11 com Dark Slate (#0B1120)
+xsetroot -solid "#0B1120" 2>/dev/null || true
+
+# Dispara a cortina antes mesmo do xfce4-session iniciar o painel e o xfdesktop
+LOCK_FILE="/tmp/legacyos-splash.lock"
+SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
+
+touch "$LOCK_FILE"
+if [ -f "$SPLASH_SCRIPT" ]; then
+    python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
+fi
+
+exec /usr/bin/xfce4-session
+EOF
+chmod 755 /usr/local/bin/legacyos-session-wrapper
+
+if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
+    sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
+fi
 
 # ------------------------------------------------------------------------------
 # Substitui o papel de parede fallback do Debian 13 pelo do LegacyOS
@@ -261,5 +320,5 @@ if [ -f "/usr/share/applications/exo-mail-reader.desktop" ]; then
     fi
 fi
 
-echo "[LegacyOS Hook 0650] Ativos visuais da Fase 2 concluídos."
+echo "[LegacyOS Hook 0650] Ativos visuais concluídos."
 exit 0
