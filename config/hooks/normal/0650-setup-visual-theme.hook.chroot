@@ -196,7 +196,7 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
-# Remove gnome-calculator (GTK4 fixo >600px) e mantém apenas Galculator (GTK3)
+# Remove gnome-calculator e mantém apenas Galculator (GTK3)
 # ------------------------------------------------------------------------------
 echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
 export DEBIAN_FRONTEND=noninteractive
@@ -211,7 +211,7 @@ if [ -f "/usr/share/applications/galculator.desktop" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Registra os ícones SVG oficiais no tema de ícones hicolor (Inclui legacy-guardian.svg)
+# Registra os ícones SVG oficiais no tema hicolor
 # ------------------------------------------------------------------------------
 mkdir -p /usr/share/icons/hicolor/scalable/apps
 for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg legacy-guardian.svg; do
@@ -461,6 +461,9 @@ chmod 755 /usr/local/bin/legacyos-workspace 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-settings 2>/dev/null || true
 chmod 755 /usr/local/bin/legacy-guardian 2>/dev/null || true
 chmod 755 /usr/local/bin/legacy-guardian-daemon 2>/dev/null || true
+chmod 755 /usr/local/bin/legacy-guardian-applet 2>/dev/null || true
+chmod 755 /usr/local/bin/legacyos-panel-position 2>/dev/null || true
+chmod 755 /usr/local/bin/legacyos-desktop-align 2>/dev/null || true
 
 chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-settings.desktop 2>/dev/null || true
