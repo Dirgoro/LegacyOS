@@ -1,23 +1,22 @@
-# Base XFCE e Tema (Adicionado o menu Whisker e o Sudo)
+# Base XFCE e Tema
 xfce4 xfce4-terminal thunar thunar-archive-plugin thunar-volman
 xfce4-panel xfce4-settings xfce4-power-manager xfce4-notifyd
 xfce4-whiskermenu-plugin plank arc-theme papirus-icon-theme
 lightdm lightdm-gtk-greeter
-sudo
 
 # Rede e Firmware
 network-manager network-manager-gnome
 firmware-iwlwifi firmware-realtek firmware-atheros
 
-# Segurança e Utilitários
-ufw unattended-upgrades systemd-timesyncd zram-tools lm-sensors openssl
+# Segurança e Utilitários de Sistema
+sudo curl wget ufw unattended-upgrades systemd-timesyncd zram-tools lm-sensors openssl xdotool x11-utils
+gufw gparted synaptic system-config-printer
 
-# Dependências Python/GTK (Para o Care Center e PyCairo)
+# Dependências Python/GTK (Care Center e Control Center)
 python3 python3-gi python3-gi-cairo python3-psutil gir1.2-gtk-3.0 gir1.2-notify-0.7 libnotify-bin python3-cairo
 
-# Aplicativos para o Usuário Final
-vlc ristretto mousepad galculator xarchiver p7zip-full unzip
-gufw gparted synaptic system-config-printer
+# Aplicativos de Usuário Final (Navegadores, Multimídia, Escritório, PDF)
+firefox-esr vlc ristretto atril mousepad galculator xarchiver p7zip-full unzip
 
 # Ferramentas Legacy, Drivers e Integração VMware
 util-linux util-linux-extra pciutils usbutils inxi smartmontools spice-vdagent
