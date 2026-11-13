@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LEGACYOS OFFICIAL GTK 3.24 STYLESHEET (ADAPTATIVO PARA TELAS 1024x600+)
+   LEGACYOS OFFICIAL GTK 3.24 STYLESHEET (100% DARK SLATE + COMPACTO 1024x600)
    Paleta: Dark Slate (#0B1120 / #111827 / #1E293B) + Accent Blue (#0284C7)
    ========================================================================== */
 
@@ -33,6 +33,7 @@
 window,
 dialog,
 messagedialog,
+assistant,
 .background {
     background-color: @bg_surface;
     color: @text_primary;
@@ -48,7 +49,7 @@ dialog.csd {
 }
 
 /* --------------------------------------------------------------------------
-   2. HEADERBARS E BARRAS DE FERRAMENTAS (ALTURA COMPACTA PARA TELAS LEGADO)
+   2. HEADERBARS E BARRAS DE FERRAMENTAS (ALTURA COMPACTA)
    -------------------------------------------------------------------------- */
 headerbar,
 .titlebar {
@@ -56,7 +57,7 @@ headerbar,
     background-image: none;
     color: @text_primary;
     border-bottom: 1px solid @border_subtle;
-    min-height: 30px;
+    min-height: 28px;
     padding: 2px 8px;
 }
 
@@ -78,7 +79,8 @@ headerbar .subtitle {
 
 toolbar,
 .primary-toolbar,
-menubar {
+menubar,
+infobar {
     background-color: @bg_dark;
     color: @text_primary;
     border-bottom: 1px solid @border_subtle;
@@ -86,7 +88,7 @@ menubar {
 }
 
 /* --------------------------------------------------------------------------
-   3. PAINEL SUPERIOR (XFCE4-PANEL) - TEXTO BRANCO DE ALTO CONTRASTE
+   3. PAINEL SUPERIOR (XFCE4-PANEL)
    -------------------------------------------------------------------------- */
 .xfce4-panel,
 .xfce4-panel.background {
@@ -143,7 +145,7 @@ menubar {
     color: @text_primary;
     border: 1px solid @border_subtle;
     border-radius: 8px;
-    padding: 5px 9px;
+    padding: 4px 8px;
 }
 
 #whiskermenu-window entry:focus {
@@ -153,7 +155,7 @@ menubar {
 #whiskermenu-window treeview {
     background-color: transparent;
     color: @text_primary;
-    padding: 3px;
+    padding: 2px;
 }
 
 #whiskermenu-window treeview:hover {
@@ -216,7 +218,7 @@ separator {
     background-color: @border_subtle;
     min-height: 1px;
     min-width: 1px;
-    margin: 3px 0;
+    margin: 2px 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -228,8 +230,8 @@ button {
     color: @text_primary;
     border: 1px solid @border_subtle;
     border-radius: 7px;
-    padding: 3px 10px;
-    min-height: 22px;
+    padding: 3px 9px;
+    min-height: 20px;
     box-shadow: none;
 }
 
@@ -268,13 +270,14 @@ button.destructive-action {
 }
 
 entry,
-spinbutton {
+spinbutton,
+combobox button {
     background-color: @bg_dark;
     color: @text_primary;
     border: 1px solid @border_subtle;
     border-radius: 7px;
-    padding: 4px 8px;
-    min-height: 22px;
+    padding: 3px 8px;
+    min-height: 20px;
     caret-color: @accent_primary;
 }
 
@@ -283,7 +286,7 @@ spinbutton:focus {
     border-color: @accent_primary;
 }
 
-/* Calculadora (Galculator) - Visual Dark Slate e altura compacta */
+/* Calculadora (Galculator) */
 #galculator window,
 #galculator textview,
 #galculator textview text {
@@ -298,13 +301,13 @@ spinbutton:focus {
     font-weight: 600;
 }
 
-/* Switches modernos estilo LegacyOS */
+/* Switches */
 switch {
     background-color: @bg_elevated;
     border: 1px solid @border_subtle;
     border-radius: 12px;
-    min-width: 40px;
-    min-height: 20px;
+    min-width: 38px;
+    min-height: 18px;
 }
 
 switch:checked {
@@ -315,8 +318,8 @@ switch:checked {
 switch slider {
     background-color: #FFFFFF;
     border-radius: 50%;
-    min-width: 16px;
-    min-height: 16px;
+    min-width: 14px;
+    min-height: 14px;
     margin: 2px;
 }
 
@@ -325,8 +328,8 @@ check,
 radio {
     background-color: @bg_dark;
     border: 1px solid rgba(255, 255, 255, 0.25);
-    min-width: 15px;
-    min-height: 15px;
+    min-width: 14px;
+    min-height: 14px;
 }
 
 check {
@@ -345,30 +348,34 @@ radio:checked {
 }
 
 /* --------------------------------------------------------------------------
-   7. GERENCIADOR DE ARQUIVOS (THUNAR), SIDEBARS E LISTAS
+   7. GERENCIADOR DE ARQUIVOS (THUNAR), CONFIGURAÇÕES XFCE, SIDEBARS E LISTAS
    -------------------------------------------------------------------------- */
 .sidebar,
 .sidebar row,
 placessidebar,
 placessidebar list,
-.thunar .shortcuts-pane {
+.thunar .shortcuts-pane,
+stacksidebar list {
     background-color: @bg_dark;
     color: @text_secondary;
     border-right: 1px solid @border_subtle;
 }
 
-placessidebar row {
+placessidebar row,
+stacksidebar row {
     border-radius: 7px;
     margin: 1px 4px;
     padding: 4px 8px;
 }
 
-placessidebar row:hover {
+placessidebar row:hover,
+stacksidebar row:hover {
     background-color: @bg_elevated;
     color: @text_primary;
 }
 
-placessidebar row:selected {
+placessidebar row:selected,
+stacksidebar row:selected {
     background-color: @accent_primary;
     color: #FFFFFF;
     font-weight: 600;
@@ -376,7 +383,9 @@ placessidebar row:selected {
 
 treeview.view,
 iconview.view,
-.view {
+.view,
+list,
+row {
     background-color: @bg_surface;
     color: @text_primary;
 }
@@ -398,12 +407,18 @@ treeview.view header button {
     font-weight: 600;
 }
 
+frame > border,
+scrolledwindow > border,
+.frame {
+    border-color: @border_subtle;
+}
+
 /* --------------------------------------------------------------------------
    8. ABAS (NOTEBOOK), DIÁLOGOS, PROGRESSO E SCROLLBARS
    -------------------------------------------------------------------------- */
 dialog .dialog-action-area,
 messagedialog .dialog-action-area {
-    padding: 6px 10px;
+    padding: 5px 8px;
     border-top: 1px solid @border_subtle;
     background-color: @bg_dark;
 }
@@ -416,7 +431,7 @@ notebook > header {
 notebook > header tab {
     background-color: transparent;
     color: @text_secondary;
-    padding: 5px 10px;
+    padding: 4px 9px;
     border-bottom: 2px solid transparent;
 }
 
