@@ -1,121 +1,477 @@
-/* LegacyOS Theme - Global UI */
+/* ==========================================================================
+   LEGACYOS OFFICIAL GTK 3.24 STYLESHEET
+   Paleta: Dark Slate (#0B1120 / #111827 / #1E293B) + Accent Blue (#0284C7)
+   ========================================================================== */
 
-@define-color bg_dark_glass #141D29;
-@define-color bg_sidebar #1E2B3A;
-@define-color bg_light_mode #F4F7FA;
-@define-color card_bg #FFFFFF;
-@define-color card_border #E2E8F0;
-@define-color primary_blue #0066FF;
-@define-color primary_hover #0A74DA;
-@define-color text_light #FFFFFF;
-@define-color text_dark #1E293B;
+@define-color bg_dark #0B1120;
+@define-color bg_surface #111827;
+@define-color bg_elevated #1E293B;
+@define-color bg_hover #273549;
+@define-color border_subtle rgba(255, 255, 255, 0.09);
+@define-color border_focus #0284C7;
+@define-color accent_primary #0284C7;
+@define-color accent_hover #0369A1;
+@define-color text_primary #F8FAFC;
+@define-color text_secondary #94A3B8;
+@define-color text_muted #64748B;
+@define-color status_success #10B981;
+@define-color status_warning #F59E0B;
+@define-color status_danger #EF4444;
 
-/* Força a fonte global e cantos arredondados */
+/* --------------------------------------------------------------------------
+   1. BASE GLOBAL E JANELAS
+   -------------------------------------------------------------------------- */
 * {
-    font-family: "Geist", "sans-serif";
+    -GtkScrollbar-has-backward-stepper: false;
+    -GtkScrollbar-has-forward-stepper: false;
+    outline-color: alpha(@accent_primary, 0.5);
+    outline-offset: -2px;
+    outline-style: dashed;
+    outline-width: 1px;
 }
 
-window {
-    background-color: @bg_light_mode;
-    color: @text_dark;
-    border-radius: 14px;
+window,
+dialog,
+messagedialog,
+.background {
+    background-color: @bg_surface;
+    color: @text_primary;
+    font-family: "Geist", "Inter", "Sans", sans-serif;
+    font-size: 10pt;
 }
 
-/* Barras de Título (Headerbars) Escuras */
-headerbar, .titlebar, .titlebar.flat {
-    background-color: @bg_dark_glass;
-    color: @text_light;
-    border-top-left-radius: 14px;
-    border-top-right-radius: 14px;
-    border-bottom: 1px solid #000000;
+window.csd,
+dialog.csd {
+    border-radius: 12px;
+    border: 1px solid @border_subtle;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+/* --------------------------------------------------------------------------
+   2. HEADERBARS E BARRAS DE FERRAMENTAS
+   -------------------------------------------------------------------------- */
+headerbar,
+.titlebar {
+    background-color: @bg_dark;
+    background-image: none;
+    color: @text_primary;
+    border-bottom: 1px solid @border_subtle;
     min-height: 38px;
-    box-shadow: none;
+    padding: 4px 10px;
+}
+
+headerbar:backdrop,
+.titlebar:backdrop {
+    background-color: #090E1A;
+    color: @text_secondary;
 }
 
 headerbar .title {
-    font-weight: bold;
-    color: @text_light;
+    font-weight: 700;
+    color: @text_primary;
 }
 
-/* Barra lateral escura para apps (Thunar, Configurações) */
-.sidebar, .thunar .sidebar, .xfce4-settings-manager .sidebar {
-    background-color: @bg_sidebar;
-    color: @text_light;
+headerbar .subtitle {
+    font-size: 8.5pt;
+    color: @text_secondary;
 }
 
-.sidebar row:selected, .thunar .sidebar row:selected {
-    background-color: @primary_blue;
-    color: white;
+toolbar,
+.primary-toolbar,
+menubar {
+    background-color: @bg_dark;
+    color: @text_primary;
+    border-bottom: 1px solid @border_subtle;
+    padding: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   3. PAINEL SUPERIOR (XFCE4-PANEL) - TEXTO BRANCO DE ALTO CONTRASTE
+   -------------------------------------------------------------------------- */
+.xfce4-panel,
+.xfce4-panel.background {
+    background-color: rgba(11, 17, 32, 0.92);
+    color: @text_primary;
+    border-bottom: 1px solid @border_subtle;
+    font-weight: 500;
+}
+
+.xfce4-panel label,
+.xfce4-panel button,
+.xfce4-panel button label,
+#clock-button,
+#clock-button label,
+#whiskermenu-button,
+#whiskermenu-button label {
+    color: @text_primary;
+    text-shadow: none;
+}
+
+.xfce4-panel button {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin: 2px 1px;
+    box-shadow: none;
+}
+
+.xfce4-panel button:hover {
+    background-color: rgba(255, 255, 255, 0.10);
+    color: #FFFFFF;
+}
+
+.xfce4-panel button:checked,
+.xfce4-panel button:active {
+    background-color: @accent_primary;
+    color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   4. WHISKER MENU (MENU DE APLICATIVOS LEGACYOS)
+   -------------------------------------------------------------------------- */
+#whiskermenu-window {
+    background-color: rgba(15, 23, 42, 0.96);
+    color: @text_primary;
+    border: 1px solid @border_subtle;
+    border-radius: 12px;
+}
+
+#whiskermenu-window entry {
+    background-color: @bg_elevated;
+    color: @text_primary;
+    border: 1px solid @border_subtle;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+#whiskermenu-window entry:focus {
+    border-color: @accent_primary;
+}
+
+#whiskermenu-window treeview {
+    background-color: transparent;
+    color: @text_primary;
+    padding: 4px;
+}
+
+#whiskermenu-window treeview:hover {
+    background-color: @bg_hover;
     border-radius: 8px;
 }
 
-.sidebar row:hover, .thunar .sidebar row:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+#whiskermenu-window treeview:selected {
+    background-color: @accent_primary;
+    color: #FFFFFF;
     border-radius: 8px;
 }
 
-/* Área de conteúdo clara */
-.thunar .standard-view, .view {
-    background-color: @bg_light_mode;
-}
-.thunar .standard-view row:selected, .view:selected {
-    background-color: #E2E8F0;
-    color: @text_dark;
+#whiskermenu-window button {
+    background-color: transparent;
+    color: @text_secondary;
+    border: none;
     border-radius: 8px;
+    padding: 6px 10px;
 }
 
-/* Botões Gerais */
-button {
-    border-radius: 8px;
+#whiskermenu-window button:hover,
+#whiskermenu-window button:checked {
+    background-color: @accent_primary;
+    color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   5. MENUS CONTEXTUAIS E POPOVERS
+   -------------------------------------------------------------------------- */
+menu,
+.menu,
+.context-menu,
+popover,
+popover.background {
+    background-color: @bg_surface;
+    color: @text_primary;
+    border: 1px solid @border_subtle;
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+menuitem {
+    color: @text_primary;
+    border-radius: 6px;
     padding: 6px 12px;
-    border: 1px solid @card_border;
-    background-color: @card_bg;
-    color: @text_dark;
-    transition: all 0.2s ease;
+}
+
+menuitem:hover {
+    background-color: @accent_primary;
+    color: #FFFFFF;
+}
+
+menuitem:disabled {
+    color: @text_muted;
+}
+
+separator {
+    background-color: @border_subtle;
+    min-height: 1px;
+    min-width: 1px;
+    margin: 4px 0;
+}
+
+/* --------------------------------------------------------------------------
+   6. BOTÕES, CAMPOS DE TEXTO E CONTROLES
+   -------------------------------------------------------------------------- */
+button {
+    background-color: @bg_elevated;
+    background-image: none;
+    color: @text_primary;
+    border: 1px solid @border_subtle;
+    border-radius: 8px;
+    padding: 6px 14px;
+    box-shadow: none;
 }
 
 button:hover {
-    background-color: #E2E8F0;
+    background-color: @bg_hover;
+    border-color: rgba(255, 255, 255, 0.18);
 }
 
-/* Botões de Ação (Azul) */
+button:active,
+button:checked {
+    background-color: @accent_primary;
+    color: #FFFFFF;
+    border-color: @accent_primary;
+}
+
+button:disabled {
+    background-color: rgba(30, 41, 59, 0.45);
+    color: @text_muted;
+}
+
 button.suggested-action {
-    background-color: @primary_blue;
-    color: @text_light;
-    border: none;
-    font-weight: bold;
+    background-color: @accent_primary;
+    color: #FFFFFF;
+    border-color: @accent_primary;
+    font-weight: 600;
 }
+
 button.suggested-action:hover {
-    background-color: @primary_hover;
+    background-color: @accent_hover;
 }
 
-/* Toggles / Switches */
+button.destructive-action {
+    background-color: @status_danger;
+    color: #FFFFFF;
+    border-color: @status_danger;
+}
+
+entry,
+spinbutton {
+    background-color: @bg_dark;
+    color: @text_primary;
+    border: 1px solid @border_subtle;
+    border-radius: 8px;
+    padding: 6px 10px;
+    caret-color: @accent_primary;
+}
+
+entry:focus,
+spinbutton:focus {
+    border-color: @accent_primary;
+}
+
+/* Switches modernos estilo LegacyOS */
 switch {
-    background-color: #CBD5E1;
+    background-color: @bg_elevated;
+    border: 1px solid @border_subtle;
     border-radius: 14px;
-}
-switch:checked {
-    background-color: @primary_blue;
-}
-switch slider {
-    border-radius: 14px;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    min-width: 44px;
+    min-height: 22px;
 }
 
-/* Menus e Tooltips */
-menu, .menu {
-    background-color: @bg_dark_glass;
-    color: @text_light;
-    border-radius: 10px;
-    border: 1px solid @bg_sidebar;
+switch:checked {
+    background-color: @accent_primary;
+    border-color: @accent_primary;
 }
-menuitem:hover {
-    background-color: @primary_blue;
+
+switch slider {
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    min-width: 18px;
+    min-height: 18px;
+    margin: 2px;
+}
+
+/* Checkboxes e Radios */
+check,
+radio {
+    background-color: @bg_dark;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    min-width: 16px;
+    min-height: 16px;
+}
+
+check {
+    border-radius: 4px;
+}
+
+radio {
+    border-radius: 50%;
+}
+
+check:checked,
+radio:checked {
+    background-color: @accent_primary;
+    border-color: @accent_primary;
+    color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   7. GERENCIADOR DE ARQUIVOS (THUNAR), SIDEBARS E LISTAS
+   -------------------------------------------------------------------------- */
+.sidebar,
+.sidebar row,
+placessidebar,
+placessidebar list,
+.thunar .shortcuts-pane {
+    background-color: @bg_dark;
+    color: @text_secondary;
+    border-right: 1px solid @border_subtle;
+}
+
+placessidebar row {
+    border-radius: 8px;
+    margin: 2px 6px;
+    padding: 6px 8px;
+}
+
+placessidebar row:hover {
+    background-color: @bg_elevated;
+    color: @text_primary;
+}
+
+placessidebar row:selected {
+    background-color: @accent_primary;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+treeview.view,
+iconview.view,
+.view {
+    background-color: @bg_surface;
+    color: @text_primary;
+}
+
+treeview.view:selected,
+iconview.view:selected,
+.view:selected,
+row:selected {
+    background-color: @accent_primary;
+    color: #FFFFFF;
     border-radius: 6px;
 }
-tooltip {
-    background-color: @bg_dark_glass;
-    color: @text_light;
+
+treeview.view header button {
+    background-color: @bg_dark;
+    color: @text_secondary;
+    border-radius: 0;
+    border-bottom: 1px solid @border_subtle;
+    font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   8. ABAS (NOTEBOOK), BARRAS DE PROGRESSO E SCROLLBARS
+   -------------------------------------------------------------------------- */
+notebook > header {
+    background-color: @bg_dark;
+    border-bottom: 1px solid @border_subtle;
+}
+
+notebook > header tab {
+    background-color: transparent;
+    color: @text_secondary;
+    padding: 8px 14px;
+    border-bottom: 2px solid transparent;
+}
+
+notebook > header tab:hover {
+    color: @text_primary;
+}
+
+notebook > header tab:checked {
+    color: @text_primary;
+    border-bottom: 2px solid @accent_primary;
+    font-weight: 600;
+}
+
+progressbar trough,
+scale trough {
+    background-color: @bg_elevated;
     border-radius: 6px;
+    min-height: 6px;
+}
+
+progressbar progress,
+scale highlight {
+    background-color: @accent_primary;
+    border-radius: 6px;
+}
+
+scale slider {
+    background-color: #FFFFFF;
+    border: 2px solid @accent_primary;
+    border-radius: 50%;
+    min-width: 16px;
+    min-height: 16px;
+}
+
+scrollbar {
+    background-color: transparent;
+}
+
+scrollbar slider {
+    background-color: rgba(148, 163, 184, 0.30);
+    border-radius: 6px;
+    min-width: 6px;
+    min-height: 6px;
+    margin: 2px;
+}
+
+scrollbar slider:hover {
+    background-color: rgba(148, 163, 184, 0.55);
+}
+
+/* --------------------------------------------------------------------------
+   9. NOTIFICAÇÕES DO SISTEMA (XFCE4-NOTIFYD)
+   -------------------------------------------------------------------------- */
+#XfceNotifyWindow {
+    background-color: rgba(15, 23, 42, 0.96);
+    color: @text_primary;
+    border: 1px solid @border_subtle;
+    border-radius: 12px;
+}
+
+#XfceNotifyWindow label#summary {
+    font-weight: 700;
+    color: @text_primary;
+}
+
+#XfceNotifyWindow label#body {
+    color: @text_secondary;
+}
+
+/* --------------------------------------------------------------------------
+   10. ÍCONES DA ÁREA DE TRABALHO (XFDESKTOP)
+   -------------------------------------------------------------------------- */
+XfdesktopIconView.view {
+    background-color: transparent;
+    color: #FFFFFF;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+XfdesktopIconView.view:active {
+    background-color: alpha(@accent_primary, 0.45);
+    border-radius: 8px;
 }
