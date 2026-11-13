@@ -64,13 +64,53 @@ rm -f /etc/skel/Desktop/*debian*.desktop /etc/skel/Desktop/calamares.desktop
 cp /usr/share/applications/legacyos-installer.desktop /etc/skel/Desktop/instalar-legacyos.desktop
 chmod 755 /etc/skel/Desktop/instalar-legacyos.desktop
 
+# Gera banner da tela de Boas-Vindas (420x175) e imagem do Slideshow de Instalação (640x360)
 WELCOME_PNG="/usr/share/pixmaps/legacyos-calamares-welcome.png"
-python3 - "$WELCOME_PNG" << 'PYEOF'
+SLIDE_PNG="/usr/share/pixmaps/legacyos-calamares-slide.png"
+
+python3 - "$WELCOME_PNG" "$SLIDE_PNG" << 'PYEOF'
+# -*- coding: utf-8 -*-
 import sys
 import cairo
 
-out_png = sys.argv[1]
+out_welcome = sys.argv[1]
+out_slide = sys.argv[2]
 
+def draw_logo_mark(ctx, x, y, scale):
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.scale(scale, scale)
+
+    grad_v = cairo.LinearGradient(65, 5, 20, 95)
+    grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
+    grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
+    grad_v.add_color_stop_rgb(0.72, 0.008, 0.518, 0.780)
+    grad_v.add_color_stop_rgb(1.0, 0.000, 0.278, 0.671)
+    ctx.set_source(grad_v)
+    ctx.move_to(18, 92)
+    ctx.line_to(18, 42)
+    ctx.curve_to(18, 24, 30, 12, 46, 8)
+    ctx.line_to(46, 68)
+    ctx.curve_to(34, 73, 24, 81, 18, 92)
+    ctx.close_path()
+    ctx.fill()
+
+    grad_h = cairo.LinearGradient(10, 90, 92, 55)
+    grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
+    grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
+    grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
+    grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
+    ctx.set_source(grad_h)
+    ctx.move_to(18, 92)
+    ctx.curve_to(26, 75, 38, 66, 56, 66)
+    ctx.line_to(92, 66)
+    ctx.curve_to(88, 82, 76, 92, 58, 92)
+    ctx.line_to(18, 92)
+    ctx.close_path()
+    ctx.fill()
+    ctx.restore()
+
+# 1. Banner de Boas-Vindas (420x175)
 W, H = 420, 175
 surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
 ctx = cairo.Context(surface)
@@ -93,39 +133,8 @@ ctx.set_source_rgba(0.055, 0.647, 0.914, 0.45)
 ctx.set_line_width(1.5)
 ctx.stroke()
 
-ctx.save()
 scale = 0.78
-ctx.translate(38.0, (H - 100.0 * scale) / 2.0)
-ctx.scale(scale, scale)
-
-grad_v = cairo.LinearGradient(65, 5, 20, 95)
-grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
-grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
-grad_v.add_color_stop_rgb(0.72, 0.008, 0.518, 0.780)
-grad_v.add_color_stop_rgb(1.0, 0.000, 0.278, 0.671)
-ctx.set_source(grad_v)
-ctx.move_to(18, 92)
-ctx.line_to(18, 42)
-ctx.curve_to(18, 24, 30, 12, 46, 8)
-ctx.line_to(46, 68)
-ctx.curve_to(34, 73, 24, 81, 18, 92)
-ctx.close_path()
-ctx.fill()
-
-grad_h = cairo.LinearGradient(10, 90, 92, 55)
-grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
-grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
-grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
-grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
-ctx.set_source(grad_h)
-ctx.move_to(18, 92)
-ctx.curve_to(26, 75, 38, 66, 56, 66)
-ctx.line_to(92, 66)
-ctx.curve_to(88, 82, 76, 92, 58, 92)
-ctx.line_to(18, 92)
-ctx.close_path()
-ctx.fill()
-ctx.restore()
+draw_logo_mark(ctx, 38.0, (H - 100.0 * scale) / 2.0, scale)
 
 ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 ctx.set_font_size(28)
@@ -143,8 +152,58 @@ ctx.set_font_size(11)
 ctx.set_source_rgb(0.580, 0.639, 0.722)
 ctx.move_to(136, 108)
 ctx.show_text("Seu equipamento ganhando nova vida")
+surface.write_to_png(out_welcome)
 
-surface.write_to_png(out_png)
+# 2. Imagem do Slideshow da Etapa "Instalar" (640x360 Dark Slate)
+SW, SH = 640, 360
+s_surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, SW, SH)
+s_ctx = cairo.Context(s_surf)
+
+s_ctx.set_source_rgb(0.067, 0.094, 0.153)
+s_ctx.rectangle(0, 0, SW, SH)
+s_ctx.fill()
+
+radial = cairo.RadialGradient(SW / 2.0, 125, 10, SW / 2.0, 125, 260)
+radial.add_color_stop_rgba(0.0, 0.008, 0.518, 0.780, 0.25)
+radial.add_color_stop_rgba(1.0, 0.067, 0.094, 0.153, 0.0)
+s_ctx.set_source(radial)
+s_ctx.rectangle(0, 0, SW, SH)
+s_ctx.fill()
+
+s_scale = 1.15
+draw_logo_mark(s_ctx, (SW - 100.0 * s_scale) / 2.0, 48.0, s_scale)
+
+s_ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+s_ctx.set_font_size(34)
+e1 = s_ctx.text_extents("Legacy")
+e2 = s_ctx.text_extents("OS")
+tx = (SW - (e1.width + e2.width + 3)) / 2.0
+
+s_ctx.set_source_rgb(0.973, 0.980, 0.988)
+s_ctx.move_to(tx, 206)
+s_ctx.show_text("Legacy")
+
+s_ctx.set_source_rgb(0.055, 0.647, 0.914)
+s_ctx.move_to(tx + e1.width + 3, 206)
+s_ctx.show_text("OS")
+
+s_ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+s_ctx.set_font_size(14)
+t_main = "Instalando o LegacyOS no seu computador..."
+em = s_ctx.text_extents(t_main)
+s_ctx.set_source_rgb(0.886, 0.910, 0.941)
+s_ctx.move_to((SW - em.width) / 2.0, 248)
+s_ctx.show_text(t_main)
+
+s_ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+s_ctx.set_font_size(12)
+t_sub = "O processo é automático e otimizado para desempenho e estabilidade."
+es = s_ctx.text_extents(t_sub)
+s_ctx.set_source_rgb(0.580, 0.639, 0.722)
+s_ctx.move_to((SW - es.width) / 2.0, 274)
+s_ctx.show_text(t_sub)
+
+s_surf.write_to_png(out_slide)
 PYEOF
 
 for BRAND_DIR in /etc/calamares/branding/debian /usr/share/calamares/branding/debian; do
@@ -156,6 +215,54 @@ for BRAND_DIR in /etc/calamares/branding/debian /usr/share/calamares/branding/de
         fi
 
         cp "$WELCOME_PNG" "$BRAND_DIR/welcome.png" 2>/dev/null || true
+        cp "$SLIDE_PNG" "$BRAND_DIR/slide.png" 2>/dev/null || true
+
+        # Substitui qualquer imagem PNG/SVG antiga do slideshow Debian pela imagem LegacyOS
+        for OLD_SLIDE in "$BRAND_DIR"/*slide*.png "$BRAND_DIR"/*background*.png "$BRAND_DIR"/*debian*.png; do
+            if [ -f "$OLD_SLIDE" ]; then
+                cp "$SLIDE_PNG" "$OLD_SLIDE" 2>/dev/null || true
+            fi
+        done
+
+        # Sobrescreve o slideshow QML da etapa "Instalar" com o visual oficial do LegacyOS
+        cat << 'EOF' > "$BRAND_DIR/show.qml"
+import QtQuick 2.0;
+import calamares.slideshow 1.0;
+
+Presentation
+{
+    id: presentation
+
+    function nextSlide() {
+        presentation.goToNextSlide();
+    }
+
+    Timer {
+        id: advanceTimer
+        interval: 8000
+        running: true
+        repeat: true
+        onTriggered: nextSlide()
+    }
+
+    Slide {
+        Rectangle {
+            anchors.fill: parent
+            color: "#111827"
+
+            Image {
+                id: legacySlideImg
+                source: "slide.png"
+                anchors.centerIn: parent
+                width: Math.min(parent.width, 640)
+                height: Math.min(parent.height, 360)
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+            }
+        }
+    }
+}
+EOF
 
         cat << 'EOF' > "$BRAND_DIR/stylesheet.qss"
 QWidget {
@@ -176,8 +283,8 @@ QPushButton {
     color: #F8FAFC;
     border: 1px solid #334155;
     border-radius: 6px;
-    padding: 6px 14px;
-    min-height: 24px;
+    padding: 4px 12px;
+    min-height: 22px;
 }
 
 QPushButton:hover {
@@ -241,7 +348,7 @@ replacements = [
     (r'(supportUrl:\s*).*', r'\1"https://github.com"'),
     (r'(knownIssuesUrl:\s*).*', r'\1"https://github.com"'),
     (r'(releaseNotesUrl:\s*).*', r'\1"https://github.com"'),
-    (r'(windowSize:\s*).*', r'\1"800px,520px"'),
+    (r'(windowSize:\s*).*', r'\1"800px,495px"'),
     (r'(windowExpanding:\s*).*', r'\1"normal"'),
     (r'(sidebarBackground:\s*).*', r'\1"#0B1120"'),
     (r'(sidebarText:\s*).*', r'\1"#94A3B8"'),
