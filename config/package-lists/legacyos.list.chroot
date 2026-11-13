@@ -18,7 +18,9 @@ sudo
 curl
 wget
 gnupg
-policykit-1-gnome
+polkitd
+pkexec
+mate-polkit
 
 # 2. Ambiente Gráfico (XFCE Minimalista)
 xfce4
