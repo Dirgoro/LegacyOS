@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - HOOK DE ATIVOS VISUAIS DA FASE 2 (CHROOT)
-# Gera bordas/botões XPM do xfwm4, registra logotipo SVG, fontes e fundo padrão
+# Gera tema de janela xfwm4, boot splash Plymouth, logotipo SVG e fontes
 # ==============================================================================
 
 set -e
@@ -161,6 +161,80 @@ if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
     chmod 644 /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
     gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 fi
+
+# ------------------------------------------------------------------------------
+# Cria tema Plymouth oficial do LegacyOS (substitui a tela inicial debian 13)
+# ------------------------------------------------------------------------------
+echo "[LegacyOS Hook 0650] Configurando boot splash Plymouth do LegacyOS..."
+PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
+mkdir -p "$PLYMOUTH_DIR"
+
+python3 - << 'PYEOF'
+import os
+import gi
+gi.require_version("GdkPixbuf", "2.0")
+from gi.repository import GdkPixbuf
+import cairo
+
+out_png = "/usr/share/plymouth/themes/legacyos/logo.png"
+svg_path = "/usr/share/pixmaps/legacyos-logo.svg"
+
+rendered = False
+if os.path.isfile(svg_path):
+    try:
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(svg_path, 112, 112, True)
+        pixbuf.savev(out_png, "png", [], [])
+        rendered = True
+    except Exception:
+        rendered = False
+
+if not rendered:
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 112, 112)
+    ctx = cairo.Context(surface)
+    ctx.set_source_rgb(0.055, 0.647, 0.914)
+    ctx.rectangle(24, 16, 24, 80)
+    ctx.fill()
+    ctx.set_source_rgb(0.945, 0.961, 0.976)
+    ctx.rectangle(24, 74, 64, 22)
+    ctx.fill()
+    surface.write_to_png(out_png)
+PYEOF
+
+cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.plymouth"
+[Plymouth Theme]
+Name=LegacyOS
+Description=Tela de inicialização oficial do LegacyOS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/legacyos
+ScriptFile=/usr/share/plymouth/themes/legacyos/legacyos.script
+EOF
+
+cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.script"
+Window.SetBackgroundTopColor(0.043, 0.067, 0.125);
+Window.SetBackgroundBottomColor(0.043, 0.067, 0.125);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 20);
+logo.sprite.SetOpacity(1);
+
+fun refresh_callback () {
+    logo.sprite.SetOpacity(1);
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+EOF
+
+mkdir -p /etc/plymouth
+cat << 'EOF' > /etc/plymouth/plymouthd.conf
+[Daemon]
+Theme=legacyos
+ShowDelay=0
+EOF
+
+plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
 # Substitui o papel de parede fallback do Debian 13 pelo do LegacyOS
