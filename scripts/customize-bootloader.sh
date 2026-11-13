@@ -18,6 +18,7 @@ echo "[LegacyOS Bootloader] Gerando splash screen 640x480..."
 SPLASH_PNG="/tmp/legacyos-boot-splash.png"
 
 python3 - "$SPLASH_PNG" << 'PYEOF'
+# -*- coding: utf-8 -*-
 import sys
 import cairo
 
@@ -91,10 +92,10 @@ ctx.set_source_rgb(0.055, 0.647, 0.914)
 ctx.move_to(start_x + e1.width + 2, 122)
 ctx.show_text(t2)
 
-# 4. Subtítulo discreto acima das instruções de tecla (sem sobreposição)
+# 4. Subtítulo discreto com acentuação correta
 ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 ctx.set_font_size(11)
-sub = "Novas possibilidades para grandes historias"
+sub = "Novas possibilidades para grandes histórias"
 esub = ctx.text_extents(sub)
 ctx.set_source_rgb(0.580, 0.639, 0.722)
 ctx.move_to((W - esub.width) / 2.0, 388)
