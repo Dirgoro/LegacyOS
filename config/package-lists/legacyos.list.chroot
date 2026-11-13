@@ -43,13 +43,16 @@ xfce4-notifyd
 xfce4-pulseaudio-plugin
 xfce4-whiskermenu-plugin
 
-# 4. Personalização, Ícones e UI (Visual LegacyOS)
+# 4. Personalização, Ícones e UI (GTK2, GTK3, Qt5/Qt6)
 plank
 xdotool
+wmctrl
 gtk2-engines-murrine
 gnome-themes-extra
 papirus-icon-theme
 librsvg2-common
+qt5ct
+qt6ct
 
 # 5. Programas de Terceiros e Utilitários Leves (0 MB em segundo plano)
 firefox-esr
