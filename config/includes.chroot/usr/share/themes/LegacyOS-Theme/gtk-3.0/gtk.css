@@ -484,3 +484,39 @@ XfdesktopIconView.view:active {
     background-color: alpha(@accent_primary, 0.45);
     border-radius: 8px;
 }
+
+/* --------------------------------------------------------------------------
+   11. TELA DE LOGIN / BLOQUEIO (LIGHTDM GTK GREETER)
+   -------------------------------------------------------------------------- */
+#panel_window {
+    background-color: rgba(11, 17, 32, 0.88);
+    color: @text_primary;
+    border-bottom: 1px solid @border_subtle;
+}
+
+#panel_window menubar,
+#panel_window menuitem,
+#panel_window label {
+    background-color: transparent;
+    color: @text_primary;
+}
+
+#login_window {
+    background-color: rgba(15, 23, 42, 0.94);
+    color: @text_primary;
+    border: 1px solid @border_subtle;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+}
+
+#login_window #login_button {
+    background-color: @accent_primary;
+    color: #FFFFFF;
+    border-color: @accent_primary;
+    font-weight: 600;
+}
+
+#login_window #login_button:hover {
+    background-color: @accent_hover;
+}
