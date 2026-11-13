@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Fundo Dark Slate do LegacyOS -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="55%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#0B1120" />
+    </linearGradient>
+
+    <!-- Brilho sutil superior -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.55" />
+      <stop offset="50%" stop-color="#0284C7" stop-opacity="0.20" />
+      <stop offset="100%" stop-color="#94A3B8" stop-opacity="0.15" />
+    </linearGradient>
+
+    <!-- Escudo em Azul LegacyOS -->
+    <linearGradient id="shieldGrad" x1="20%" y1="10%" x2="85%" y2="95%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0369A1" />
+    </linearGradient>
+
+    <!-- Sombra suave interna -->
+    <filter id="dropShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#020617" flood-opacity="0.55" />
+    </filter>
+  </defs>
+
+  <!-- Base arredondada estilo squircle -->
+  <rect x="8" y="8" width="112" height="112" rx="28" ry="28" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="2.5" />
+
+  <!-- Halo luminoso discreto atrás do escudo -->
+  <circle cx="64" cy="64" r="36" fill="#0284C7" opacity="0.14" />
+
+  <!-- Escudo de Saúde e Proteção do Sistema -->
+  <path d="M64 24
+           C76 30, 89 33, 98 35
+           L98 62
+           C98 83, 83 98, 64 105
+           C45 98, 30 83, 30 62
+           L30 35
+           C39 33, 52 30, 64 24 Z" fill="url(#shieldGrad)" filter="url(#dropShadow)" />
+
+  <!-- Reflexo interno sutil no topo do escudo -->
+  <path d="M64 27
+           C75 32, 86 35, 95 37
+           L95 52
+           C77 48, 51 48, 33 52
+           L33 37
+           C42 35, 53 32, 64 27 Z" fill="#E0F2FE" opacity="0.18" />
+
+  <!-- Linha de Pulso / Telemetria de Saúde -->
+  <polyline points="38,65 50,65 56,50 64,79 72,56 77,65 90,65" fill="none" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Indicador de Status Saudável (Verde Esmeralda) -->
+  <circle cx="94" cy="94" r="13" fill="#0B1120" />
+  <circle cx="94" cy="94" r="9.5" fill="#10B981" />
+  <polyline points="89.5,94 92.8,97.2 98.8,91" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
