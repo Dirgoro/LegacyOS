@@ -211,10 +211,10 @@ if [ -f "/usr/share/applications/galculator.desktop" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Registra os ícones SVG oficiais no tema de ícones hicolor
+# Registra os ícones SVG oficiais no tema de ícones hicolor (Inclui legacy-guardian.svg)
 # ------------------------------------------------------------------------------
 mkdir -p /usr/share/icons/hicolor/scalable/apps
-for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg; do
+for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg legacy-guardian.svg; do
     if [ -f "/usr/share/pixmaps/$ICON_SVG" ]; then
         cp "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
         chmod 644 "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
@@ -223,7 +223,7 @@ done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Gera o avatar padrão do usuário (.face em PNG) substituindo o ícone Debian
+# Gera o avatar padrão do usuário (.face em PNG)
 # ------------------------------------------------------------------------------
 echo "[LegacyOS Hook 0650] Gerando avatar oficial do usuário (.face)..."
 AVATAR_PNG="/usr/share/pixmaps/legacyos-avatar.png"
@@ -307,9 +307,9 @@ mkdir -p /var/lib/AccountsService/icons
 cp "$AVATAR_PNG" /var/lib/AccountsService/icons/user 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
-# Cria tema Plymouth oficial e imagem de transição contínua X11
+# Tema Plymouth e transição X11
 # ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Configurando boot splash contínuo sem piscadas pretas..."
+echo "[LegacyOS Hook 0650] Configurando boot splash contínuo..."
 PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
 mkdir -p "$PLYMOUTH_DIR"
 
@@ -419,26 +419,6 @@ ExecStart=
 ExecStart=-/bin/plymouth --wait
 EOF
 
-cat << 'EOF' > /usr/local/bin/legacyos-x11-hold
-#!/bin/bash
-export DISPLAY="${DISPLAY:-:0}"
-
-xsetroot -solid "#0F141C" 2>/dev/null || true
-
-LOCK_FILE="/tmp/legacyos-splash.lock"
-SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
-touch "$LOCK_FILE"
-if [ -f "$SPLASH_SCRIPT" ] && ! pgrep -f "login-splash/main.py" >/dev/null; then
-    nohup python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
-fi
-
-exit 0
-EOF
-chmod 755 /usr/local/bin/legacyos-x11-hold
-
-mkdir -p /etc/modprobe.d
-echo "blacklist i2c_piix4" > /etc/modprobe.d/blacklist-piix4.conf
-
 cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
@@ -471,21 +451,22 @@ fi
 echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
 fc-cache -f -v >/dev/null 2>&1 || true
 
-if [ -f "/usr/share/applications/exo-mail-reader.desktop" ]; then
-    if ! grep -q "NoDisplay=true" /usr/share/applications/exo-mail-reader.desktop; then
-        echo "NoDisplay=true" >> /usr/share/applications/exo-mail-reader.desktop
-    fi
-fi
-
+# ------------------------------------------------------------------------------
+# Permissões e Registros Finais de Todas as Ferramentas do LegacyOS
+# ------------------------------------------------------------------------------
 chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-window-fit 2>/dev/null || true
 chmod 755 /usr/local/bin/legacy-care-center 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-workspace 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-settings 2>/dev/null || true
+chmod 755 /usr/local/bin/legacy-guardian 2>/dev/null || true
+chmod 755 /usr/local/bin/legacy-guardian-daemon 2>/dev/null || true
+
 chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-settings.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacy-care-center.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-workspace.desktop 2>/dev/null || true
+chmod 644 /usr/share/applications/legacy-guardian.desktop 2>/dev/null || true
 
-echo "[LegacyOS Hook 0650] Ativos visuais concluídos."
+echo "[LegacyOS Hook 0650] Ativos visuais e ferramentas concluídos com sucesso."
 exit 0
