@@ -1,14 +1,29 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - SCRIPT DE ESTABILIZAÇÃO VISUAL E ADAPTATIVA (FASE 2)
-# Aplica símbolo oficial na barra superior, tema escuro e modo 1024x600+
+# Aciona cortina de boas-vindas imediatamente e prepara desktop em segundo plano
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
-sleep 2
 
 # ------------------------------------------------------------------------------
-# 0. DETECÇÃO DE RESOLUÇÃO DE TELA (MODO COMPACTO PARA NETBOOKS COMO D260)
+# 0. ACIONAMENTO IMEDIATO DA CORTINA DE LOGIN (OCULTA MONTAGEM DO DESKTOP)
+# ------------------------------------------------------------------------------
+LOCK_FILE="/tmp/legacyos-splash.lock"
+SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
+
+touch "$LOCK_FILE"
+trap 'rm -f "$LOCK_FILE"' EXIT
+
+if [ -f "$SPLASH_SCRIPT" ]; then
+    python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
+fi
+
+# Aguarda o xfconfd estabilizar enquanto a cortina cobre a tela
+sleep 1.5
+
+# ------------------------------------------------------------------------------
+# 1. DETECÇÃO DE RESOLUÇÃO DE TELA (MODO COMPACTO PARA NETBOOKS COMO D260)
 # ------------------------------------------------------------------------------
 SCREEN_HEIGHT=$(xrandr --current 2>/dev/null | awk '/\*/ {split($1, res, "x"); print res[2]; exit}')
 SCREEN_HEIGHT="${SCREEN_HEIGHT:-768}"
@@ -32,7 +47,7 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 1. TEMA GLOBAL, BORDAS DE JANELA, ÍCONES E GERENCIADOR ADAPTATIVO (XFWM4)
+# 2. TEMA GLOBAL, BORDAS DE JANELA, ÍCONES E GERENCIADOR ADAPTATIVO (XFWM4)
 # ------------------------------------------------------------------------------
 xfconf-query -c xsettings -p /Net/ThemeName -n -t string -s "LegacyOS-Theme"
 xfconf-query -c xsettings -p /Net/IconThemeName -n -t string -s "Papirus-Dark"
@@ -51,10 +66,10 @@ xfconf-query -c xfwm4 -p /general/snap_to_border -n -t bool -s true
 xfconf-query -c xfwm4 -p /general/tile_on_move -n -t bool -s true
 
 # ------------------------------------------------------------------------------
-# 2. CONSTRUÇÃO DA BARRA SUPERIOR (SÍMBOLO LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
+# 3. CONSTRUÇÃO DA BARRA SUPERIOR (SÍMBOLO LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
 # ------------------------------------------------------------------------------
 pkill -x xfce4-panel 2>/dev/null || true
-sleep 0.5
+sleep 0.4
 
 xfconf-query -c xfce4-panel -p / -r -R 2>/dev/null || true
 
@@ -114,7 +129,7 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -n \
 nohup xfce4-panel >/dev/null 2>&1 &
 
 # ------------------------------------------------------------------------------
-# 3. APLICAÇÃO DO PAPEL DE PAREDE OFICIAL (/usr/share/backgrounds/legacyos-wallpaper.jpg)
+# 4. APLICAÇÃO DO PAPEL DE PAREDE OFICIAL (/usr/share/backgrounds/legacyos-wallpaper.jpg)
 # ------------------------------------------------------------------------------
 WALLPAPER="/usr/share/backgrounds/legacyos-wallpaper.jpg"
 
@@ -132,13 +147,13 @@ fi
 
 if ! pgrep -x xfdesktop >/dev/null; then
     nohup xfdesktop >/dev/null 2>&1 &
-    sleep 1
+    sleep 0.8
 else
     xfdesktop --reload 2>/dev/null || true
 fi
 
 # ------------------------------------------------------------------------------
-# 4. CONFIGURAÇÃO E INICIALIZAÇÃO ADAPTATIVA DA DOCK (PLANK)
+# 5. CONFIGURAÇÃO E INICIALIZAÇÃO ADAPTATIVA DA DOCK (PLANK)
 # ------------------------------------------------------------------------------
 DOCK_DIR="$HOME/.config/plank/dock1/launchers"
 mkdir -p "$DOCK_DIR"
@@ -171,11 +186,15 @@ if ! pgrep -x plank >/dev/null; then
 fi
 
 # ------------------------------------------------------------------------------
-# 5. ALINHAMENTO DOS ÍCONES DA ÁREA DE TRABALHO
+# 6. ALINHAMENTO DOS ÍCONES DA ÁREA DE TRABALHO E LIBERAÇÃO DA TELA
 # ------------------------------------------------------------------------------
 if [ -x "/usr/bin/legacyos-move-icons.sh" ]; then
-    sleep 1
-    /usr/bin/legacyos-move-icons.sh >/dev/null 2>&1 &
+    sleep 0.6
+    /usr/bin/legacyos-move-icons.sh >/dev/null 2>&1 || true
 fi
+
+# Pequena margem para Plank e wallpaper terminarem de renderizar atrás da cortina
+sleep 0.5
+rm -f "$LOCK_FILE"
 
 exit 0
