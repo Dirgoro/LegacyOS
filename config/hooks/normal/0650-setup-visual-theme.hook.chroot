@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - HOOK DE ATIVOS VISUAIS DA FASE 2 (CHROOT)
-# Gera bordas/botões XPM do xfwm4, atualiza cache da fonte Geist e limpa menus
+# Gera bordas/botões XPM do xfwm4, registra logotipo SVG, fontes e limpa menus
 # ==============================================================================
 
 set -e
@@ -151,6 +151,16 @@ EOF
 cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-prelight.xpm"
 cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#0284C7/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
+
+# ------------------------------------------------------------------------------
+# Registra o logotipo SVG oficial no tema de ícones hicolor
+# ------------------------------------------------------------------------------
+if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
+    mkdir -p /usr/share/icons/hicolor/scalable/apps
+    cp /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
+    chmod 644 /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
+    gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
+fi
 
 # ------------------------------------------------------------------------------
 # Atualiza cache das fontes (inclui a família Geist)
