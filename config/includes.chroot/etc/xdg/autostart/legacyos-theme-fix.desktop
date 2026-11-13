@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=LegacyOS Boot Adjustments
+Comment=Configura barra superior, papel de parede e dock no boot
+Exec=/usr/bin/legacyos-fix-theme.sh
+OnlyShowIn=XFCE;
+StartupNotify=false
+Terminal=false
+Hidden=false
