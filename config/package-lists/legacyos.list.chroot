@@ -1,22 +1,76 @@
-# Base XFCE e Tema (Adicionado o menu Whisker e o Sudo)
-xfce4 xfce4-terminal thunar thunar-archive-plugin thunar-volman
-xfce4-panel xfce4-settings xfce4-power-manager xfce4-notifyd
-xfce4-whiskermenu-plugin plank arc-theme papirus-icon-theme
-lightdm lightdm-gtk-greeter
+# ==========================================
+# RELAÇÃO DE PACOTES BASE - LEGACYOS (DEBIAN 13)
+# ==========================================
+
+# 1. Sistema Base, Hardware e Memória Virtual
+linux-image-amd64
+live-boot
+live-config
+systemd-sysv
+zram-tools
+network-manager
+network-manager-gnome
+pipewire-audio
+pavucontrol
+upower
+ufw
 sudo
+curl
+wget
+gnupg
+policykit-1-gnome
 
-# Rede e Firmware
-network-manager network-manager-gnome
-firmware-iwlwifi firmware-realtek firmware-atheros
+# 2. Ambiente Gráfico (XFCE Minimalista)
+xfce4
+xfce4-panel
+xfce4-session
+xfce4-settings
+xfwm4
+xfdesktop4
+thunar
+thunar-archive-plugin
+thunar-volman
+xfce4-power-manager
+xfce4-notifyd
+xfce4-pulseaudio-plugin
+xfce4-whiskermenu-plugin
 
-# Segurança e Utilitários
-ufw unattended-upgrades systemd-timesyncd zram-tools lm-sensors openssl
-python3 python3-gi python3-gi-cairo python3-psutil gir1.2-gtk-3.0 gir1.2-notify-0.7 libnotify-bin
+# 3. Personalização, Ícones e UI (Visual LegacyOS)
+plank
+xdotool
+gtk2-engines-murrine
+gnome-themes-extra
+papirus-icon-theme
 
-# Ferramentas Legacy, Drivers e Integração VMware
-util-linux util-linux-extra pciutils usbutils inxi smartmontools spice-vdagent
-xserver-xorg xserver-xorg-video-vesa xserver-xorg-video-fbdev open-vm-tools open-vm-tools-desktop
+# 4. Programas de Terceiros e Utilitários Leves (0 MB em segundo plano)
+firefox-esr
+vlc
+atril
+ristretto
+xarchiver
+p7zip-full
+unzip
+mousepad
+gnome-calculator
+gnome-system-monitor
+gnome-disk-utility
+xfce4-screenshooter
+synaptic
+gdebi
 
-# Aplicativos para o Usuário Final
-vlc ristretto mousepad galculator xarchiver p7zip-full unzip
-gufw gparted synaptic system-config-printer
+# 5. Compatibilidade de Fontes (Office) e Codecs Multimídia
+fonts-crosextra-carlito
+fonts-crosextra-caladea
+libavcodec-extra
+
+# 6. Dependências para os Apps Nativos (Python/GTK3/Cairo)
+python3
+python3-gi
+python3-gi-cairo
+python3-psutil
+gir1.2-gtk-3.0
+gir1.2-glib-2.0
+gir1.2-notify-0.7
+gir1.2-pango-1.0
+libcairo2-dev
+libgirepository1.0-dev
