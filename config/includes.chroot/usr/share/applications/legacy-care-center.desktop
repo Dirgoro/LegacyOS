@@ -1,8 +1,11 @@
 [Desktop Entry]
+Type=Application
+Version=1.0
 Name=Legacy Care Center
-Comment=Diagnóstico e Manutenção
-Exec=python3 /usr/share/legacyos/src/care-center/main.py
+GenericName=Central de Saúde do Sistema
+Comment=Diagnosticar, otimizar e monitorar o desempenho do LegacyOS
+Exec=/usr/local/bin/legacy-care-center
 Icon=utilities-system-monitor
 Terminal=false
-Type=Application
-Categories=System;Utility;
+StartupNotify=true
+Categories=System;Settings;
