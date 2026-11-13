@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Configurações
+GenericName=Preferências do sistema
+Comment=Personalize aparência, rede, som, notificações e privacidade do LegacyOS
+Exec=/usr/local/bin/legacyos-settings
+Icon=/usr/share/pixmaps/legacyos-settings.svg
+Terminal=false
+StartupNotify=true
+Categories=Settings;System;
