@@ -1,6 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - SCRIPT DE ESTABILIZAÇÃO VISUAL, ÍCONE DE INSTALAÇÃO E SESSÃO
+# Mantém a cortina de login ativa até painel, wallpaper e dock estarem prontos
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
@@ -14,11 +15,12 @@ SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
 touch "$LOCK_FILE"
 trap 'rm -f "$LOCK_FILE"' EXIT
 
-if [ -f "$SPLASH_SCRIPT" ]; then
+if [ -f "$SPLASH_SCRIPT" ] && ! pgrep -f "login-splash/main.py" >/dev/null; then
     python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
 fi
 
-sleep 1.5
+# Aguarda o servidor gráfico e o xfconfd estabilizarem atrás da cortina
+sleep 1.8
 
 # ------------------------------------------------------------------------------
 # 1. DETECÇÃO DE RESOLUÇÃO DE TELA (MODO COMPACTO PARA NETBOOKS COMO D260)
@@ -64,7 +66,7 @@ xfconf-query -c xfwm4 -p /general/tile_on_move -n -t bool -s true
 # 3. CONSTRUÇÃO DA BARRA SUPERIOR (SÍMBOLO LEGACYOS, LOCAIS, BANDEJA E RELÓGIO)
 # ------------------------------------------------------------------------------
 pkill -x xfce4-panel 2>/dev/null || true
-sleep 0.4
+sleep 0.5
 
 xfconf-query -c xfce4-panel -p / -r -R 2>/dev/null || true
 
@@ -142,7 +144,7 @@ fi
 
 if ! pgrep -x xfdesktop >/dev/null; then
     nohup xfdesktop >/dev/null 2>&1 &
-    sleep 0.8
+    sleep 1.0
 else
     xfdesktop --reload 2>/dev/null || true
 fi
@@ -163,7 +165,6 @@ if grep -q "boot=live" /proc/cmdline; then
         gio set "$INSTALL_DST" metadata::xfce-exe-checksum "$CHECKSUM" 2>/dev/null || true
     fi
 else
-    # Remove atalho de instalação caso o sistema já esteja instalado no disco
     rm -f "$DESKTOP_DIR/instalar-legacyos.desktop"
 fi
 
@@ -178,7 +179,7 @@ mkdir -p "$CONFIG_DIR" "$DOCK_DIR"
 
 if [ ! -f "$DOCK_FLAG" ]; then
     pkill -x plank 2>/dev/null || true
-    sleep 0.3
+    sleep 0.4
     rm -f "$DOCK_DIR"/*.dockitem
 
     for APP in \
@@ -211,14 +212,23 @@ if ! pgrep -x plank >/dev/null; then
 fi
 
 # ------------------------------------------------------------------------------
-# 7. ALINHAMENTO DOS ÍCONES E LIBERAÇÃO DA CORTINA DE LOGIN
+# 7. SINCRONIZAÇÃO FINAL: AGUARDA PAINEL, DESKTOP E DOCK RENDERIZAREM
 # ------------------------------------------------------------------------------
 if [ -x "/usr/bin/legacyos-move-icons.sh" ]; then
     sleep 0.6
     /usr/bin/legacyos-move-icons.sh >/dev/null 2>&1 || true
 fi
 
-sleep 0.5
+# Aguarda até que painel, xfdesktop e plank estejam ativos antes de abrir a cortina
+for i in $(seq 1 15); do
+    if pgrep -x xfce4-panel >/dev/null && pgrep -x xfdesktop >/dev/null && pgrep -x plank >/dev/null; then
+        break
+    fi
+    sleep 0.3
+done
+
+# Margem extra para o compositor concluir o desenho do papel de parede e da dock
+sleep 1.4
 rm -f "$LOCK_FILE"
 
 # Se o usuário escolheu "Instalar o LegacyOS" no menu de boot, abre o instalador
