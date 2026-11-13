@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Legacy Guardian
+GenericName=Central de segurança e hardware
+Comment=Monitore a saúde do seu computador, bateria, SSD e temperatura
+Exec=/usr/local/bin/legacy-guardian
+Icon=/usr/share/pixmaps/legacy-guardian.svg
+Terminal=false
+StartupNotify=true
+Categories=System;Security;Utility;
