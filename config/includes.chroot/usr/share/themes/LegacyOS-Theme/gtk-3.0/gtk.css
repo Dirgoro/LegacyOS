@@ -56,7 +56,7 @@ headerbar,
     background-image: none;
     color: @text_primary;
     border-bottom: 1px solid @border_subtle;
-    min-height: 32px;
+    min-height: 30px;
     padding: 2px 8px;
 }
 
@@ -220,7 +220,7 @@ separator {
 }
 
 /* --------------------------------------------------------------------------
-   6. BOTÕES, CAMPOS DE TEXTO E CONTROLES (ESPACAMENTO OTIMIZADO)
+   6. BOTÕES, CAMPOS DE TEXTO E CONTROLES (OTIMIZADO PARA 1024x600)
    -------------------------------------------------------------------------- */
 button {
     background-color: @bg_elevated;
@@ -228,8 +228,8 @@ button {
     color: @text_primary;
     border: 1px solid @border_subtle;
     border-radius: 7px;
-    padding: 4px 12px;
-    min-height: 24px;
+    padding: 3px 10px;
+    min-height: 22px;
     box-shadow: none;
 }
 
@@ -274,13 +274,28 @@ spinbutton {
     border: 1px solid @border_subtle;
     border-radius: 7px;
     padding: 4px 8px;
-    min-height: 24px;
+    min-height: 22px;
     caret-color: @accent_primary;
 }
 
 entry:focus,
 spinbutton:focus {
     border-color: @accent_primary;
+}
+
+/* Calculadora (Galculator) - Visual Dark Slate e altura compacta */
+#galculator window,
+#galculator textview,
+#galculator textview text {
+    background-color: @bg_dark;
+    color: @text_primary;
+}
+
+#galculator button {
+    padding: 2px 6px;
+    min-height: 20px;
+    border-radius: 6px;
+    font-weight: 600;
 }
 
 /* Switches modernos estilo LegacyOS */
