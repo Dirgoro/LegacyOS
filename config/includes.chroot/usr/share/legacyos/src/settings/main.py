@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 LEGACYOS SETTINGS - Preferências do Sistema
-Interface fiel ao design oficial do LegacyOS (#0F141C / #141A23 / #19212D / #137FEC)
-com controles reais integrados ao XFCE, xfwm4, NetworkManager, PulseAudio e Plank.
+Interface fiel ao design oficial do LegacyOS com controles integrados de
+posição de barra, dock, alinhamento de ícones e hardware.
 """
 
 import os
@@ -40,8 +40,6 @@ def run_async(cmd):
 
 
 class ThemePreviewCard(Gtk.Button):
-    """Cartão visual com miniatura desenhada em Cairo (Claro, Escuro ou Automático)."""
-
     def __init__(self, mode, title, selected=False, on_select=None):
         super().__init__()
         self.mode = mode
@@ -93,24 +91,20 @@ class ThemePreviewCard(Gtk.Button):
         side = (0.059, 0.078, 0.110) if dark else (0.886, 0.910, 0.941)
         card = (0.145, 0.192, 0.259) if dark else (1.0, 1.0, 1.0)
 
-        # Fundo geral
         ctx.set_source_rgb(*bg)
         ctx.rectangle(0, 0, w, h)
         ctx.fill()
 
-        # Sidebar
         ctx.set_source_rgb(*side)
         ctx.rectangle(0, 0, w * 0.28, h)
         ctx.fill()
 
-        # Linhas sidebar
         ctx.set_source_rgba(0.58, 0.64, 0.72, 0.35)
         ctx.rectangle(6, 10, w * 0.16, 4)
         ctx.rectangle(6, 18, w * 0.13, 4)
         ctx.rectangle(6, 26, w * 0.15, 4)
         ctx.fill()
 
-        # Cartões conteúdo
         ctx.set_source_rgb(*card)
         ctx.rectangle(w * 0.34, 9, w * 0.58, 14)
         ctx.rectangle(w * 0.34, 28, w * 0.58, 15)
@@ -129,7 +123,6 @@ class ThemePreviewCard(Gtk.Button):
         elif self.mode == "dark":
             self._draw_mockup(ctx, w, h, dark=True)
         else:
-            # Metade clara à esquerda (diagonal), metade escura à direita
             self._draw_mockup(ctx, w, h, dark=True)
             ctx.save()
             ctx.move_to(0, 0)
@@ -143,7 +136,6 @@ class ThemePreviewCard(Gtk.Button):
 
         ctx.restore()
 
-        # Borda do mockup
         self._rounded_rect(ctx, 1, 1, w - 2, h - 2, 7)
         if self.selected:
             ctx.set_source_rgb(0.075, 0.498, 0.925)
@@ -153,7 +145,6 @@ class ThemePreviewCard(Gtk.Button):
             ctx.set_line_width(1.0)
         ctx.stroke()
 
-        # Badge de seleção circular azul no canto superior direito
         if self.selected:
             cx, cy, r = w - 10, 10, 7.5
             ctx.set_source_rgb(0.075, 0.498, 0.925)
@@ -173,7 +164,7 @@ class ThemePreviewCard(Gtk.Button):
 class LegacySettingsWindow(Gtk.Window):
     def __init__(self):
         super().__init__(title="Configurações — Preferências do sistema")
-        self.set_default_size(1100, 620)
+        self.set_default_size(1120, 640)
         self.set_size_request(860, 500)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -220,142 +211,35 @@ class LegacySettingsWindow(Gtk.Window):
 
     def _apply_css(self):
         css = b"""
-        #st-root {
-            background-color: #141A23;
-            color: #F8FAFC;
-        }
-        #st-topbar {
-            background-color: #0F141C;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-            padding: 8px 16px;
-        }
-        #st-app-title {
-            color: #F8FAFC;
-            font-size: 11.5pt;
-            font-weight: 700;
-        }
-        #st-app-sub {
-            color: #94A3B8;
-            font-size: 8.5pt;
-        }
-        #st-sidebar {
-            background-color: #0F141C;
-            border-right: 1px solid rgba(255, 255, 255, 0.07);
-            padding: 16px 12px;
-        }
-        #st-search {
-            background-color: #19212D;
-            color: #F8FAFC;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 7px 12px;
-            font-size: 9.5pt;
-        }
-        #st-search:focus {
-            border-color: #137FEC;
-        }
-        #nav-item {
-            background-color: transparent;
-            color: #CBD5E1;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 14px;
-            font-size: 10pt;
-            font-weight: 500;
-        }
-        #nav-item:hover {
-            background-color: #19212D;
-            color: #FFFFFF;
-        }
-        #nav-item-active {
-            background-image: linear-gradient(to right, #137FEC, #0B66C3);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 14px;
-            font-size: 10pt;
-            font-weight: 700;
-            box-shadow: 0 4px 14px rgba(19, 127, 236, 0.30);
-        }
-        #page-kicker {
-            color: #137FEC;
-            font-size: 8.5pt;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-        }
-        #page-title {
-            color: #F8FAFC;
-            font-size: 20pt;
-            font-weight: 700;
-        }
-        #setting-card {
-            background-color: #19212D;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 16px 20px;
-        }
-        #row-title {
-            color: #F8FAFC;
-            font-size: 10.5pt;
-            font-weight: 600;
-        }
-        #row-desc {
-            color: #94A3B8;
-            font-size: 8.8pt;
-        }
-        #icon-badge {
-            background-color: rgba(19, 127, 236, 0.14);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 10px;
-            padding: 8px;
-        }
-        #row-divider {
-            background-color: rgba(255, 255, 255, 0.06);
-            min-height: 1px;
-        }
-        #theme-card {
-            background-color: #141A23;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 2px;
-        }
-        #theme-card:hover {
-            border-color: rgba(56, 189, 248, 0.45);
-        }
-        #theme-card-selected {
-            background-color: rgba(19, 127, 236, 0.10);
-            border: 1.5px solid #137FEC;
-            border-radius: 12px;
-            padding: 2px;
-        }
-        #theme-card-label {
-            color: #E2E8F0;
-            font-size: 8.5pt;
-            font-weight: 600;
-        }
-        #scale-hint {
-            color: #64748B;
-            font-size: 8.5pt;
-        }
-        #action-pill {
-            background-color: #141A23;
-            color: #F8FAFC;
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 9px;
-            padding: 6px 14px;
-            font-weight: 600;
-        }
-        #action-pill:hover {
-            background-color: #202A39;
-            border-color: #137FEC;
-        }
+        #st-root { background-color: #141A23; color: #F8FAFC; }
+        #st-topbar { background-color: #0F141C; border-bottom: 1px solid rgba(255, 255, 255, 0.07); padding: 8px 16px; }
+        #st-app-title { color: #F8FAFC; font-size: 11.5pt; font-weight: 700; }
+        #st-app-sub { color: #94A3B8; font-size: 8.5pt; }
+        #st-sidebar { background-color: #0F141C; border-right: 1px solid rgba(255, 255, 255, 0.07); padding: 16px 12px; }
+        #st-search { background-color: #19212D; color: #F8FAFC; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 7px 12px; font-size: 9.5pt; }
+        #st-search:focus { border-color: #137FEC; }
+        #nav-item { background-color: transparent; color: #CBD5E1; border: none; border-radius: 10px; padding: 9px 14px; font-size: 10pt; font-weight: 500; }
+        #nav-item:hover { background-color: #19212D; color: #FFFFFF; }
+        #nav-item-active { background-image: linear-gradient(to right, #137FEC, #0B66C3); color: #FFFFFF; border: none; border-radius: 10px; padding: 9px 14px; font-size: 10pt; font-weight: 700; box-shadow: 0 4px 14px rgba(19, 127, 236, 0.30); }
+        #page-kicker { color: #137FEC; font-size: 8.5pt; font-weight: 700; letter-spacing: 1.2px; }
+        #page-title { color: #F8FAFC; font-size: 20pt; font-weight: 700; }
+        #setting-card { background-color: #19212D; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 16px 20px; }
+        #row-title { color: #F8FAFC; font-size: 10.5pt; font-weight: 600; }
+        #row-desc { color: #94A3B8; font-size: 8.8pt; }
+        #icon-badge { background-color: rgba(19, 127, 236, 0.14); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 8px; }
+        #row-divider { background-color: rgba(255, 255, 255, 0.06); min-height: 1px; }
+        #theme-card { background-color: #141A23; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 2px; }
+        #theme-card:hover { border-color: rgba(56, 189, 248, 0.45); }
+        #theme-card-selected { background-color: rgba(19, 127, 236, 0.10); border: 1.5px solid #137FEC; border-radius: 12px; padding: 2px; }
+        #theme-card-label { color: #E2E8F0; font-size: 8.5pt; font-weight: 600; }
+        #scale-hint { color: #64748B; font-size: 8.5pt; }
+        #action-pill { background-color: #141A23; color: #F8FAFC; border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 9px; padding: 6px 14px; font-weight: 600; }
+        #action-pill:hover { background-color: #202A39; border-color: #137FEC; }
         """
         provider = Gtk.CssProvider()
         provider.load_from_data(css)
         Gtk.StyleContext.add_provider_for_screen(
-            Gdk.Screen.get_default(),
-            provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+            Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
     def _build_ui(self):
@@ -363,7 +247,6 @@ class LegacySettingsWindow(Gtk.Window):
         root.set_name("st-root")
         self.add(root)
 
-        # Barra superior (Idêntica à imagem)
         topbar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         topbar.set_name("st-topbar")
         root.pack_start(topbar, False, False, 0)
@@ -381,7 +264,6 @@ class LegacySettingsWindow(Gtk.Window):
         title_col.pack_start(lbl_s, False, False, 0)
         topbar.pack_start(title_col, True, True, 0)
 
-        # Corpo Principal: Sidebar à esquerda + Conteúdo à direita
         body = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         root.pack_start(body, True, True, 0)
 
@@ -422,7 +304,6 @@ class LegacySettingsWindow(Gtk.Window):
             sidebar.pack_start(btn, False, False, 1)
             self.nav_buttons[cat_id] = btn
 
-        # Stack de Páginas
         self.stack = Gtk.Stack()
         self.stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
         self.stack.set_transition_duration(140)
@@ -498,12 +379,12 @@ class LegacySettingsWindow(Gtk.Window):
         return sep
 
     # ==========================================================================
-    # 1. ABA APARÊNCIA (CORRESPONDENTE EXATO À IMAGEM ANEXADA)
+    # ABA APARÊNCIA (TEMAS, POSIÇÃO DA BARRA E ALINHAMENTO DE ÍCONES)
     # ==========================================================================
     def _build_appearance_page(self):
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
 
-        # Cartão 1: Tema do sistema (Claro / Escuro / Automático)
+        # 1. Cartão: Tema do sistema
         card_theme = self._make_card()
         row_theme = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
 
@@ -520,8 +401,7 @@ class LegacySettingsWindow(Gtk.Window):
         cards_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         for mode, label in [("light", "Claro"), ("dark", "Escuro"), ("auto", "Automático")]:
             c = ThemePreviewCard(
-                mode=mode,
-                title=label,
+                mode=mode, title=label,
                 selected=(self.state["theme_mode"] == mode),
                 on_select=self._on_theme_selected,
             )
@@ -533,52 +413,69 @@ class LegacySettingsWindow(Gtk.Window):
         col.pack_start(card_theme, False, False, 0)
         self.searchable_items.append(("aparencia", "tema do sistema claro escuro automatico"))
 
-        # Cartão 2: Switches (Modo noturno automático, Efeitos de transparência, Animações)
+        # 2. Cartão: Posição da barra superior (acima, abaixo, esquerda, direita)
+        card_panel = self._make_card()
+        p_txt = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        p_t = Gtk.Label(label="Posição da barra superior", xalign=0)
+        p_t.set_name("row-title")
+        p_d = Gtk.Label(label="Escolha a borda da tela. Na opção abaixo, a dock se ajusta automaticamente.", xalign=0)
+        p_d.set_name("row-desc")
+        p_txt.pack_start(p_t, False, False, 0)
+        p_txt.pack_start(p_d, False, False, 0)
+        card_panel.pack_start(p_txt, False, False, 0)
+
+        p_btns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        p_btns.set_margin_top(8)
+        for pid, plabel in [("top", "⬆️ Acima"), ("bottom", "⬇️ Abaixo"), ("left", "⬅️ Esquerda"), ("right", "➡️ Direita")]:
+            b = Gtk.Button(label=plabel)
+            b.set_name("action-pill")
+            b.connect("clicked", lambda _, p=pid: run_async(["legacyos-panel-position", p]))
+            p_btns.pack_start(b, True, True, 0)
+        card_panel.pack_start(p_btns, False, False, 0)
+        col.pack_start(card_panel, False, False, 0)
+        self.searchable_items.append(("aparencia", "posicao da barra superior acima abaixo esquerda direita"))
+
+        # 3. Cartão: Organização dos ícones na área de trabalho
+        card_icons = self._make_card()
+        i_txt = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        i_t = Gtk.Label(label="Organização dos ícones na área de trabalho", xalign=0)
+        i_t.set_name("row-title")
+        i_d = Gtk.Label(label="Defina o ponto de alinhamento inicial dos ícones no desktop.", xalign=0)
+        i_d.set_name("row-desc")
+        i_txt.pack_start(i_t, False, False, 0)
+        i_txt.pack_start(i_d, False, False, 0)
+        card_icons.pack_start(i_txt, False, False, 0)
+
+        i_btns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        i_btns.set_margin_top(8)
+        for aid, alabel in [("right", "Direita (Padrão)"), ("left", "Esquerda"), ("above", "Acima"), ("below", "Abaixo")]:
+            b = Gtk.Button(label=alabel)
+            b.set_name("action-pill")
+            b.connect("clicked", lambda _, a=aid: run_async(["legacyos-desktop-align", a]))
+            i_btns.pack_start(b, True, True, 0)
+        card_icons.pack_start(i_btns, False, False, 0)
+        col.pack_start(card_icons, False, False, 0)
+        self.searchable_items.append(("aparencia", "organizacao dos icones area de trabalho direita esquerda acima abaixo"))
+
+        # 4. Cartão: Switches (Modo noturno, transparência e animações)
         card_sw = self._make_card()
         card_sw.pack_start(
-            self._make_switch_row(
-                "aparencia",
-                "weather-clear-night-symbolic",
-                "Modo noturno automático",
-                "Ativar o tema escuro após o pôr do sol",
-                self.state["auto_night"],
-                self._on_toggle_auto_night,
-            ),
-            False,
-            False,
-            0,
+            self._make_switch_row("aparencia", "weather-clear-night-symbolic", "Modo noturno automático", "Ativar o tema escuro após o pôr do sol", self.state["auto_night"], self._on_toggle_auto_night),
+            False, False, 0
         )
         card_sw.pack_start(self._make_divider(), False, False, 0)
         card_sw.pack_start(
-            self._make_switch_row(
-                "aparencia",
-                "preferences-desktop-effects-symbolic",
-                "Efeitos de transparência",
-                "Permitir desfoque em menus, dock e janelas",
-                self.state["transparency"],
-                self._on_toggle_transparency,
-            ),
-            False,
-            False,
-            0,
+            self._make_switch_row("aparencia", "preferences-desktop-effects-symbolic", "Efeitos de transparência", "Permitir desfoque em menus, dock e janelas", self.state["transparency"], self._on_toggle_transparency),
+            False, False, 0
         )
         card_sw.pack_start(self._make_divider(), False, False, 0)
         card_sw.pack_start(
-            self._make_switch_row(
-                "aparencia",
-                "view-grid-symbolic",
-                "Animações da interface",
-                "Movimentos suaves ao alternar entre aplicativos",
-                self.state["animations"],
-                self._on_toggle_animations,
-            ),
-            False,
-            False,
-            0,
+            self._make_switch_row("aparencia", "view-grid-symbolic", "Animações da interface", "Movimentos suaves ao alternar entre aplicativos", self.state["animations"], self._on_toggle_animations),
+            False, False, 0
         )
         col.pack_start(card_sw, False, False, 0)
 
-        # Cartão 3: Intensidade do vidro (Opaco <-> Transparente)
+        # 5. Cartão: Intensidade do vidro
         card_glass = self._make_card()
         row_glass = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
 
@@ -649,7 +546,6 @@ class LegacySettingsWindow(Gtk.Window):
         val = int(scale.get_value())
         self.state["glass_intensity"] = val
         self._save_state()
-        # Converte 0..100 (Opaco -> Transparente) em alpha 1.00 .. 0.72 no painel superior
         alpha = round(1.0 - (val / 100.0) * 0.28, 3)
         run_async([
             "xfconf-query", "-c", "xfce4-panel", "-p", "/panels/panel-1/background-rgba",
@@ -660,7 +556,7 @@ class LegacySettingsWindow(Gtk.Window):
         ])
 
     # ==========================================================================
-    # 2. REDE E INTERNET
+    # REDE E INTERNET
     # ==========================================================================
     def _build_network_page(self):
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
@@ -670,17 +566,8 @@ class LegacySettingsWindow(Gtk.Window):
         is_wifi_on = wifi_state != "disabled"
 
         card.pack_start(
-            self._make_switch_row(
-                "rede",
-                "network-wireless-symbolic",
-                "Wi-Fi sem fio",
-                "Conectar-se a redes Wi-Fi disponíveis",
-                is_wifi_on,
-                lambda on: run_async(["nmcli", "radio", "wifi", "on" if on else "off"]),
-            ),
-            False,
-            False,
-            0,
+            self._make_switch_row("rede", "network-wireless-symbolic", "Wi-Fi sem fio", "Conectar-se a redes Wi-Fi disponíveis", is_wifi_on, lambda on: run_async(["nmcli", "radio", "wifi", "on" if on else "off"])),
+            False, False, 0
         )
         card.pack_start(self._make_divider(), False, False, 0)
 
@@ -698,7 +585,7 @@ class LegacySettingsWindow(Gtk.Window):
         return col
 
     # ==========================================================================
-    # 3. SOM
+    # SOM
     # ==========================================================================
     def _build_sound_page(self):
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
@@ -738,24 +625,15 @@ class LegacySettingsWindow(Gtk.Window):
         return col
 
     # ==========================================================================
-    # 4. NOTIFICAÇÕES
+    # NOTIFICAÇÕES
     # ==========================================================================
     def _build_notifications_page(self):
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         card = self._make_card()
 
         card.pack_start(
-            self._make_switch_row(
-                "notificacoes",
-                "notifications-disabled-symbolic",
-                "Modo Não Perturbe",
-                "Silenciar avisos flutuantes na área de trabalho",
-                self.state["dnd"],
-                self._on_toggle_dnd,
-            ),
-            False,
-            False,
-            0,
+            self._make_switch_row("notificacoes", "notifications-disabled-symbolic", "Modo Não Perturbe", "Silenciar avisos flutuantes na área de trabalho", self.state["dnd"], self._on_toggle_dnd),
+            False, False, 0
         )
         col.pack_start(card, False, False, 0)
         return col
@@ -767,7 +645,7 @@ class LegacySettingsWindow(Gtk.Window):
         run_async(["xfconf-query", "-c", "xfce4-notifyd", "-p", "/do-not-disturb", "-n", "-t", "bool", "-s", val])
 
     # ==========================================================================
-    # 5. CONTAS
+    # CONTAS
     # ==========================================================================
     def _build_accounts_page(self):
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
@@ -802,24 +680,15 @@ class LegacySettingsWindow(Gtk.Window):
         return col
 
     # ==========================================================================
-    # 6. PRIVACIDADE
+    # PRIVACIDADE
     # ==========================================================================
     def _build_privacy_page(self):
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
         card = self._make_card()
 
         card.pack_start(
-            self._make_switch_row(
-                "privacidade",
-                "system-lock-screen-symbolic",
-                "Bloqueio automático de tela",
-                "Exigir senha ao retornar da suspensão",
-                self.state["auto_lock"],
-                self._on_toggle_lock,
-            ),
-            False,
-            False,
-            0,
+            self._make_switch_row("privacidade", "system-lock-screen-symbolic", "Bloqueio automático de tela", "Exigir senha ao retornar da suspensão", self.state["auto_lock"], self._on_toggle_lock),
+            False, False, 0
         )
         col.pack_start(card, False, False, 0)
         return col
@@ -831,7 +700,7 @@ class LegacySettingsWindow(Gtk.Window):
         run_async(["xfconf-query", "-c", "xfce4-session", "-p", "/shutdown/LockScreen", "-n", "-t", "bool", "-s", val])
 
     # ==========================================================================
-    # 7. SOBRE
+    # SOBRE
     # ==========================================================================
     def _build_about_page(self):
         col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
