@@ -1,0 +1,9 @@
+# Configuração de zRAM do LegacyOS
+# Usa zstd para máxima velocidade em processadores Intel Atom
+ALGO=zstd
+
+# Aloca até 100% do tamanho físico da RAM (2 GB em máquinas de 2 GB) como dispositivo comprimido
+PERCENT=100
+
+# Prioridade alta (100) para ser usada antes do Swap em SSD (prioridade 10)
+PRIORITY=100
