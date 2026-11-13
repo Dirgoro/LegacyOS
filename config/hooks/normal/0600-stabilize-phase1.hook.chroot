@@ -1,0 +1,33 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS - HOOK DE ESTABILIZAÇÃO DA FASE 1 (CHROOT)
+# Garante permissões de execução e ativa serviços de memória virtual e rede
+# ==============================================================================
+
+set -e
+
+echo "[LegacyOS Hook 0600] Aplicando permissões nos scripts do sistema..."
+
+for SCRIPT in \
+    /usr/bin/legacyos-fix-theme.sh \
+    /usr/bin/legacyos-move-icons.sh \
+    /usr/local/sbin/legacyos-setup-swap.sh; do
+    if [ -f "$SCRIPT" ]; then
+        chmod 755 "$SCRIPT"
+        echo "  -> Permissão 755 aplicada em: $SCRIPT"
+    fi
+done
+
+echo "[LegacyOS Hook 0600] Ativando serviços essenciais (zRAM, Swap SSD e Rede)..."
+
+systemctl enable zramswap.service 2>/dev/null || true
+systemctl enable legacyos-swap.service 2>/dev/null || true
+systemctl enable NetworkManager.service 2>/dev/null || true
+
+# Garante que o UFW permaneça ativo no boot sem interromper o build
+if command -v ufw >/dev/null 2>&1; then
+    ufw --force enable 2>/dev/null || true
+fi
+
+echo "[LegacyOS Hook 0600] Estabilização da Fase 1 concluída com sucesso."
+exit 0
