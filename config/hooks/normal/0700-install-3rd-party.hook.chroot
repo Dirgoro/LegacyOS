@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+echo "[*] Instalando OnlyOffice..."
+wget -qO /tmp/onlyoffice.deb https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
+apt-get install -y /tmp/onlyoffice.deb || apt-get install -f -y
+rm -f /tmp/onlyoffice.deb
+
+echo "[*] Adicionando o repositório oficial do Brave..."
+# Garantir que o curl e o gnupg estão instalados
+apt-get install -y curl gnupg
+
+# Baixar a chave GPG do Brave e adicionar ao sistema
+curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+
+# Adicionar o repositório do Brave
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | tee /etc/apt/sources.list.d/brave-browser-release.list
+
+# Atualizar e instalar o Brave
+apt-get update
+apt-get install -y brave-browser
+
+echo "[*] Limpando cache..."
+apt-get clean
