@@ -154,15 +154,12 @@ xdg-user-dirs-update 2>/dev/null || true
 XDG_DESKTOP="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
 mkdir -p "$HOME/Desktop" "$XDG_DESKTOP"
 
-# Garante que os 3 ícones padrão da área de trabalho estejam visíveis
 xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-home -n -t bool -s true
 xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-filesystem -n -t bool -s true
 xfconf-query -c xfce4-desktop -p /desktop-icons/file-icons/show-trash -n -t bool -s true
 
 for TARGET_DIR in "$HOME/Desktop" "$XDG_DESKTOP"; do
     [ -d "$TARGET_DIR" ] || continue
-
-    # Remove qualquer atalho genérico do Debian
     rm -f "$TARGET_DIR"/*debian*.desktop "$TARGET_DIR"/calamares.desktop
 
     if grep -q "boot=live" /proc/cmdline; then
@@ -183,9 +180,10 @@ xfdesktop --reload 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
 # 6. CONFIGURAÇÃO E INICIALIZAÇÃO COMPLETA DA DOCK (PLANK)
+# Inclui a Grade de Aplicativos (legacyos-apps) como primeiro ícone da Dock
 # ------------------------------------------------------------------------------
 CONFIG_DIR="$HOME/.config/legacyos"
-DOCK_FLAG="$CONFIG_DIR/.dock_initialized"
+DOCK_FLAG="$CONFIG_DIR/.dock_initialized_v2"
 DOCK_DIR="$HOME/.config/plank/dock1/launchers"
 
 mkdir -p "$CONFIG_DIR" "$DOCK_DIR"
@@ -196,6 +194,7 @@ if [ ! -f "$DOCK_FLAG" ]; then
     rm -f "$DOCK_DIR"/*.dockitem
 
     for APP in \
+        legacyos-apps.desktop \
         legacy-care-center.desktop \
         brave-browser.desktop \
         firefox-esr.desktop \
