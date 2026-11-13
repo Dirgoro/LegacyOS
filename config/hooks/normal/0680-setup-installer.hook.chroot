@@ -1,0 +1,94 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS - HOOK DE CONFIGURAÇÃO DO INSTALADOR GRÁFICO (CALAMARES)
+# Aplica identidade visual LegacyOS, ajusta janela para 1024x600 e cria atalho
+# ==============================================================================
+
+set -e
+
+echo "[LegacyOS Hook 0680] Configurando lançador e tema do instalador..."
+
+# 1. Wrapper seguro com repasse de display gráfico para o Calamares
+cat << 'EOF' > /usr/local/bin/legacyos-installer
+#!/bin/bash
+export DISPLAY="${DISPLAY:-:0}"
+export XAUTHORITY="${XAUTHORITY:-$HOME/.Xauthority}"
+
+if command -v calamares >/dev/null 2>&1; then
+    pkexec env DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" /usr/bin/calamares
+fi
+EOF
+chmod 755 /usr/local/bin/legacyos-installer
+
+# 2. Cria atalho padrão no menu de aplicativos
+cat << 'EOF' > /usr/share/applications/legacyos-installer.desktop
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Instalar o LegacyOS
+GenericName=Instalador do Sistema
+Comment=Instala o LegacyOS permanentemente no disco rígido ou SSD
+Exec=/usr/local/bin/legacyos-installer
+Icon=/usr/share/pixmaps/legacyos-logo.svg
+Terminal=false
+StartupNotify=true
+Categories=System;Settings;
+EOF
+chmod 644 /usr/share/applications/legacyos-installer.desktop
+
+# Oculta o atalho genérico do Debian caso tenha sido criado
+if [ -f "/usr/share/applications/install-debian.desktop" ]; then
+    if ! grep -q "NoDisplay=true" /usr/share/applications/install-debian.desktop; then
+        echo "NoDisplay=true" >> /usr/share/applications/install-debian.desktop
+    fi
+fi
+
+# 3. Provisiona o atalho na área de trabalho padrão (/etc/skel/Desktop)
+mkdir -p /etc/skel/Desktop
+cp /usr/share/applications/legacyos-installer.desktop /etc/skel/Desktop/instalar-legacyos.desktop
+chmod 755 /etc/skel/Desktop/instalar-legacyos.desktop
+
+# 4. Personaliza a marca e dimensões do Calamares (compatível com 1024x600)
+for BRAND_DIR in /etc/calamares/branding/debian /usr/share/calamares/branding/debian; do
+    if [ -d "$BRAND_DIR" ]; then
+        if [ -f "/usr/share/plymouth/themes/legacyos/logo.png" ]; then
+            cp /usr/share/plymouth/themes/legacyos/logo.png "$BRAND_DIR/logo.png" 2>/dev/null || true
+            cp /usr/share/plymouth/themes/legacyos/logo.png "$BRAND_DIR/squid.png" 2>/dev/null || true
+        fi
+
+        if [ -f "$BRAND_DIR/branding.desc" ]; then
+            python3 - "$BRAND_DIR/branding.desc" << 'PYEOF'
+import re
+import sys
+
+desc_path = sys.argv[1]
+with open(desc_path, "r", encoding="utf-8") as f:
+    content = f.read()
+
+replacements = [
+    (r'(productName:\s*).*', r'\1"LegacyOS"'),
+    (r'(shortProductName:\s*).*', r'\1"LegacyOS"'),
+    (r'(version:\s*).*', r'\1"1.0 Alpha"'),
+    (r'(shortVersion:\s*).*', r'\1"1.0"'),
+    (r'(versionedName:\s*).*', r'\1"LegacyOS 1.0 Alpha"'),
+    (r'(shortVersionedName:\s*).*', r'\1"LegacyOS 1.0"'),
+    (r'(bootloaderEntryName:\s*).*', r'\1"LegacyOS"'),
+    (r'(windowSize:\s*).*', r'\1"800px,520px"'),
+    (r'(windowExpanding:\s*).*', r'\1"normal"'),
+    (r'(sidebarBackground:\s*).*', r'\1"#0B1120"'),
+    (r'(sidebarText:\s*).*', r'\1"#F8FAFC"'),
+    (r'(sidebarTextCurrent:\s*).*', r'\1"#0284C7"'),
+]
+
+for pattern, repl in replacements:
+    content = re.sub(pattern, repl, content)
+
+with open(desc_path, "w", encoding="utf-8") as f:
+    f.write(content)
+PYEOF
+        fi
+    fi
+done
+
+echo "[LegacyOS Hook 0680] Instalador configurado com sucesso."
+exit 0
