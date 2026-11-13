@@ -214,7 +214,7 @@ fi
 # Registra os ícones SVG oficiais no tema de ícones hicolor
 # ------------------------------------------------------------------------------
 mkdir -p /usr/share/icons/hicolor/scalable/apps
-for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg; do
+for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg; do
     if [ -f "/usr/share/pixmaps/$ICON_SVG" ]; then
         cp "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
         chmod 644 "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
@@ -239,9 +239,9 @@ surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
 ctx = cairo.Context(surf)
 
 grad_bg = cairo.LinearGradient(0, 0, W, H)
-grad_bg.add_color_stop_rgb(0.0, 0.098, 0.129, 0.176)  # #19212D
-grad_bg.add_color_stop_rgb(0.6, 0.059, 0.078, 0.110)  # #0F141C
-grad_bg.add_color_stop_rgb(1.0, 0.043, 0.059, 0.086)  # #0B0F16
+grad_bg.add_color_stop_rgb(0.0, 0.098, 0.129, 0.176)
+grad_bg.add_color_stop_rgb(0.6, 0.059, 0.078, 0.110)
+grad_bg.add_color_stop_rgb(1.0, 0.043, 0.059, 0.086)
 
 ctx.arc(64, 64, 58, 0, 2 * math.pi)
 ctx.set_source(grad_bg)
@@ -267,8 +267,8 @@ ctx.fill()
 
 grad_body = cairo.LinearGradient(24, 80, 104, 120)
 grad_body.add_color_stop_rgb(0.0, 0.220, 0.741, 0.973)
-grad_body.add_color_stop_rgb(0.55, 0.075, 0.498, 0.925) # #137FEC
-grad_body.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)  # #0B66C3
+grad_body.add_color_stop_rgb(0.55, 0.075, 0.498, 0.925)
+grad_body.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)
 
 ctx.move_to(22, 118)
 ctx.curve_to(22, 93, 40, 80, 64, 80)
@@ -481,6 +481,7 @@ chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-window-fit 2>/dev/null || true
 chmod 755 /usr/local/bin/legacy-care-center 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-workspace 2>/dev/null || true
+chmod 755 /usr/local/bin/legacyos-settings 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-settings.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacy-care-center.desktop 2>/dev/null || true
