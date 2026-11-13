@@ -1,0 +1,84 @@
+# ==============================================================================
+# LEGACYOS OFFICIAL GTK 2.0 THEME (DARK SLATE #0B1120 / #111827 + #0284C7)
+# ==============================================================================
+
+gtk-color-scheme = "bg_color:#111827\nfg_color:#F8FAFC\nbase_color:#0B1120\ntext_color:#F8FAFC\nselected_bg_color:#0284C7\nselected_fg_color:#FFFFFF\ntooltip_bg_color:#0B1120\ntooltip_fg_color:#F8FAFC"
+
+gtk-auto-mnemonics = 1
+
+style "legacyos-default" {
+    xthickness = 2
+    ythickness = 2
+
+    GtkWidget::focus-line-width = 1
+    GtkButton::child-displacement-x = 0
+    GtkButton::child-displacement-y = 1
+    GtkButton::default-border = { 0, 0, 0, 0 }
+    GtkScrollbar::min-slider-length = 30
+    GtkMenuBar::internal-padding = 1
+    GtkToolbar::internal-padding = 1
+    GtkTreeView::expander-size = 12
+    GtkExpander::expander-size = 12
+
+    fg[NORMAL]        = @fg_color
+    fg[PRELIGHT]      = "#FFFFFF"
+    fg[ACTIVE]        = "#FFFFFF"
+    fg[SELECTED]      = @selected_fg_color
+    fg[INSENSITIVE]   = "#64748B"
+
+    bg[NORMAL]        = @bg_color
+    bg[PRELIGHT]      = "#1E293B"
+    bg[ACTIVE]        = "#1E293B"
+    bg[SELECTED]      = @selected_bg_color
+    bg[INSENSITIVE]   = "#0B1120"
+
+    base[NORMAL]      = @base_color
+    base[PRELIGHT]    = "#1E293B"
+    base[ACTIVE]      = "#0369A1"
+    base[SELECTED]    = @selected_bg_color
+    base[INSENSITIVE] = "#0B1120"
+
+    text[NORMAL]      = @text_color
+    text[PRELIGHT]    = "#FFFFFF"
+    text[ACTIVE]      = "#FFFFFF"
+    text[SELECTED]    = @selected_fg_color
+    text[INSENSITIVE] = "#64748B"
+
+    engine "murrine" {
+        animation           = FALSE
+        contrast            = 0.8
+        glazestyle          = 0
+        highlight_shade     = 1.0
+        lightborder_shade   = 1.0
+        listviewheaderstyle = 0
+        listviewstyle       = 0
+        menubaritemstyle    = 0
+        menubarstyle        = 0
+        menuitemstyle       = 0
+        progressbarstyle    = 0
+        reliefstyle         = 0
+        roundness           = 4
+        scrollbarstyle      = 0
+        sliderstyle         = 0
+        stepperstyle        = 1
+        toolbarstyle        = 0
+    }
+}
+
+style "legacyos-button" = "legacyos-default" {
+    bg[NORMAL]   = "#1E293B"
+    bg[PRELIGHT] = "#273549"
+    bg[ACTIVE]   = "#0284C7"
+}
+
+style "legacyos-dark-bar" = "legacyos-default" {
+    bg[NORMAL]   = "#0B1120"
+    bg[PRELIGHT] = "#1E293B"
+    bg[ACTIVE]   = "#0284C7"
+}
+
+class "GtkWidget"    style "legacyos-default"
+class "GtkButton"    style "legacyos-button"
+class "GtkMenuBar"   style "legacyos-dark-bar"
+class "GtkToolbar"   style "legacyos-dark-bar"
+class "GtkStatusbar" style "legacyos-dark-bar"
