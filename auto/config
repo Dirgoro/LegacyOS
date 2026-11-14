@@ -3,19 +3,19 @@
 set -e
 
 lb config noauto \
-    --architecture amd64 \
     --mode debian \
     --distribution trixie \
+    --architecture amd64 \
     --archive-areas "main contrib non-free non-free-firmware" \
     --binary-images iso-hybrid \
-    --bootloader syslinux \
-    --initramfs live-boot \
+    --bootloaders "syslinux,grub-efi" \
+    --debian-installer false \
+    --apt-recommends false \
     --apt-indices false \
-    --apt-recommends true \
     --memtest none \
-    --image-name "LegacyOS-Alpha" \
-    --iso-application "LegacyOS Alpha" \
+    --win32-loader false \
+    --iso-application "LegacyOS 1.0" \
     --iso-publisher "LegacyOS Project" \
-    --iso-volume "LegacyOS Alpha" \
-    --bootappend-live "boot=live components quiet splash loglevel=0 rd.systemd.show_status=false rd.udev.log_level=0 vt.global_cursor_default=0 noeject hostname=legacyos username=user locales=pt_BR.UTF-8 keyboard-layouts=br" \
+    --iso-volume "LegacyOS_1_0" \
+    --bootappend-live "boot=live components locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo quiet splash" \
     "${@}"
