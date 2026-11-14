@@ -1,29 +1,46 @@
 # ==============================================================================
-# LEGACYOS 1.0 - LISTA DE PACOTES AUDITADA (DEBIAN TRIXIE + XFCE OTIMIZADO)
+# LEGACYOS 1.0 - LISTA DE PACOTES AUDITADA (DEBIAN TRIXIE + XFCE + MESA DRI)
 # ==============================================================================
 
-# Sistema Base, Live-Boot, Kernel & Otimização de Memória Legada
+# Sistema Base, Live-Boot, Kernel & Gerenciamento de Sessão
 live-boot
 live-config
 live-config-systemd
 systemd-sysv
+libpam-systemd
+dbus-x11
+polkitd
+pkexec
 plymouth
 plymouth-themes
+plymouth-label
 zram-tools
 earlyoom
 preload
-polkitd
-pkexec
 
-# Servidor Gráfico Xorg, Drivers (VM + Hardware Legado) & Sessão XFCE
+# Servidor Gráfico Xorg, Mesa DRI (Corrige Tela Preta) & Drivers VM/Hardware Legado
 xorg
 xserver-xorg-core
 xserver-xorg-video-all
+xserver-xorg-video-vmware
+xserver-xorg-video-vesa
+xserver-xorg-video-fbdev
 xserver-xorg-input-all
 x11-xserver-utils
-dbus-x11
+libgl1-mesa-dri
+mesa-utils
 open-vm-tools-desktop
+qemu-guest-agent
+spice-vdagent
+
+# Ambiente Gráfico XFCE Completo & Gerenciador de Login LightDM
 xfce4
+xfce4-session
+xfwm4
+xfdesktop4
+xfce4-panel
+xfce4-settings
+xfce4-terminal
 xfce4-goodies
 xfce4-whiskermenu-plugin
 xfce4-pulseaudio-plugin
@@ -32,6 +49,7 @@ xfce4-notifyd
 plank
 lightdm
 lightdm-gtk-greeter
+accountsservice
 
 # Temas, Ícones e Fontes
 papirus-icon-theme
@@ -53,7 +71,7 @@ gir1.2-vte-2.91
 gir1.2-webkit2-4.1
 libglib2.0-bin
 
-# Utilitários de Hardware, Áudio, Rede e Diagnóstico (Legacy Guardian & Settings)
+# Utilitários de Hardware, Áudio, Rede e Diagnóstico
 lm-sensors
 smartmontools
 bc
