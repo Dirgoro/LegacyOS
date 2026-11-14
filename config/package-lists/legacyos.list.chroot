@@ -1,23 +1,57 @@
-# Base XFCE e Tema
-xfce4 xfce4-terminal thunar thunar-archive-plugin thunar-volman
-xfce4-panel xfce4-settings xfce4-power-manager xfce4-notifyd
-xfce4-whiskermenu-plugin plank arc-theme papirus-icon-theme
-lightdm lightdm-gtk-greeter
+# ==============================================================================
+# LEGACYOS 1.0 - LISTA DE PACOTES AUDITADA (DEBIAN TRIXIE + XFCE + MESA DRI)
+# ==============================================================================
 
-# Rede e Firmware
-network-manager network-manager-gnome
-firmware-iwlwifi firmware-realtek firmware-atheros
+# Sistema Base, Live-Boot, D-Bus & Gestão de Sessão
+live-boot
+live-config
+live-config-systemd
+systemd-sysv
+libpam-systemd
+dbus
+dbus-x11
+dbus-user-session
+polkitd
+pkexec
+mate-polkit
+plymouth
+plymouth-themes
+plymouth-label
+zram-tools
+earlyoom
 
-# Segurança e Utilitários de Sistema
-sudo curl wget ufw unattended-upgrades systemd-timesyncd zram-tools lm-sensors openssl
-gufw gparted synaptic system-config-printer
+# Servidor Gráfico Xorg, Mesa DRI & Controladores VM/Hardware Legado
+xorg
+xserver-xorg
+xserver-xorg-core
+xserver-xorg-legacy
+xserver-xorg-video-all
+xserver-xorg-input-all
+x11-xserver-utils
+x11-utils
+libgl1-mesa-dri
+libglx-mesa0
+mesa-utils
+open-vm-tools-desktop
+qemu-guest-agent
+spice-vdagent
 
-# Dependências Python/GTK (Para o Care Center)
-python3 python3-gi python3-gi-cairo python3-psutil gir1.2-gtk-3.0 gir1.2-notify-0.7 libnotify-bin
+# Ambiente Gráfico XFCE & Gestor de Sessão LightDM
+xfce4
+xfce4-session
+xfwm4
+xfdesktop4
+xfce4-panel
+xfce4-settings
+xfce4-terminal
+xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
+xfce4-power-manager
+xfce4-notifyd
+xfce4-screenshooter
+plank
+lightdm
+lightdm-gtk-greeter
+accountsservice
 
-# Aplicativos de Usuário Final
-vlc ristretto mousepad galculator xarchiver p7zip-full unzip
-
-# Ferramentas Legacy, Drivers e VMware
-util-linux util-linux-extra pciutils usbutils inxi smartmontools spice-vdagent
-xserver-xorg xserver-xorg-video-vesa xserver-xorg-video-fbdev open-vm-tools open-vm-tools-desktop
+# Temas, Í
