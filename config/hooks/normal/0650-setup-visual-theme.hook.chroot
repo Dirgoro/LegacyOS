@@ -194,6 +194,21 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
+# Configuração padrão do XFWM4 (evita tela preta do compositor em VMs)
+# ------------------------------------------------------------------------------
+mkdir -p /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+cat << 'EOF' > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="LegacyOS-Theme"/>
+    <property name="use_compositing" type="bool" value="false"/>
+    <property name="vblank_mode" type="string" value="off"/>
+  </property>
+</channel>
+EOF
+
+# ------------------------------------------------------------------------------
 # Garante calculadora compacta GTK3 (galculator)
 # ------------------------------------------------------------------------------
 if [ -f "/usr/share/applications/galculator.desktop" ]; then
@@ -216,7 +231,7 @@ done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Configuração Segura do Plymouth e LightDM (Sem bloqueios de VT / Framebuffer)
+# Configuração do Plymouth (Atualiza initramfs com -R) e LightDM
 # ------------------------------------------------------------------------------
 mkdir -p /etc/plymouth
 cat << 'EOF' > /etc/plymouth/plymouthd.conf
@@ -226,31 +241,26 @@ ShowDelay=0
 DeviceTimeout=2
 EOF
 
-plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
+plymouth-set-default-theme -R legacyos >/dev/null 2>&1 || plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
 
 rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
 rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
 mkdir -p /etc/lightdm/lightdm.conf.d
 cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
-[LightDM]
-minimum-vt=7
-
 [Seat:*]
 user-session=xfce
 greeter-session=lightdm-gtk-greeter
-xserver-command=X -core -br
 EOF
 
 # ------------------------------------------------------------------------------
-# Script de Sessão Otimizado
+# Script de Sessão (Usa startxfce4 para carregar toda a área de trabalho)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 xsetroot -solid "#0F141C" 2>/dev/null || true
-plymouth quit 2>/dev/null || true
-exec /usr/bin/xfce4-session
+exec /usr/bin/startxfce4
 EOF
 chmod 755 /usr/local/bin/legacyos-session-wrapper
 
@@ -324,5 +334,5 @@ do
     chmod 644 "/usr/share/applications/$DESKTOP_FILE" 2>/dev/null || true
 done
 
-echo "[LegacyOS Hook 0650] Auditoria e configuração concluídas com sucesso."
+echo "[LegacyOS Hook 0650] Configuração concluída com sucesso."
 exit 0
