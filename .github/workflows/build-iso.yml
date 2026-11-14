@@ -37,22 +37,18 @@ jobs:
             findutils \
             sed
 
-      - name: Sanitizar permissões, quebras de linha (LF) e initramfs
+      - name: Sanitizar quebras de linha (LF) e permissões
         run: |
-          # Converte CRLF para LF em scripts, hooks, binários de texto e listas de pacotes
-          find auto config -type f \( -name "*.sh" -o -name "*.chroot" -o -name "*.binary" -o -name "*.list*" -o -path "*/bin/*" -o -path "auto/*" \) \
-            -exec sed -i 's/\r$//' {} + 2>/dev/null || true
+          find auto config -type f \( \
+            -name "*.sh" -o -name "*.chroot" -o -name "*.binary" -o -name "*.list*" \
+            -o -name "*.py" -o -name "*.desktop" -o -name "*.xml" -o -name "*.css" \
+            -o -name "*.conf" -o -name "*.plymouth" -o -name "*.script" \
+            -o -path "*/bin/*" -o -path "auto/*" \
+          \) -exec sed -i 's/\r$//' {} + 2>/dev/null || true
 
-          # Garante permissão de execução nos scripts de build, hooks e ferramentas locais
           chmod -R +x auto/ 2>/dev/null || true
           find config/hooks -type f -exec chmod +x {} + 2>/dev/null || true
           find config/includes.chroot/usr/local/bin -type f -exec chmod +x {} + 2>/dev/null || true
-
-          # Força update-initramfs -u -k all para reconstruir o kernel do chroot Debian Trixie
-          if [ -f "config/hooks/normal/0650-setup-visual-theme.hook.chroot" ]; then
-            sed -i 's|update-initramfs -u -k all|update-initramfs -u|g' config/hooks/normal/0650-setup-visual-theme.hook.chroot
-            sed -i 's|update-initramfs -u|update-initramfs -u -k all|g' config/hooks/normal/0650-setup-visual-theme.hook.chroot
-          fi
 
       - name: Limpar e Configurar Live-Build
         run: |
@@ -63,12 +59,12 @@ jobs:
         run: |
           lb build
 
-      - name: Verificar Initramfs e Artefato ISO
+      - name: Validar Initramfs e Artefato ISO
         run: |
-          echo "=== Conteúdo de chroot/boot ==="
+          echo "=== Kernel e Initramfs no Chroot ==="
           ls -lh chroot/boot/vmlinuz* chroot/boot/initrd.img*
 
-          echo "=== Conteúdo de binary/live ==="
+          echo "=== Kernel, Initramfs e SquashFS na ISO ==="
           ls -lh binary/live/vmlinuz* binary/live/initrd.img* binary/live/filesystem.squashfs
 
           ISO_FILE=$(ls -1 *.iso 2>/dev/null | head -n 1)
