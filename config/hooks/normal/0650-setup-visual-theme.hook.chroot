@@ -146,7 +146,7 @@ cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#137FEC/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
-# Variáveis de ambiente globais
+# Variáveis de ambiente globais (força Dark Slate em GTK2/3/4 e Qt5/6)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > /etc/environment
 GTK_THEME=LegacyOS-Theme
@@ -196,7 +196,7 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
-# Remove gnome-calculator e mantém Galculator
+# Remove gnome-calculator e mantém Galculator (GTK3)
 # ------------------------------------------------------------------------------
 echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
 export DEBIAN_FRONTEND=noninteractive
@@ -211,7 +211,7 @@ if [ -f "/usr/share/applications/galculator.desktop" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Ícones SVG e Cache
+# Registra os ícones SVG oficiais no tema hicolor
 # ------------------------------------------------------------------------------
 mkdir -p /usr/share/icons/hicolor/scalable/apps
 for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg legacy-guardian.svg; do
@@ -223,7 +223,7 @@ done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Configuração Segura do Plymouth (Sem travamentos de espera)
+# Configuração Segura do Plymouth e LightDM (Sem travamentos de vídeo)
 # ------------------------------------------------------------------------------
 mkdir -p /etc/plymouth
 cat << 'EOF' > /etc/plymouth/plymouthd.conf
@@ -235,18 +235,24 @@ EOF
 
 plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
 
-# Remove serviços restritivos de espera que causam tela preta
 rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
 rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
+mkdir -p /etc/lightdm/lightdm.conf.d
+cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
+[Seat:*]
+user-session=xfce
+greeter-session=lightdm-gtk-greeter
+EOF
+
 # ------------------------------------------------------------------------------
-# Script de Sessão Otimizado (Fecha o Plymouth e inicia o XFCE instantaneamente)
+# Script de Sessão Otimizado
 # ------------------------------------------------------------------------------
 cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 xsetroot -solid "#0F141C" 2>/dev/null || true
-plymouth quit --retain-splash 2>/dev/null || true
+plymouth quit 2>/dev/null || true
 exec /usr/bin/xfce4-session
 EOF
 chmod 755 /usr/local/bin/legacyos-session-wrapper
@@ -259,7 +265,7 @@ echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
 fc-cache -f -v >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Permissões Finais
+# Permissões Finais de Todas as Ferramentas do LegacyOS
 # ------------------------------------------------------------------------------
 chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-window-fit 2>/dev/null || true
