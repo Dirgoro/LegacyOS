@@ -1,31 +1,39 @@
 # ==============================================================================
-# LEGACYOS 1.0 - LISTA DE PACOTES AUDITADA (DEBIAN TRIXIE + XFCE + MESA DRI)
+# LEGACYOS 1.0 - LISTA DE PACOTES BASE DE RECUPERAÇÃO DO BOOT (DEBIAN TRIXIE)
+# Inclui user-setup, sudo, D-Bus, Mesa DRI, Xorg, LightDM e XFCE puro
 # ==============================================================================
 
-# Sistema Base, Live-Boot, D-Bus & Gerenciamento de Sessão
+# Sistema Base, Live-Boot e Criação de Usuário Live (Crítico para Autologin)
 live-boot
 live-config
 live-config-systemd
+user-setup
+sudo
 systemd-sysv
 libpam-systemd
+procps
+psmisc
+locales
+keyboard-configuration
+console-setup
+
+# Barramento D-Bus e Autenticação de Sessão
 dbus
 dbus-x11
 dbus-user-session
 polkitd
 pkexec
 mate-polkit
-plymouth
-plymouth-themes
-zram-tools
-earlyoom
 
-# Servidor Gráfico Xorg, Mesa DRI & Drivers VM/Hardware Legado
+# Servidor Gráfico Xorg, Mesa DRI (Corrige Tela Preta) e Drivers de Vídeo/VM
 xorg
 xserver-xorg
 xserver-xorg-core
-xserver-xorg-legacy
 xserver-xorg-video-all
+xserver-xorg-video-vesa
+xserver-xorg-video-fbdev
 xserver-xorg-input-all
+xserver-xorg-input-libinput
 x11-xserver-utils
 x11-utils
 libgl1-mesa-dri
@@ -35,7 +43,7 @@ open-vm-tools-desktop
 qemu-guest-agent
 spice-vdagent
 
-# Ambiente Gráfico XFCE & Gerenciador de Login LightDM
+# Ambiente Gráfico XFCE Puro e Gerenciador de Login LightDM
 xfce4
 xfce4-session
 xfwm4
@@ -47,13 +55,20 @@ xfce4-whiskermenu-plugin
 xfce4-pulseaudio-plugin
 xfce4-power-manager
 xfce4-notifyd
-xfce4-screenshooter
-plank
+thunar
+thunar-archive-plugin
+gvfs
+gvfs-backends
 lightdm
 lightdm-gtk-greeter
 accountsservice
 
-# Temas, Ícones e Fontes
+# Rede, Áudio, Temas e Fontes Base
+network-manager
+network-manager-gnome
+pulseaudio
+pulseaudio-utils
+pavucontrol
 papirus-icon-theme
 qt5ct
 qt6ct
@@ -61,7 +76,7 @@ fonts-inter
 fonts-noto-core
 fonts-noto-color-emoji
 
-# Bibliotecas Gráficas e Motores dos Aplicativos Exclusivos LegacyOS
+# Bibliotecas Python/GTK (Mantidas instaladas para quando reativar os apps)
 python3
 python3-gi
 python3-gi-cairo
@@ -72,35 +87,14 @@ gir1.2-gdkpixbuf-2.0
 gir1.2-pango-1.0
 gir1.2-vte-2.91
 gir1.2-webkit2-4.1
-gir1.2-notify-0.7
 libglib2.0-bin
 
-# Utilitários de Hardware, Áudio, Rede e Sistema
-lm-sensors
-smartmontools
-bc
-libnotify-bin
-pulseaudio
-pulseaudio-utils
-pavucontrol
-network-manager
-network-manager-gnome
-blueman
-thunar
-thunar-archive-plugin
-thunar-volman
-gvfs
-gvfs-backends
-udisks2
-upower
-file-roller
+# Utilitários Básicos
 galculator
 mousepad
 ristretto
-gparted
+file-roller
 htop
-fastfetch
 curl
 wget
-git
 ca-certificates
