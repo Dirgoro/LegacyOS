@@ -37,8 +37,27 @@ jobs:
             findutils \
             sed
 
-      - name: Sanitizar quebras de linha (LF) e permissões
+      - name: Sanitizar quebras de linha (LF) e isolar hooks suspeitos
         run: |
+          # Isola temporariamente os 5 hooks antigos que podem quebrar o user-setup ou o Xorg
+          mkdir -p config/hooks/disabled
+          for HOOK in \
+            0500-enable-phase2.hook.chroot \
+            0600-force-password.hook.chroot \
+            0600-stabilize-phase1.hook.chroot \
+            0680-setup-installer.hook.chroot \
+            0700-install-3rd-party.hook.chroot
+          do
+            if [ -f "config/hooks/normal/$HOOK" ]; then
+              mv "config/hooks/normal/$HOOK" "config/hooks/disabled/$HOOK"
+              echo "Hook isolado em disabled/: $HOOK"
+            fi
+          done
+
+          echo "=== Hooks ativos em config/hooks/normal ==="
+          ls -la config/hooks/normal/
+
+          # Converte CRLF para LF em todos os scripts e configurações
           find auto config -type f \( \
             -name "*.sh" -o -name "*.chroot" -o -name "*.binary" -o -name "*.list*" \
             -o -name "*.py" -o -name "*.desktop" -o -name "*.xml" -o -name "*.css" \
@@ -47,7 +66,7 @@ jobs:
           \) -exec sed -i 's/\r$//' {} + 2>/dev/null || true
 
           chmod -R +x auto/ 2>/dev/null || true
-          find config/hooks -type f -exec chmod +x {} + 2>/dev/null || true
+          find config/hooks/normal -maxdepth 1 -type f -exec chmod +x {} + 2>/dev/null || true
           find config/includes.chroot/usr/local/bin -type f -exec chmod +x {} + 2>/dev/null || true
 
       - name: Limpar e Configurar Live-Build
