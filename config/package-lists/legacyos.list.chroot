@@ -1,8 +1,8 @@
 # ==============================================================================
-# LEGACYOS 1.0 - LISTA DE PACOTES DO SISTEMA (DEBIAN BASE + XFCE OTIMIZADO)
+# LEGACYOS 1.0 - LISTA DE PACOTES AUDITADA (DEBIAN TRIXIE + XFCE OTIMIZADO)
 # ==============================================================================
 
-# Sistema Base & Kernel / Boot
+# Sistema Base, Live-Boot, Kernel & Otimização de Memória Legada
 live-boot
 live-config
 live-config-systemd
@@ -12,11 +12,14 @@ plymouth-themes
 zram-tools
 earlyoom
 preload
+polkitd
+pkexec
 
-# Ambiente Gráfico XFCE Leve & Drivers de Vídeo (VM + Hardware Legado)
+# Servidor Gráfico Xorg, Drivers (VM + Hardware Legado) & Sessão XFCE
 xorg
 xserver-xorg-core
 xserver-xorg-video-all
+xserver-xorg-input-all
 x11-xserver-utils
 dbus-x11
 xfce4
@@ -47,8 +50,18 @@ gir1.2-gdkpixbuf-2.0
 gir1.2-pango-1.0
 gir1.2-vte-2.91
 gir1.2-webkit2-4.1
+libglib2.0-bin
 
-# Utilitários Essenciais de Sistema & Hardware Legado
+# Utilitários de Hardware, Áudio, Rede e Diagnóstico (Legacy Guardian & Settings)
+lm-sensors
+smartmontools
+bc
+libnotify-bin
+pulseaudio-utils
+pavucontrol
+network-manager
+network-manager-gnome
+blueman
 thunar
 thunar-archive-plugin
 thunar-volman
@@ -59,12 +72,9 @@ galculator
 mousepad
 ristretto
 xfce4-screenshooter
-network-manager
-network-manager-gnome
-blueman
-pavucontrol
 gparted
 htop
+fastfetch
 curl
 wget
 git
