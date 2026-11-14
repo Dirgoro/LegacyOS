@@ -1,16 +1,16 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - WRAPPER DE SESSÃO GRÁFICA
-# Encerra o splash do Plymouth e inicia o XFCE de forma limpa e sem travamentos
+# Libera o framebuffer do Plymouth e inicia a sessão XFCE sem bloqueios
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
 
-# Define a cor de fundo padrão para evitar piscar tela branca
+# Define fundo Dark Slate imediato no servidor X
 xsetroot -solid "#0F141C" 2>/dev/null || true
 
-# Encerra o Plymouth liberando totalmente o framebuffer para o Xorg
+# Encerra o Plymouth liberando o dispositivo de vídeo para o Xorg
 plymouth quit 2>/dev/null || true
 
-# Inicia o ambiente gráfico XFCE
+# Inicia a sessão completa do XFCE
 exec /usr/bin/xfce4-session
