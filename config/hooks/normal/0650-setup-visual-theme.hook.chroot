@@ -1,6 +1,7 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS E TRANSIÇÃO SEM TELA PRETA (CHROOT)
+# LEGACYOS - HOOK DE ATIVOS VISUAIS, PLYMOUTH, LIGHTDM E DESKTOP XFCE (TRIXIE)
+# Sincronizado com config/package-lists/legacyos.list.chroot
 # ==============================================================================
 
 set -e
@@ -10,38 +11,34 @@ mkdir -p "$XFWM_DIR"
 
 echo "[LegacyOS Hook 0650] Gerando ativos de janela (xfwm4)..."
 
-# Barra de título (1x30px Dark Slate #0B1120 / #090E1A)
 cat << 'EOF' > "$XFWM_DIR/title-1-active.xpm"
 /* XPM */
 static char * title_1_active_xpm[] = {
 "1 30 2 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 ".",
 " "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
 EOF
 
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-2-active.xpm"
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-3-active.xpm"
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-4-active.xpm"
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-5-active.xpm"
+for N in 2 3 4 5; do
+    cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-${N}-active.xpm"
+done
 
 cat << 'EOF' > "$XFWM_DIR/title-1-inactive.xpm"
 /* XPM */
 static char * title_1_inactive_xpm[] = {
 "1 30 2 1",
-" 	c #090E1A",
-".	c #111827",
+" 	c #0B0F16",
+".	c #141A23",
 ".",
 " "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
 EOF
 
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-2-inactive.xpm"
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-3-inactive.xpm"
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-4-inactive.xpm"
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-5-inactive.xpm"
+for N in 2 3 4 5; do
+    cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-${N}-inactive.xpm"
+done
 
-# Cantos superiores e bordas finas (1px)
 cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-left-active.xpm"
 cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-right-active.xpm"
 cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/top-left-inactive.xpm"
@@ -51,7 +48,7 @@ cat << 'EOF' > "$XFWM_DIR/left-active.xpm"
 /* XPM */
 static char * border_xpm[] = {
 "1 1 1 1",
-".	c #1E293B",
+".	c #19212D",
 "."};
 EOF
 
@@ -63,7 +60,7 @@ cat << 'EOF' > "$XFWM_DIR/left-inactive.xpm"
 /* XPM */
 static char * border_inact_xpm[] = {
 "1 1 1 1",
-".	c #111827",
+".	c #141A23",
 "."};
 EOF
 
@@ -71,13 +68,12 @@ for SIDE in right bottom bottom-left bottom-right; do
     cp "$XFWM_DIR/left-inactive.xpm" "$XFWM_DIR/${SIDE}-inactive.xpm"
 done
 
-# Botão Fechar (18x30)
 cat << 'EOF' > "$XFWM_DIR/close-active.xpm"
 /* XPM */
 static char * close_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 "+	c #94A3B8",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
@@ -89,15 +85,14 @@ EOF
 
 sed 's/#94A3B8/#EF4444/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-prelight.xpm"
 sed 's/#94A3B8/#DC2626/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-inactive.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/close-active.xpm" > "$XFWM_DIR/close-inactive.xpm"
 
-# Botão Maximizar (18x30)
 cat << 'EOF' > "$XFWM_DIR/maximize-active.xpm"
 /* XPM */
 static char * max_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 "+	c #94A3B8",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
@@ -108,16 +103,15 @@ static char * max_active_xpm[] = {
 EOF
 
 sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-prelight.xpm"
-sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-inactive.xpm"
+sed 's/#94A3B8/#137FEC/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-pressed.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/maximize-active.xpm" > "$XFWM_DIR/maximize-inactive.xpm"
 
-# Botão Minimizar (18x30)
 cat << 'EOF' > "$XFWM_DIR/hide-active.xpm"
 /* XPM */
 static char * hide_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
+" 	c #0F141C",
+".	c #19212D",
 "+	c #94A3B8",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
@@ -128,17 +122,16 @@ static char * hide_active_xpm[] = {
 EOF
 
 sed 's/#94A3B8/#F8FAFC/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-prelight.xpm"
-sed 's/#94A3B8/#0284C7/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-inactive.xpm"
+sed 's/#94A3B8/#137FEC/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-pressed.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#94A3B8/#475569/' "$XFWM_DIR/hide-active.xpm" > "$XFWM_DIR/hide-inactive.xpm"
 
-# Botão de Menu da Janela (18x30)
 cat << 'EOF' > "$XFWM_DIR/menu-active.xpm"
 /* XPM */
 static char * menu_active_xpm[] = {
 "18 30 3 1",
-" 	c #0B1120",
-".	c #1E293B",
-"+	c #0284C7",
+" 	c #0F141C",
+".	c #19212D",
+"+	c #137FEC",
 "..................","                  ","                  ","                  ","                  ",
 "                  ","                  ","                  ","                  ","                  ",
 "       ++++       ","      ++++++      ","      ++++++      ","      ++++++      ","      ++++++      ",
@@ -149,17 +142,214 @@ EOF
 
 cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-prelight.xpm"
 cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
-sed -e 's/#0B1120/#090E1A/' -e 's/#1E293B/#111827/' -e 's/#0284C7/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
+sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#137FEC/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
-# Remove gnome-calculator (GTK4 fixo >600px) e mantém apenas Galculator (GTK3)
+# Variáveis de ambiente globais (GTK2/3/4 e Qt5/6)
 # ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
-export DEBIAN_FRONTEND=noninteractive
-apt-get purge -y gnome-calculator >/dev/null 2>&1 || true
-apt-get autoremove -y >/dev/null 2>&1 || true
+cat << 'EOF' > /etc/environment
+GTK_THEME=LegacyOS-Theme
+GTK2_RC_FILES=/usr/share/themes/LegacyOS-Theme/gtk-2.0/gtkrc
+QT_QPA_PLATFORMTHEME=qt5ct
+ADW_DEBUG_COLOR_SCHEME=prefer-dark
+EOF
 
-# Garante que o atalho padrão "Calculadora" do XFCE aponte para o galculator
+mkdir -p /etc/skel/.config/gtk-3.0 /etc/skel/.config/gtk-4.0
+cat << 'EOF' > /etc/skel/.config/gtk-3.0/settings.ini
+[Settings]
+gtk-theme-name=LegacyOS-Theme
+gtk-icon-theme-name=Papirus-Dark
+gtk-font-name=Geist 9.5
+gtk-application-prefer-dark-theme=1
+gtk-decoration-layout=menu:minimize,maximize,close
+EOF
+cp /etc/skel/.config/gtk-3.0/settings.ini /etc/skel/.config/gtk-4.0/settings.ini
+
+cat << 'EOF' > /etc/skel/.gtkrc-2.0
+include "/usr/share/themes/LegacyOS-Theme/gtk-2.0/gtkrc"
+gtk-icon-theme-name="Papirus-Dark"
+gtk-font-name="Geist 9.5"
+EOF
+
+mkdir -p /etc/skel/.config/qt5ct/colors /etc/skel/.config/qt6ct/colors
+cat << 'EOF' > /etc/skel/.config/qt5ct/colors/LegacyOS.conf
+[ColorScheme]
+active_colors=#fff8fafc, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #fff8fafc, #ffffffff, #fff8fafc, #ff0f141c, #ff141a23, #ff0b0f16, #ff137fec, #ffffffff, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #fff8fafc
+disabled_colors=#ff64748b, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #ff64748b, #ffffffff, #ff64748b, #ff0f141c, #ff141a23, #ff0b0f16, #ff19212d, #ff94a3b8, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #ff64748b
+inactive_colors=#fff8fafc, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #fff8fafc, #ffffffff, #fff8fafc, #ff0f141c, #ff141a23, #ff0b0f16, #ff0b66c3, #ffffffff, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #fff8fafc
+EOF
+cp /etc/skel/.config/qt5ct/colors/LegacyOS.conf /etc/skel/.config/qt6ct/colors/LegacyOS.conf
+
+cat << 'EOF' > /etc/skel/.config/qt5ct/qt5ct.conf
+[Appearance]
+color_scheme_path=/etc/skel/.config/qt5ct/colors/LegacyOS.conf
+custom_palette=true
+icon_theme=Papirus-Dark
+standard_dialogs=gtk3
+style=Fusion
+
+[Fonts]
+fixed="Monospace,9.5,-1,5,50,0,0,0,0,0"
+general="Geist,9.5,-1,5,50,0,0,0,0,0"
+EOF
+sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
+
+# ------------------------------------------------------------------------------
+# Fallback tipográfico (Geist -> Inter -> Noto Sans)
+# ------------------------------------------------------------------------------
+mkdir -p /etc/fonts/conf.d
+cat << 'EOF' > /etc/fonts/local.conf
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias>
+    <family>Geist</family>
+    <prefer>
+      <family>Geist</family>
+      <family>Inter</family>
+      <family>Noto Sans</family>
+    </prefer>
+  </alias>
+</fontconfig>
+EOF
+
+# ------------------------------------------------------------------------------
+# Configuração Padrão do XFCE em /etc/skel (Painel Superior Único + Dark Slate)
+# ------------------------------------------------------------------------------
+SKEL_XFCONF="/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml"
+mkdir -p "$SKEL_XFCONF"
+
+cat << 'EOF' > "$SKEL_XFCONF/xfwm4.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="LegacyOS-Theme"/>
+    <property name="use_compositing" type="bool" value="false"/>
+    <property name="vblank_mode" type="string" value="off"/>
+  </property>
+</channel>
+EOF
+
+cat << 'EOF' > "$SKEL_XFCONF/xsettings.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xsettings" version="1.0">
+  <property name="Net" type="empty">
+    <property name="ThemeName" type="string" value="LegacyOS-Theme"/>
+    <property name="IconThemeName" type="string" value="Papirus-Dark"/>
+  </property>
+  <property name="Gtk" type="empty">
+    <property name="FontName" type="string" value="Geist 9.5"/>
+  </property>
+</channel>
+EOF
+
+cat << 'EOF' > "$SKEL_XFCONF/xfce4-panel.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-panel" version="1.0">
+  <property name="configver" type="int" value="2"/>
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+    <property name="dark-mode" type="bool" value="true"/>
+    <property name="panel-1" type="empty">
+      <property name="position" type="string" value="p=6;x=0;y=0"/>
+      <property name="length" type="uint" value="100"/>
+      <property name="position-locked" type="bool" value="true"/>
+      <property name="size" type="uint" value="32"/>
+      <property name="mode" type="uint" value="0"/>
+      <property name="background-style" type="uint" value="1"/>
+      <property name="background-rgba" type="array">
+        <value type="double" value="0.059"/>
+        <value type="double" value="0.078"/>
+        <value type="double" value="0.110"/>
+        <value type="double" value="0.960"/>
+      </property>
+      <property name="plugin-ids" type="array">
+        <value type="int" value="1"/>
+        <value type="int" value="2"/>
+        <value type="int" value="3"/>
+        <value type="int" value="4"/>
+        <value type="int" value="5"/>
+        <value type="int" value="6"/>
+        <value type="int" value="7"/>
+        <value type="int" value="8"/>
+        <value type="int" value="9"/>
+      </property>
+    </property>
+  </property>
+  <property name="plugins" type="empty">
+    <property name="plugin-1" type="string" value="whiskermenu"/>
+    <property name="plugin-2" type="string" value="tasklist">
+      <property name="flat-buttons" type="bool" value="true"/>
+      <property name="show-handle" type="bool" value="false"/>
+    </property>
+    <property name="plugin-3" type="string" value="separator">
+      <property name="expand" type="bool" value="true"/>
+      <property name="style" type="uint" value="0"/>
+    </property>
+    <property name="plugin-4" type="string" value="systray">
+      <property name="square-icons" type="bool" value="true"/>
+    </property>
+    <property name="plugin-5" type="string" value="pulseaudio">
+      <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
+    </property>
+    <property name="plugin-6" type="string" value="power-manager-plugin"/>
+    <property name="plugin-7" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="legacy-guardian-applet.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-8" type="string" value="clock">
+      <property name="digital-layout" type="uint" value="3"/>
+      <property name="digital-time-format" type="string" value="%H:%M"/>
+    </property>
+    <property name="plugin-9" type="string" value="actions"/>
+  </property>
+</channel>
+EOF
+
+mkdir -p /etc/skel/.config/xfce4/panel/launcher-7
+cat << 'EOF' > /etc/skel/.config/xfce4/panel/launcher-7/legacy-guardian-applet.desktop
+[Desktop Entry]
+Type=Application
+Name=Legacy Guardian
+Comment=Central rápida de saúde e alertas do sistema
+Exec=/usr/local/bin/legacy-guardian-applet
+Icon=legacy-guardian
+Terminal=false
+EOF
+
+if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
+    cat << 'EOF' > "$SKEL_XFCONF/xfce4-desktop.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-desktop" version="1.0">
+  <property name="backdrop" type="empty">
+    <property name="screen0" type="empty">
+      <property name="monitor0" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/legacyos-wallpaper.jpg"/>
+        </property>
+      </property>
+      <property name="monitorVirtual1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/legacyos-wallpaper.jpg"/>
+        </property>
+      </property>
+    </property>
+  </property>
+  <property name="desktop-icons" type="empty">
+    <property name="gravity" type="int" value="2"/>
+  </property>
+</channel>
+EOF
+fi
+
+# ------------------------------------------------------------------------------
+# Localiza o atalho da calculadora compacta GTK3 (galculator)
+# ------------------------------------------------------------------------------
 if [ -f "/usr/share/applications/galculator.desktop" ]; then
     sed -i 's/^Name=.*/Name=Calculadora/' /usr/share/applications/galculator.desktop
     if ! grep -q "^Name\[pt_BR\]=" /usr/share/applications/galculator.desktop; then
@@ -168,77 +358,65 @@ if [ -f "/usr/share/applications/galculator.desktop" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Registra o logotipo SVG oficial no tema de ícones hicolor
+# Registra os ícones SVG oficiais no tema hicolor
 # ------------------------------------------------------------------------------
-if [ -f "/usr/share/pixmaps/legacyos-logo.svg" ]; then
-    mkdir -p /usr/share/icons/hicolor/scalable/apps
-    cp /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
-    chmod 644 /usr/share/pixmaps/legacyos-logo.svg /usr/share/icons/hicolor/scalable/apps/legacyos-logo.svg
-    gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
-fi
+mkdir -p /usr/share/icons/hicolor/scalable/apps
+for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg legacy-guardian.svg; do
+    if [ -f "/usr/share/pixmaps/$ICON_SVG" ]; then
+        cp "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
+        chmod 644 "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
+    fi
+done
+gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Cria tema Plymouth oficial e imagem de transição contínua X11
+# Gera e aplica o tema Plymouth oficial (sobrescreve Debian 13 desktop-base)
 # ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Configurando boot splash contínuo do LegacyOS..."
 PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
 mkdir -p "$PLYMOUTH_DIR"
 
-python3 - "$PLYMOUTH_DIR/logo.png" "$PLYMOUTH_DIR/boot-screen.png" << 'PYEOF'
+if [ ! -f "$PLYMOUTH_DIR/logo.png" ]; then
+python3 - "$PLYMOUTH_DIR/logo.png" << 'PYEOF'
 import sys
 import cairo
 
 out_logo = sys.argv[1]
-out_screen = sys.argv[2]
-
-def draw_legacyos_mark(ctx, cx, cy, scale):
-    ctx.save()
-    ctx.translate(cx - 50.0 * scale, cy - 50.0 * scale)
-    ctx.scale(scale, scale)
-
-    grad_v = cairo.LinearGradient(65, 5, 20, 95)
-    grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
-    grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
-    grad_v.add_color_stop_rgb(0.72, 0.008, 0.518, 0.780)
-    grad_v.add_color_stop_rgb(1.0, 0.000, 0.278, 0.671)
-    ctx.set_source(grad_v)
-    ctx.move_to(18, 92)
-    ctx.line_to(18, 42)
-    ctx.curve_to(18, 24, 30, 12, 46, 8)
-    ctx.line_to(46, 68)
-    ctx.curve_to(34, 73, 24, 81, 18, 92)
-    ctx.close_path()
-    ctx.fill()
-
-    grad_h = cairo.LinearGradient(10, 90, 92, 55)
-    grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
-    grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
-    grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
-    grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
-    ctx.set_source(grad_h)
-    ctx.move_to(18, 92)
-    ctx.curve_to(26, 75, 38, 66, 56, 66)
-    ctx.line_to(92, 66)
-    ctx.curve_to(88, 82, 76, 92, 58, 92)
-    ctx.line_to(18, 92)
-    ctx.close_path()
-    ctx.fill()
-    ctx.restore()
-
 s_logo = cairo.ImageSurface(cairo.FORMAT_ARGB32, 120, 120)
-c_logo = cairo.Context(s_logo)
-draw_legacyos_mark(c_logo, 60.0, 60.0, 1.15)
-s_logo.write_to_png(out_logo)
+ctx = cairo.Context(s_logo)
+ctx.translate(60.0 - 50.0 * 1.15, 60.0 - 50.0 * 1.15)
+ctx.scale(1.15, 1.15)
 
-W, H = 1920, 1080
-s_scr = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
-c_scr = cairo.Context(s_scr)
-c_scr.set_source_rgb(0.043, 0.067, 0.125)
-c_scr.rectangle(0, 0, W, H)
-c_scr.fill()
-draw_legacyos_mark(c_scr, W / 2.0, H / 2.0 - 40.0, 1.35)
-s_scr.write_to_png(out_screen)
+grad_v = cairo.LinearGradient(65, 5, 20, 95)
+grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
+grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
+grad_v.add_color_stop_rgb(0.72, 0.075, 0.498, 0.925)
+grad_v.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)
+ctx.set_source(grad_v)
+ctx.move_to(18, 92)
+ctx.line_to(18, 42)
+ctx.curve_to(18, 24, 30, 12, 46, 8)
+ctx.line_to(46, 68)
+ctx.curve_to(34, 73, 24, 81, 18, 92)
+ctx.close_path()
+ctx.fill()
+
+grad_h = cairo.LinearGradient(10, 90, 92, 55)
+grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
+grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
+grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
+grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
+ctx.set_source(grad_h)
+ctx.move_to(18, 92)
+ctx.curve_to(26, 75, 38, 66, 56, 66)
+ctx.line_to(92, 66)
+ctx.curve_to(88, 82, 76, 92, 58, 92)
+ctx.line_to(18, 92)
+ctx.close_path()
+ctx.fill()
+
+s_logo.write_to_png(out_logo)
 PYEOF
+fi
 
 cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.plymouth"
 [Plymouth Theme]
@@ -252,8 +430,8 @@ ScriptFile=/usr/share/plymouth/themes/legacyos/legacyos.script
 EOF
 
 cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.script"
-Window.SetBackgroundTopColor(0.043, 0.067, 0.125);
-Window.SetBackgroundBottomColor(0.043, 0.067, 0.125);
+Window.SetBackgroundTopColor(0.059, 0.078, 0.110);
+Window.SetBackgroundBottomColor(0.059, 0.078, 0.110);
 
 logo.image = Image("logo.png");
 logo.sprite = Sprite(logo.image);
@@ -272,43 +450,69 @@ cat << 'EOF' > /etc/plymouth/plymouthd.conf
 [Daemon]
 Theme=legacyos
 ShowDelay=0
+DeviceTimeout=2
 EOF
 
+update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$PLYMOUTH_DIR/legacyos.plymouth" 250 >/dev/null 2>&1 || true
+update-alternatives --set default.plymouth "$PLYMOUTH_DIR/legacyos.plymouth" >/dev/null 2>&1 || true
 plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
+update-initramfs -u -k all >/dev/null 2>&1 || true
+
+rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
+rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
 # ------------------------------------------------------------------------------
-# Oculta mensagem de console "piix4_smbus: SMBus Host Controller not enabled"
+# Configuração do LightDM (permite autologin do live-config sem conflito)
 # ------------------------------------------------------------------------------
-mkdir -p /etc/modprobe.d
-echo "blacklist i2c_piix4" > /etc/modprobe.d/blacklist-piix4.conf
+mkdir -p /etc/lightdm/lightdm.conf.d
+cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
+[LightDM]
+logind-check-graphical=false
 
-# ------------------------------------------------------------------------------
-# Intercepta o arranque da sessão XFCE para cobrir a tela ANTES do painel subir
-# ------------------------------------------------------------------------------
-cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
-#!/bin/bash
-export DISPLAY="${DISPLAY:-:0}"
-
-xsetroot -solid "#0B1120" 2>/dev/null || true
-
-LOCK_FILE="/tmp/legacyos-splash.lock"
-SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
-
-touch "$LOCK_FILE"
-if [ -f "$SPLASH_SCRIPT" ]; then
-    python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
-fi
-
-exec /usr/bin/xfce4-session
+[Seat:*]
+user-session=xfce
+greeter-session=lightdm-gtk-greeter
 EOF
-chmod 755 /usr/local/bin/legacyos-session-wrapper
 
+# ------------------------------------------------------------------------------
+# Vincula o wrapper de sessão ao xfce.desktop e fallback .xsessionrc
+# ------------------------------------------------------------------------------
 if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
     sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
 fi
 
+cat << 'EOF' > /etc/skel/.xsessionrc
+export GTK_THEME=LegacyOS-Theme
+export QT_QPA_PLATFORMTHEME=qt5ct
+xsetroot -solid "#0F141C" 2>/dev/null || true
+EOF
+
 # ------------------------------------------------------------------------------
-# Substitui o papel de parede fallback do Debian 13 pelo do LegacyOS
+# Autostart de Sessão (Dock Plank + Daemon Diário do Legacy Guardian)
+# ------------------------------------------------------------------------------
+mkdir -p /etc/skel/.config/autostart
+
+cat << 'EOF' > /etc/skel/.config/autostart/plank.desktop
+[Desktop Entry]
+Type=Application
+Name=LegacyOS Dock
+Exec=plank
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+
+cat << 'EOF' > /etc/skel/.config/autostart/legacy-guardian-daemon.desktop
+[Desktop Entry]
+Type=Application
+Name=Legacy Guardian Monitor
+Comment=Análise diária de saúde de hardware e bateria
+Exec=/usr/local/bin/legacy-guardian-daemon
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+
+# ------------------------------------------------------------------------------
+# Wallpaper Padrão do Sistema
 # ------------------------------------------------------------------------------
 if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
     mkdir -p /usr/share/images/desktop-base
@@ -317,26 +521,43 @@ if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
     update-alternatives --set desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg >/dev/null 2>&1 || true
 fi
 
-# ------------------------------------------------------------------------------
-# Atualiza cache das fontes (inclui a família Geist)
-# ------------------------------------------------------------------------------
 echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
 fc-cache -f -v >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Oculta o atalho genérico de cliente de e-mail no menu de aplicativos
+# Sanitiza CRLF (\r) e aplica permissões finais em todos os executáveis
 # ------------------------------------------------------------------------------
-if [ -f "/usr/share/applications/exo-mail-reader.desktop" ]; then
-    if ! grep -q "NoDisplay=true" /usr/share/applications/exo-mail-reader.desktop; then
-        echo "NoDisplay=true" >> /usr/share/applications/exo-mail-reader.desktop
+for BIN_FILE in \
+    legacyos-apps \
+    legacyos-window-fit \
+    legacy-care-center \
+    legacyos-workspace \
+    legacyos-settings \
+    legacy-guardian \
+    legacy-guardian-daemon \
+    legacy-guardian-applet \
+    legacyos-panel-position \
+    legacyos-desktop-align \
+    legacyos-session-wrapper
+do
+    if [ -f "/usr/local/bin/$BIN_FILE" ]; then
+        sed -i 's/\r$//' "/usr/local/bin/$BIN_FILE"
+        chmod 755 "/usr/local/bin/$BIN_FILE"
     fi
-fi
+done
 
-# ------------------------------------------------------------------------------
-# Permissões do Lançador de Aplicativos (legacyos-apps)
-# ------------------------------------------------------------------------------
-chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
-chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
+for DESKTOP_FILE in \
+    legacyos-apps.desktop \
+    legacyos-settings.desktop \
+    legacy-care-center.desktop \
+    legacyos-workspace.desktop \
+    legacy-guardian.desktop
+do
+    if [ -f "/usr/share/applications/$DESKTOP_FILE" ]; then
+        sed -i 's/\r$//' "/usr/share/applications/$DESKTOP_FILE"
+        chmod 644 "/usr/share/applications/$DESKTOP_FILE"
+    fi
+done
 
-echo "[LegacyOS Hook 0650] Ativos visuais concluídos."
+echo "[LegacyOS Hook 0650] Auditoria e sincronização concluídas com sucesso."
 exit 0
