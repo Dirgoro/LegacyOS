@@ -13,10 +13,12 @@ zram-tools
 earlyoom
 preload
 
-# Ambiente Gráfico XFCE Leve & Gerenciamento de Janelas
+# Ambiente Gráfico XFCE Leve & Drivers de Vídeo (VM + Hardware Legado)
 xorg
 xserver-xorg-core
+xserver-xorg-video-all
 x11-xserver-utils
+dbus-x11
 xfce4
 xfce4-goodies
 xfce4-whiskermenu-plugin
