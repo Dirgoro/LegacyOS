@@ -1,6 +1,6 @@
 # ==============================================================================
 # LEGACYOS 1.0 - LISTA DE PACOTES BASE DE RECUPERAÇÃO DO BOOT (DEBIAN TRIXIE)
-# Inclui user-setup, sudo, D-Bus, Mesa DRI, Xorg, LightDM e XFCE puro
+# Usa PipeWire (padrão do Debian 13) + user-setup + Mesa DRI + Xorg + XFCE
 # ==============================================================================
 
 # Sistema Base, Live-Boot e Criação de Usuário Live (Crítico para Autologin)
@@ -63,10 +63,12 @@ lightdm
 lightdm-gtk-greeter
 accountsservice
 
-# Rede, Áudio, Temas e Fontes Base
+# Rede, Áudio (PipeWire nativo do Debian 13), Temas e Fontes Base
 network-manager
 network-manager-gnome
-pulseaudio
+pipewire-audio
+pipewire-pulse
+wireplumber
 pulseaudio-utils
 pavucontrol
 papirus-icon-theme
