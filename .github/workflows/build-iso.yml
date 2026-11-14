@@ -59,10 +59,8 @@ jobs:
         run: |
           set -o pipefail
           if ! lb build 2>&1 | tee build.log; then
-            echo "=================================================================="
-            echo "DIAGNÓSTICO EXATO DO ERRO DO APT / LIVE-BUILD:"
-            echo "=================================================================="
-            grep -B 35 -m 1 "Begin unmounting filesystems" build.log || tail -n 50 build.log
+            echo "=== DIAGNÓSTICO DE ERRO DO APT / LIVE-BUILD ==="
+            grep -E "^(E:|Err:|W: Failed)" build.log | tail -n 30 || true
             exit 1
           fi
 
@@ -76,7 +74,7 @@ jobs:
 
           ISO_FILE=$(ls -1 *.iso 2>/dev/null | head -n 1)
           if [ -z "$ISO_FILE" ]; then
-            echo "ERRO: Nenhum arquivo .iso foi gerado pelo lb build."
+            echo "ERRO: Nenhum ficheiro .iso foi gerado pelo lb build."
             exit 1
           fi
           echo "ISO gerada com sucesso: $ISO_FILE ($(du -h "$ISO_FILE" | cut -f1))"
