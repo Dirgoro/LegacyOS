@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - WRAPPER DE SESSÃO GRÁFICA
-# Libera o framebuffer do Plymouth e inicia a sessão XFCE sem bloqueios
+# Garante inicialização completa do XFCE e evita tela preta de compositor/vblank
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
@@ -9,8 +9,20 @@ export DISPLAY="${DISPLAY:-:0}"
 # Define fundo Dark Slate imediato no servidor X
 xsetroot -solid "#0F141C" 2>/dev/null || true
 
-# Encerra o Plymouth liberando o dispositivo de vídeo para o Xorg
-plymouth quit 2>/dev/null || true
+# Garante que o compositor não trave o framebuffer em VMs ou GPUs antigas
+mkdir -p "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
+if [ ! -f "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml" ]; then
+    cat << 'EOF' > "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="LegacyOS-Theme"/>
+    <property name="use_compositing" type="bool" value="false"/>
+    <property name="vblank_mode" type="string" value="off"/>
+  </property>
+</channel>
+EOF
+fi
 
-# Inicia a sessão completa do XFCE
-exec /usr/bin/xfce4-session
+# Inicia a sessão completa do XFCE via startxfce4
+exec /usr/bin/startxfce4
