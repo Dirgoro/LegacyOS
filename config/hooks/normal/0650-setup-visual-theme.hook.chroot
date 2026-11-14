@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS, TEMA UNIFICADO (GTK2/3/4 + QT) E BOOT
+# LEGACYOS - HOOK DE ATIVOS VISUAIS, TEMA UNIFICADO, LIGHTDM E AUTOSTART
 # ==============================================================================
 
 set -e
@@ -20,10 +20,9 @@ static char * title_1_active_xpm[] = {
 " "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
 EOF
 
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-2-active.xpm"
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-3-active.xpm"
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-4-active.xpm"
-cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-5-active.xpm"
+for N in 2 3 4 5; do
+    cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/title-${N}-active.xpm"
+done
 
 cat << 'EOF' > "$XFWM_DIR/title-1-inactive.xpm"
 /* XPM */
@@ -35,10 +34,9 @@ static char * title_1_inactive_xpm[] = {
 " "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "};
 EOF
 
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-2-inactive.xpm"
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-3-inactive.xpm"
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-4-inactive.xpm"
-cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-5-inactive.xpm"
+for N in 2 3 4 5; do
+    cp "$XFWM_DIR/title-1-inactive.xpm" "$XFWM_DIR/title-${N}-inactive.xpm"
+done
 
 cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-left-active.xpm"
 cp "$XFWM_DIR/title-1-active.xpm" "$XFWM_DIR/top-right-active.xpm"
@@ -146,7 +144,7 @@ cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#137FEC/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
-# Variáveis de ambiente globais (força Dark Slate em GTK2/3/4 e Qt5/6)
+# Variáveis de ambiente globais (GTK2/3/4 e Qt5/6)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > /etc/environment
 GTK_THEME=LegacyOS-Theme
@@ -196,13 +194,8 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
-# Remove gnome-calculator e mantém Galculator (GTK3)
+# Garante calculadora compacta GTK3 (galculator)
 # ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
-export DEBIAN_FRONTEND=noninteractive
-apt-get purge -y gnome-calculator >/dev/null 2>&1 || true
-apt-get autoremove -y >/dev/null 2>&1 || true
-
 if [ -f "/usr/share/applications/galculator.desktop" ]; then
     sed -i 's/^Name=.*/Name=Calculadora/' /usr/share/applications/galculator.desktop
     if ! grep -q "^Name\[pt_BR\]=" /usr/share/applications/galculator.desktop; then
@@ -223,7 +216,7 @@ done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Configuração Segura do Plymouth e LightDM (Sem travamentos de vídeo)
+# Configuração Segura do Plymouth e LightDM (Sem bloqueios de VT / Framebuffer)
 # ------------------------------------------------------------------------------
 mkdir -p /etc/plymouth
 cat << 'EOF' > /etc/plymouth/plymouthd.conf
@@ -240,9 +233,13 @@ rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
 mkdir -p /etc/lightdm/lightdm.conf.d
 cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
+[LightDM]
+minimum-vt=7
+
 [Seat:*]
 user-session=xfce
 greeter-session=lightdm-gtk-greeter
+xserver-command=X -core -br
 EOF
 
 # ------------------------------------------------------------------------------
@@ -261,28 +258,71 @@ if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
     sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
 fi
 
+# ------------------------------------------------------------------------------
+# Autostart de Sessão (Dock Plank + Daemon Diário do Legacy Guardian)
+# ------------------------------------------------------------------------------
+mkdir -p /etc/skel/.config/autostart
+
+cat << 'EOF' > /etc/skel/.config/autostart/plank.desktop
+[Desktop Entry]
+Type=Application
+Name=LegacyOS Dock
+Exec=plank
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+
+cat << 'EOF' > /etc/skel/.config/autostart/legacy-guardian-daemon.desktop
+[Desktop Entry]
+Type=Application
+Name=Legacy Guardian Monitor
+Comment=Análise diária de saúde de hardware e bateria
+Exec=/usr/local/bin/legacy-guardian-daemon
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+
+# ------------------------------------------------------------------------------
+# Wallpaper e Fontes
+# ------------------------------------------------------------------------------
+if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
+    mkdir -p /usr/share/images/desktop-base
+    ln -sf /usr/share/backgrounds/legacyos-wallpaper.jpg /usr/share/images/desktop-base/default
+    update-alternatives --install /usr/share/images/desktop-base/desktop-background desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg 90 >/dev/null 2>&1 || true
+    update-alternatives --set desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg >/dev/null 2>&1 || true
+fi
+
 echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
 fc-cache -f -v >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Permissões Finais de Todas as Ferramentas do LegacyOS
+# Permissões Finais de Todas as Ferramentas e Atalhos do LegacyOS
 # ------------------------------------------------------------------------------
-chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
-chmod 755 /usr/local/bin/legacyos-window-fit 2>/dev/null || true
-chmod 755 /usr/local/bin/legacy-care-center 2>/dev/null || true
-chmod 755 /usr/local/bin/legacyos-workspace 2>/dev/null || true
-chmod 755 /usr/local/bin/legacyos-settings 2>/dev/null || true
-chmod 755 /usr/local/bin/legacy-guardian 2>/dev/null || true
-chmod 755 /usr/local/bin/legacy-guardian-daemon 2>/dev/null || true
-chmod 755 /usr/local/bin/legacy-guardian-applet 2>/dev/null || true
-chmod 755 /usr/local/bin/legacyos-panel-position 2>/dev/null || true
-chmod 755 /usr/local/bin/legacyos-desktop-align 2>/dev/null || true
+for BIN_FILE in \
+    legacyos-apps \
+    legacyos-window-fit \
+    legacy-care-center \
+    legacyos-workspace \
+    legacyos-settings \
+    legacy-guardian \
+    legacy-guardian-daemon \
+    legacy-guardian-applet \
+    legacyos-panel-position \
+    legacyos-desktop-align \
+    legacyos-session-wrapper
+do
+    chmod 755 "/usr/local/bin/$BIN_FILE" 2>/dev/null || true
+done
 
-chmod 644 /usr/share/applications/legacyos-apps.desktop 2>/dev/null || true
-chmod 644 /usr/share/applications/legacyos-settings.desktop 2>/dev/null || true
-chmod 644 /usr/share/applications/legacy-care-center.desktop 2>/dev/null || true
-chmod 644 /usr/share/applications/legacyos-workspace.desktop 2>/dev/null || true
-chmod 644 /usr/share/applications/legacy-guardian.desktop 2>/dev/null || true
+for DESKTOP_FILE in \
+    legacyos-apps.desktop \
+    legacyos-settings.desktop \
+    legacy-care-center.desktop \
+    legacyos-workspace.desktop \
+    legacy-guardian.desktop
+do
+    chmod 644 "/usr/share/applications/$DESKTOP_FILE" 2>/dev/null || true
+done
 
-echo "[LegacyOS Hook 0650] Configuração concluída com sucesso."
+echo "[LegacyOS Hook 0650] Auditoria e configuração concluídas com sucesso."
 exit 0
