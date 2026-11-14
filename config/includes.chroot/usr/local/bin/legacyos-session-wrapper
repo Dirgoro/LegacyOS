@@ -1,15 +1,20 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - WRAPPER DE SESSÃO GRÁFICA
-# Garante inicialização completa do XFCE e evita tela preta de compositor/vblank
+# Inicializa o ambiente XFCE completo com tema Dark Slate e compositor seguro
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
+
+# Define fundo Dark Slate imediato antes do xfdesktop carregar
 xsetroot -solid "#0F141C" 2>/dev/null || true
 
-mkdir -p "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
-if [ ! -f "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml" ]; then
-    cat << 'EOF' > "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+# Garante configurações iniciais do XFCE caso o perfil seja recém-criado
+XFCONF_DIR="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
+mkdir -p "$XFCONF_DIR"
+
+if [ ! -f "$XFCONF_DIR/xfwm4.xml" ]; then
+    cat << 'EOF' > "$XFCONF_DIR/xfwm4.xml"
 <?xml version="1.0" encoding="UTF-8"?>
 <channel name="xfwm4" version="1.0">
   <property name="general" type="empty">
@@ -21,4 +26,20 @@ if [ ! -f "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml" ]; then
 EOF
 fi
 
+if [ ! -f "$XFCONF_DIR/xsettings.xml" ]; then
+    cat << 'EOF' > "$XFCONF_DIR/xsettings.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xsettings" version="1.0">
+  <property name="Net" type="empty">
+    <property name="ThemeName" type="string" value="LegacyOS-Theme"/>
+    <property name="IconThemeName" type="string" value="Papirus-Dark"/>
+  </property>
+  <property name="Gtk" type="empty">
+    <property name="FontName" type="string" value="Geist 9.5"/>
+  </property>
+</channel>
+EOF
+fi
+
+# Inicia a sessão completa do XFCE (DBus, xfwm4, xfce4-panel, xfdesktop)
 exec /usr/bin/startxfce4
