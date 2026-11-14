@@ -194,10 +194,12 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
-# Configuração padrão do XFWM4 (compositor desativado no primeiro boot para VM)
+# Configuração Padrão do XFCE em /etc/skel (Tema, Wallpaper e Compositor)
 # ------------------------------------------------------------------------------
-mkdir -p /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
-cat << 'EOF' > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+SKEL_XFCONF="/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml"
+mkdir -p "$SKEL_XFCONF"
+
+cat << 'EOF' > "$SKEL_XFCONF/xfwm4.xml"
 <?xml version="1.0" encoding="UTF-8"?>
 <channel name="xfwm4" version="1.0">
   <property name="general" type="empty">
@@ -207,6 +209,45 @@ cat << 'EOF' > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
   </property>
 </channel>
 EOF
+
+cat << 'EOF' > "$SKEL_XFCONF/xsettings.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xsettings" version="1.0">
+  <property name="Net" type="empty">
+    <property name="ThemeName" type="string" value="LegacyOS-Theme"/>
+    <property name="IconThemeName" type="string" value="Papirus-Dark"/>
+  </property>
+  <property name="Gtk" type="empty">
+    <property name="FontName" type="string" value="Geist 9.5"/>
+  </property>
+</channel>
+EOF
+
+if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
+    cat << 'EOF' > "$SKEL_XFCONF/xfce4-desktop.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-desktop" version="1.0">
+  <property name="backdrop" type="empty">
+    <property name="screen0" type="empty">
+      <property name="monitor0" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/legacyos-wallpaper.jpg"/>
+        </property>
+      </property>
+      <property name="monitorVirtual1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/legacyos-wallpaper.jpg"/>
+        </property>
+      </property>
+    </property>
+  </property>
+</channel>
+EOF
+fi
 
 # ------------------------------------------------------------------------------
 # Garante calculadora compacta GTK3 (galculator)
@@ -252,7 +293,7 @@ rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
 rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
 # ------------------------------------------------------------------------------
-# Configuração do LightDM (evita trava de logind-check-graphical e força XFCE)
+# Configuração do LightDM (evita trava de logind-check-graphical e define XFCE)
 # ------------------------------------------------------------------------------
 mkdir -p /etc/lightdm/lightdm.conf.d
 cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
@@ -262,36 +303,11 @@ logind-check-graphical=false
 [Seat:*]
 user-session=xfce
 greeter-session=lightdm-gtk-greeter
-autologin-user=user
-autologin-user-timeout=0
-autologin-session=xfce
 EOF
 
 # ------------------------------------------------------------------------------
-# Script de Sessão (Usa startxfce4 e sanitiza quebras de linha CRLF)
+# Vincula o wrapper de sessão ao xfce.desktop
 # ------------------------------------------------------------------------------
-cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
-#!/bin/bash
-export DISPLAY="${DISPLAY:-:0}"
-xsetroot -solid "#0F141C" 2>/dev/null || true
-
-mkdir -p "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
-if [ ! -f "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml" ]; then
-    cat << 'INNER' > "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfwm4" version="1.0">
-  <property name="general" type="empty">
-    <property name="theme" type="string" value="LegacyOS-Theme"/>
-    <property name="use_compositing" type="bool" value="false"/>
-    <property name="vblank_mode" type="string" value="off"/>
-  </property>
-</channel>
-INNER
-fi
-
-exec /usr/bin/startxfce4
-EOF
-
 if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
     sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
 fi
@@ -321,7 +337,7 @@ X-GNOME-Autostart-enabled=true
 EOF
 
 # ------------------------------------------------------------------------------
-# Wallpaper e Fontes
+# Wallpaper Padrão do Sistema
 # ------------------------------------------------------------------------------
 if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
     mkdir -p /usr/share/images/desktop-base
@@ -368,5 +384,5 @@ do
     fi
 done
 
-echo "[LegacyOS Hook 0650] Configuração concluída com sucesso."
+echo "[LegacyOS Hook 0650] Auditoria concluída com sucesso."
 exit 0
