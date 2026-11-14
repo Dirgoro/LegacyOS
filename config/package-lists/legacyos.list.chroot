@@ -2,7 +2,7 @@
 # LEGACYOS 1.0 - LISTA DE PACOTES AUDITADA (DEBIAN TRIXIE + XFCE + MESA DRI)
 # ==============================================================================
 
-# Sistema Base, Live-Boot, D-Bus & Gerenciamento de Sessão
+# Sistema Base, Live-Boot, D-Bus & Gestão de Sessão
 live-boot
 live-config
 live-config-systemd
@@ -19,17 +19,12 @@ plymouth-themes
 plymouth-label
 zram-tools
 earlyoom
-preload
 
-# Servidor Gráfico Xorg, Mesa DRI (Corrige Tela Preta) & Drivers VM/Legado
+# Servidor Gráfico Xorg, Mesa DRI (Corrige Ecrã Preto) & Controladores VM/Legado
 xorg
 xserver-xorg
 xserver-xorg-core
-xserver-xorg-legacy
 xserver-xorg-video-all
-xserver-xorg-video-vmware
-xserver-xorg-video-vesa
-xserver-xorg-video-fbdev
 xserver-xorg-input-all
 x11-xserver-utils
 x11-utils
@@ -40,7 +35,7 @@ open-vm-tools-desktop
 qemu-guest-agent
 spice-vdagent
 
-# Ambiente Gráfico XFCE & Gerenciador de Login LightDM
+# Ambiente Gráfico XFCE & Gestor de Sessão LightDM
 xfce4
 xfce4-session
 xfwm4
