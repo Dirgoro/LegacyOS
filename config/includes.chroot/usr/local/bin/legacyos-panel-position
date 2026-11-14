@@ -1,7 +1,6 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - GERENCIADOR DE POSIÇÃO DO PAINEL E AJUSTE AUTOMÁTICO DA DOCK
-# Usa flags -n -t no xfconf-query para criar propriedades caso ainda não existam
 # ==============================================================================
 
 POSITION="${1:-top}"
