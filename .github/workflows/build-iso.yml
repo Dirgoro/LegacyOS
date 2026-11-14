@@ -1,11 +1,11 @@
-name: Build LegacyOS ISO (Debian 13)
+name: Build LegacyOS ISO
 
 on:
+  push:
+    branches:
+      - main
+      - "Fase-1---Gemini"
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - Fase-4-Refinamento
-  #     - "Fase-1---Gemini"
 
 jobs:
   build-iso:
@@ -18,61 +18,69 @@ jobs:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Instalar Dependências do Live-Build (Debian 13)
+      - name: Instalar dependências do Live-Build
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          apt-get update -qq
+          apt-get update
           apt-get install -y --no-install-recommends \
             live-build \
             debootstrap \
             squashfs-tools \
             xorriso \
-            syslinux \
-            syslinux-common \
             isolinux \
+            syslinux-common \
+            grub-pc-bin \
+            grub-efi-amd64-bin \
+            mtools \
+            dosfstools \
             ca-certificates \
-            curl \
-            gnupg \
-            sed \
-            python3 \
-            python3-gi \
-            python3-gi-cairo \
-            gir1.2-gdkpixbuf-2.0 \
-            librsvg2-common
+            findutils \
+            sed
 
-      - name: Normalizar Permissões e Quebras de Linha (LF)
+      - name: Sanitizar permissões, quebras de linha (LF) e initramfs
         run: |
-          find auto config scripts -type f \( -name "*.sh" -o -name "*.chroot" -o -path "auto/*" \) -exec sed -i 's/\r$//' {} + 2>/dev/null || true
-          chmod +x auto/* 2>/dev/null || true
-          chmod +x scripts/*.sh 2>/dev/null || true
-          find config/hooks -type f -exec chmod +x {} + 2>/dev/null || true
+          # Converte CRLF para LF em scripts, hooks, binários de texto e listas de pacotes
+          find auto config -type f \( -name "*.sh" -o -name "*.chroot" -o -name "*.binary" -o -name "*.list*" -o -path "*/bin/*" -o -path "auto/*" \) \
+            -exec sed -i 's/\r$//' {} + 2>/dev/null || true
 
-      - name: Configurar e Personalizar Bootloader (lb config)
+          # Garante permissão de execução nos scripts de build, hooks e ferramentas locais
+          chmod -R +x auto/ 2>/dev/null || true
+          find config/hooks -type f -exec chmod +x {} + 2>/dev/null || true
+          find config/includes.chroot/usr/local/bin -type f -exec chmod +x {} + 2>/dev/null || true
+
+          # Força update-initramfs -u -k all para reconstruir o kernel do chroot Debian Trixie
+          if [ -f "config/hooks/normal/0650-setup-visual-theme.hook.chroot" ]; then
+            sed -i 's|update-initramfs -u -k all|update-initramfs -u|g' config/hooks/normal/0650-setup-visual-theme.hook.chroot
+            sed -i 's|update-initramfs -u|update-initramfs -u -k all|g' config/hooks/normal/0650-setup-visual-theme.hook.chroot
+          fi
+
+      - name: Limpar e Configurar Live-Build
         run: |
           lb clean --purge
-          if [ -x "./scripts/customize-bootloader.sh" ]; then
-            ./scripts/customize-bootloader.sh
-          fi
           lb config
-          if [ -x "./scripts/customize-bootloader.sh" ]; then
-            ./scripts/customize-bootloader.sh
-          fi
 
-      - name: Construir ISO (lb build)
+      - name: Compilar ISO do LegacyOS
         run: |
           lb build
 
-      - name: Validar Arquivo ISO Gerado
+      - name: Verificar Initramfs e Artefato ISO
         run: |
-          ls -lh *.iso
-          if ! ls *.iso 1> /dev/null 2>&1; then
-            echo "ERRO CRÍTICO: Nenhuma imagem .iso foi gerada pelo lb build."
+          echo "=== Conteúdo de chroot/boot ==="
+          ls -lh chroot/boot/vmlinuz* chroot/boot/initrd.img*
+
+          echo "=== Conteúdo de binary/live ==="
+          ls -lh binary/live/vmlinuz* binary/live/initrd.img* binary/live/filesystem.squashfs
+
+          ISO_FILE=$(ls -1 *.iso 2>/dev/null | head -n 1)
+          if [ -z "$ISO_FILE" ]; then
+            echo "ERRO: Nenhum arquivo .iso foi gerado pelo lb build."
             exit 1
           fi
+          echo "ISO gerada com sucesso: $ISO_FILE ($(du -h "$ISO_FILE" | cut -f1))"
 
-      - name: Publicar ISO como Artifact
+      - name: Publicar Artefato ISO
         uses: actions/upload-artifact@v4
         with:
-          name: LegacyOS-Alpha-amd64
+          name: LegacyOS-1.0-amd64
           path: "*.iso"
           retention-days: 7
