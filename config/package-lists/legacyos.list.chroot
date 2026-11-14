@@ -20,11 +20,10 @@ plymouth-label
 zram-tools
 earlyoom
 
-# Servidor Gráfico Xorg, Mesa DRI & Controladores VM/Hardware Legado
+# Servidor Gráfico Xorg, Mesa DRI (Corrige Ecrã Preto) & Controladores VM/Legado
 xorg
 xserver-xorg
 xserver-xorg-core
-xserver-xorg-legacy
 xserver-xorg-video-all
 xserver-xorg-input-all
 x11-xserver-utils
@@ -54,4 +53,54 @@ lightdm
 lightdm-gtk-greeter
 accountsservice
 
-# Temas, Í
+# Temas, Ícones e Fontes
+papirus-icon-theme
+qt5ct
+qt6ct
+fonts-inter
+fonts-noto-core
+fonts-noto-color-emoji
+
+# Bibliotecas Gráficas e Motores dos Aplicativos Exclusivos LegacyOS
+python3
+python3-gi
+python3-gi-cairo
+python3-cairo
+python3-psutil
+gir1.2-gtk-3.0
+gir1.2-gdkpixbuf-2.0
+gir1.2-pango-1.0
+gir1.2-vte-2.91
+gir1.2-webkit2-4.1
+gir1.2-notify-0.7
+libglib2.0-bin
+
+# Utilitários de Hardware, Áudio, Rede e Sistema
+lm-sensors
+smartmontools
+bc
+libnotify-bin
+pulseaudio
+pulseaudio-utils
+pavucontrol
+network-manager
+network-manager-gnome
+blueman
+thunar
+thunar-archive-plugin
+thunar-volman
+gvfs
+gvfs-backends
+udisks2
+upower
+file-roller
+galculator
+mousepad
+ristretto
+gparted
+htop
+fastfetch
+curl
+wget
+git
+ca-certificates
