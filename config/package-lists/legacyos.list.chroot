@@ -2,15 +2,18 @@
 # LEGACYOS 1.0 - LISTA DE PACOTES AUDITADA (DEBIAN TRIXIE + XFCE + MESA DRI)
 # ==============================================================================
 
-# Sistema Base, Live-Boot, Kernel & Gerenciamento de Sessão
+# Sistema Base, Live-Boot, D-Bus & Gerenciamento de Sessão
 live-boot
 live-config
 live-config-systemd
 systemd-sysv
 libpam-systemd
+dbus
 dbus-x11
+dbus-user-session
 polkitd
 pkexec
+mate-polkit
 plymouth
 plymouth-themes
 plymouth-label
@@ -18,22 +21,26 @@ zram-tools
 earlyoom
 preload
 
-# Servidor Gráfico Xorg, Mesa DRI (Corrige Tela Preta) & Drivers VM/Hardware Legado
+# Servidor Gráfico Xorg, Mesa DRI (Corrige Tela Preta) & Drivers VM/Legado
 xorg
+xserver-xorg
 xserver-xorg-core
+xserver-xorg-legacy
 xserver-xorg-video-all
 xserver-xorg-video-vmware
 xserver-xorg-video-vesa
 xserver-xorg-video-fbdev
 xserver-xorg-input-all
 x11-xserver-utils
+x11-utils
 libgl1-mesa-dri
+libglx-mesa0
 mesa-utils
 open-vm-tools-desktop
 qemu-guest-agent
 spice-vdagent
 
-# Ambiente Gráfico XFCE Completo & Gerenciador de Login LightDM
+# Ambiente Gráfico XFCE & Gerenciador de Login LightDM
 xfce4
 xfce4-session
 xfwm4
@@ -41,11 +48,11 @@ xfdesktop4
 xfce4-panel
 xfce4-settings
 xfce4-terminal
-xfce4-goodies
 xfce4-whiskermenu-plugin
 xfce4-pulseaudio-plugin
 xfce4-power-manager
 xfce4-notifyd
+xfce4-screenshooter
 plank
 lightdm
 lightdm-gtk-greeter
@@ -63,19 +70,22 @@ fonts-noto-color-emoji
 python3
 python3-gi
 python3-gi-cairo
+python3-cairo
 python3-psutil
 gir1.2-gtk-3.0
 gir1.2-gdkpixbuf-2.0
 gir1.2-pango-1.0
 gir1.2-vte-2.91
 gir1.2-webkit2-4.1
+gir1.2-notify-0.7
 libglib2.0-bin
 
-# Utilitários de Hardware, Áudio, Rede e Diagnóstico
+# Utilitários de Hardware, Áudio, Rede e Sistema
 lm-sensors
 smartmontools
 bc
 libnotify-bin
+pulseaudio
 pulseaudio-utils
 pavucontrol
 network-manager
@@ -86,11 +96,12 @@ thunar-archive-plugin
 thunar-volman
 gvfs
 gvfs-backends
+udisks2
+upower
 file-roller
 galculator
 mousepad
 ristretto
-xfce4-screenshooter
 gparted
 htop
 fastfetch
