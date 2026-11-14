@@ -1,18 +1,21 @@
 #!/bin/sh
+
 set -e
 
 lb config noauto \
-  --mode debian \
-  --distribution trixie \
-  --archive-areas "main contrib non-free non-free-firmware" \
-  --apt-options "--yes --no-install-recommends" \
-  --debian-installer live \
-  --bootloader syslinux \
-  --initramfs live-boot \
-  --security false \
-  --updates false \
-  --iso-application "LegacyOS" \
-  --iso-publisher "LegacyOS Team" \
-  --iso-volume "LegacyOS_1.0" \
-  --linux-flavours "amd64" \
-  --bootappend-live "boot=live components quiet splash noeject"
+    --mode debian \
+    --distribution trixie \
+    --architecture amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --binary-images iso-hybrid \
+    --bootloaders "syslinux,grub-efi" \
+    --debian-installer false \
+    --apt-recommends false \
+    --apt-indices false \
+    --memtest none \
+    --win32-loader false \
+    --iso-application "LegacyOS 1.0" \
+    --iso-publisher "LegacyOS Project" \
+    --iso-volume "LegacyOS_1_0" \
+    --bootappend-live "boot=live components locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo plymouth.enable=0" \
+    "${@}"
