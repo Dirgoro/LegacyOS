@@ -1,15 +1,19 @@
 #!/bin/bash
 # ==============================================================================
 # LEGACYOS - WRAPPER DE SESSÃO GRÁFICA
-# Inicializa o ambiente XFCE completo com tema Dark Slate e compositor seguro
+# Garante barramento D-Bus ativo, tema Dark Slate e inicialização limpa do XFCE
 # ==============================================================================
 
 export DISPLAY="${DISPLAY:-:0}"
+export XDG_CONFIG_DIRS="${XDG_CONFIG_DIRS:-/etc/xdg}"
+export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export GTK_THEME="LegacyOS-Theme"
+export QT_QPA_PLATFORMTHEME="qt5ct"
 
-# Define fundo Dark Slate imediato antes do xfdesktop carregar
+# Define fundo Dark Slate imediato antes do xfdesktop assumir
 xsetroot -solid "#0F141C" 2>/dev/null || true
 
-# Garante configurações iniciais do XFCE caso o perfil seja recém-criado
+# Garante diretório de configuração com permissões do usuário atual
 XFCONF_DIR="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
 mkdir -p "$XFCONF_DIR"
 
@@ -41,5 +45,9 @@ if [ ! -f "$XFCONF_DIR/xsettings.xml" ]; then
 EOF
 fi
 
-# Inicia a sessão completa do XFCE (DBus, xfwm4, xfce4-panel, xfdesktop)
-exec /usr/bin/startxfce4
+# Inicia o XFCE garantindo um barramento D-Bus ativo
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ] && command -v dbus-run-session >/dev/null 2>&1; then
+    exec dbus-run-session -- /usr/bin/startxfce4
+else
+    exec /usr/bin/startxfce4
+fi
