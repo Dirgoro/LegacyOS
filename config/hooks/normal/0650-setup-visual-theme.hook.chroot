@@ -146,7 +146,7 @@ cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#137FEC/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
-# Variáveis de ambiente globais (força Dark Slate em GTK2/3/4 e Qt5/6)
+# Variáveis de ambiente globais
 # ------------------------------------------------------------------------------
 cat << 'EOF' > /etc/environment
 GTK_THEME=LegacyOS-Theme
@@ -196,7 +196,7 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
-# Remove gnome-calculator e mantém apenas Galculator (GTK3)
+# Remove gnome-calculator e mantém Galculator
 # ------------------------------------------------------------------------------
 echo "[LegacyOS Hook 0650] Garantindo calculadora compacta GTK3 (galculator)..."
 export DEBIAN_FRONTEND=noninteractive
@@ -211,7 +211,7 @@ if [ -f "/usr/share/applications/galculator.desktop" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Registra os ícones SVG oficiais no tema hicolor
+# Ícones SVG e Cache
 # ------------------------------------------------------------------------------
 mkdir -p /usr/share/icons/hicolor/scalable/apps
 for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg legacy-guardian.svg; do
@@ -223,216 +223,30 @@ done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Gera o avatar padrão do usuário (.face em PNG)
+# Configuração Segura do Plymouth (Sem travamentos de espera)
 # ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Gerando avatar oficial do usuário (.face)..."
-AVATAR_PNG="/usr/share/pixmaps/legacyos-avatar.png"
-
-python3 - "$AVATAR_PNG" << 'PYEOF'
-import sys
-import math
-import cairo
-
-out_png = sys.argv[1]
-W, H = 128, 128
-surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
-ctx = cairo.Context(surf)
-
-grad_bg = cairo.LinearGradient(0, 0, W, H)
-grad_bg.add_color_stop_rgb(0.0, 0.098, 0.129, 0.176)
-grad_bg.add_color_stop_rgb(0.6, 0.059, 0.078, 0.110)
-grad_bg.add_color_stop_rgb(1.0, 0.043, 0.059, 0.086)
-
-ctx.arc(64, 64, 58, 0, 2 * math.pi)
-ctx.set_source(grad_bg)
-ctx.fill_preserve()
-
-grad_ring = cairo.LinearGradient(0, 0, W, H)
-grad_ring.add_color_stop_rgba(0.0, 0.075, 0.498, 0.925, 0.90)
-grad_ring.add_color_stop_rgba(1.0, 0.043, 0.400, 0.765, 0.50)
-ctx.set_source(grad_ring)
-ctx.set_line_width(3.0)
-ctx.stroke()
-
-ctx.save()
-ctx.arc(64, 64, 56, 0, 2 * math.pi)
-ctx.clip()
-
-rad = cairo.RadialGradient(64, 52, 4, 64, 52, 40)
-rad.add_color_stop_rgba(0.0, 0.075, 0.498, 0.925, 0.25)
-rad.add_color_stop_rgba(1.0, 0.075, 0.498, 0.925, 0.0)
-ctx.set_source(rad)
-ctx.rectangle(0, 0, W, H)
-ctx.fill()
-
-grad_body = cairo.LinearGradient(24, 80, 104, 120)
-grad_body.add_color_stop_rgb(0.0, 0.220, 0.741, 0.973)
-grad_body.add_color_stop_rgb(0.55, 0.075, 0.498, 0.925)
-grad_body.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)
-
-ctx.move_to(22, 118)
-ctx.curve_to(22, 93, 40, 80, 64, 80)
-ctx.curve_to(88, 80, 106, 93, 106, 118)
-ctx.close_path()
-ctx.set_source(grad_body)
-ctx.fill()
-
-ctx.move_to(46, 82)
-ctx.line_to(64, 98)
-ctx.line_to(82, 82)
-ctx.curve_to(76, 80.5, 70, 80, 64, 80)
-ctx.curve_to(58, 80, 52, 80.5, 46, 82)
-ctx.close_path()
-ctx.set_source_rgba(0.878, 0.949, 0.996, 0.35)
-ctx.fill()
-
-grad_head = cairo.LinearGradient(44, 30, 84, 70)
-grad_head.add_color_stop_rgb(0.0, 0.973, 0.980, 0.988)
-grad_head.add_color_stop_rgb(0.55, 0.796, 0.835, 0.882)
-grad_head.add_color_stop_rgb(1.0, 0.490, 0.827, 0.988)
-
-ctx.arc(64, 50, 20, 0, 2 * math.pi)
-ctx.set_source(grad_head)
-ctx.fill()
-
-ctx.restore()
-surf.write_to_png(out_png)
-PYEOF
-
-chmod 644 "$AVATAR_PNG"
-cp "$AVATAR_PNG" /etc/skel/.face
-chmod 644 /etc/skel/.face
-
-mkdir -p /var/lib/AccountsService/icons
-cp "$AVATAR_PNG" /var/lib/AccountsService/icons/user 2>/dev/null || true
-
-# ------------------------------------------------------------------------------
-# Tema Plymouth e transição X11
-# ------------------------------------------------------------------------------
-echo "[LegacyOS Hook 0650] Configurando boot splash contínuo..."
-PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
-mkdir -p "$PLYMOUTH_DIR"
-
-python3 - "$PLYMOUTH_DIR/logo.png" "$PLYMOUTH_DIR/boot-screen.png" << 'PYEOF'
-import sys
-import cairo
-
-out_logo = sys.argv[1]
-out_screen = sys.argv[2]
-
-def draw_legacyos_mark(ctx, cx, cy, scale):
-    ctx.save()
-    ctx.translate(cx - 50.0 * scale, cy - 50.0 * scale)
-    ctx.scale(scale, scale)
-
-    grad_v = cairo.LinearGradient(65, 5, 20, 95)
-    grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
-    grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
-    grad_v.add_color_stop_rgb(0.72, 0.075, 0.498, 0.925)
-    grad_v.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)
-    ctx.set_source(grad_v)
-    ctx.move_to(18, 92)
-    ctx.line_to(18, 42)
-    ctx.curve_to(18, 24, 30, 12, 46, 8)
-    ctx.line_to(46, 68)
-    ctx.curve_to(34, 73, 24, 81, 18, 92)
-    ctx.close_path()
-    ctx.fill()
-
-    grad_h = cairo.LinearGradient(10, 90, 92, 55)
-    grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
-    grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
-    grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
-    grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
-    ctx.set_source(grad_h)
-    ctx.move_to(18, 92)
-    ctx.curve_to(26, 75, 38, 66, 56, 66)
-    ctx.line_to(92, 66)
-    ctx.curve_to(88, 82, 76, 92, 58, 92)
-    ctx.line_to(18, 92)
-    ctx.close_path()
-    ctx.fill()
-    ctx.restore()
-
-s_logo = cairo.ImageSurface(cairo.FORMAT_ARGB32, 120, 120)
-c_logo = cairo.Context(s_logo)
-draw_legacyos_mark(c_logo, 60.0, 60.0, 1.15)
-s_logo.write_to_png(out_logo)
-
-W, H = 1920, 1080
-s_scr = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
-c_scr = cairo.Context(s_scr)
-c_scr.set_source_rgb(0.059, 0.078, 0.110)
-c_scr.rectangle(0, 0, W, H)
-c_scr.fill()
-draw_legacyos_mark(c_scr, W / 2.0, H / 2.0 - 40.0, 1.35)
-s_scr.write_to_png(out_screen)
-PYEOF
-
-cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.plymouth"
-[Plymouth Theme]
-Name=LegacyOS
-Description=Tela de inicialização oficial do LegacyOS
-ModuleName=script
-
-[script]
-ImageDir=/usr/share/plymouth/themes/legacyos
-ScriptFile=/usr/share/plymouth/themes/legacyos/legacyos.script
-EOF
-
-cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.script"
-Window.SetBackgroundTopColor(0.059, 0.078, 0.110);
-Window.SetBackgroundBottomColor(0.059, 0.078, 0.110);
-
-logo.image = Image("logo.png");
-logo.sprite = Sprite(logo.image);
-logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 40);
-logo.sprite.SetOpacity(1);
-
-fun refresh_callback () {
-    logo.sprite.SetOpacity(1);
-}
-Plymouth.SetRefreshFunction(refresh_callback);
-EOF
-
 mkdir -p /etc/plymouth
 cat << 'EOF' > /etc/plymouth/plymouthd.conf
 [Daemon]
 Theme=legacyos
 ShowDelay=0
+DeviceTimeout=2
 EOF
 
 plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
 
-mkdir -p /etc/systemd/system/plymouth-quit.service.d
-cat << 'EOF' > /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
-[Service]
-ExecStart=
-ExecStart=-/bin/plymouth quit --retain-splash
-EOF
+# Remove serviços restritivos de espera que causam tela preta
+rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
+rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
-mkdir -p /etc/systemd/system/plymouth-quit-wait.service.d
-cat << 'EOF' > /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
-[Service]
-ExecStart=
-ExecStart=-/bin/plymouth --wait
-EOF
-
+# ------------------------------------------------------------------------------
+# Script de Sessão Otimizado (Fecha o Plymouth e inicia o XFCE instantaneamente)
+# ------------------------------------------------------------------------------
 cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
-
 xsetroot -solid "#0F141C" 2>/dev/null || true
-
-LOCK_FILE="/tmp/legacyos-splash.lock"
-SPLASH_SCRIPT="/usr/share/legacyos/src/login-splash/main.py"
-
-touch "$LOCK_FILE"
-if [ -f "$SPLASH_SCRIPT" ] && ! pgrep -f "login-splash/main.py" >/dev/null; then
-    python3 "$SPLASH_SCRIPT" >/dev/null 2>&1 &
-fi
-
+plymouth quit --retain-splash 2>/dev/null || true
 exec /usr/bin/xfce4-session
 EOF
 chmod 755 /usr/local/bin/legacyos-session-wrapper
@@ -441,18 +255,11 @@ if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
     sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
 fi
 
-if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
-    mkdir -p /usr/share/images/desktop-base
-    ln -sf /usr/share/backgrounds/legacyos-wallpaper.jpg /usr/share/images/desktop-base/default
-    update-alternatives --install /usr/share/images/desktop-base/desktop-background desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg 90 >/dev/null 2>&1 || true
-    update-alternatives --set desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg >/dev/null 2>&1 || true
-fi
-
 echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
 fc-cache -f -v >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Permissões e Registros Finais de Todas as Ferramentas do LegacyOS
+# Permissões Finais
 # ------------------------------------------------------------------------------
 chmod 755 /usr/local/bin/legacyos-apps 2>/dev/null || true
 chmod 755 /usr/local/bin/legacyos-window-fit 2>/dev/null || true
@@ -471,5 +278,5 @@ chmod 644 /usr/share/applications/legacy-care-center.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacyos-workspace.desktop 2>/dev/null || true
 chmod 644 /usr/share/applications/legacy-guardian.desktop 2>/dev/null || true
 
-echo "[LegacyOS Hook 0650] Ativos visuais e ferramentas concluídos com sucesso."
+echo "[LegacyOS Hook 0650] Configuração concluída com sucesso."
 exit 0
