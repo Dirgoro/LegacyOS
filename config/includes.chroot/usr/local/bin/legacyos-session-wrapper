@@ -9,8 +9,8 @@ export DISPLAY="${DISPLAY:-:0}"
 # Define a cor de fundo padrão para evitar piscar tela branca
 xsetroot -solid "#0F141C" 2>/dev/null || true
 
-# Encerra o Plymouth de forma segura liberando o framebuffer para o X11
-plymouth quit --retain-splash 2>/dev/null || true
+# Encerra o Plymouth liberando totalmente o framebuffer para o Xorg
+plymouth quit 2>/dev/null || true
 
 # Inicia o ambiente gráfico XFCE
 exec /usr/bin/xfce4-session
