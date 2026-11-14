@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS, TEMA UNIFICADO, LIGHTDM E AUTOSTART
+# LEGACYOS - HOOK DE ATIVOS VISUAIS, PLYMOUTH, LIGHTDM E SESSÃO XFCE (TRIXIE)
 # ==============================================================================
 
 set -e
@@ -194,7 +194,7 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
-# Configuração padrão do XFWM4 (evita tela preta do compositor em VMs)
+# Configuração padrão do XFWM4 (compositor desativado no primeiro boot para VM)
 # ------------------------------------------------------------------------------
 mkdir -p /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
 cat << 'EOF' > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
@@ -231,7 +231,7 @@ done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Configuração do Plymouth (Atualiza initramfs com -R) e LightDM
+# Sobrescreve o tema Debian 13 (desktop-base) no Plymouth com prioridade 200
 # ------------------------------------------------------------------------------
 mkdir -p /etc/plymouth
 cat << 'EOF' > /etc/plymouth/plymouthd.conf
@@ -241,28 +241,56 @@ ShowDelay=0
 DeviceTimeout=2
 EOF
 
-plymouth-set-default-theme -R legacyos >/dev/null 2>&1 || plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
+if [ -f "/usr/share/plymouth/themes/legacyos/legacyos.plymouth" ]; then
+    update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/legacyos/legacyos.plymouth 200 >/dev/null 2>&1 || true
+    update-alternatives --set default.plymouth /usr/share/plymouth/themes/legacyos/legacyos.plymouth >/dev/null 2>&1 || true
+fi
+plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
+update-initramfs -u >/dev/null 2>&1 || true
 
 rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
 rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
+# ------------------------------------------------------------------------------
+# Configuração do LightDM (evita trava de logind-check-graphical e força XFCE)
+# ------------------------------------------------------------------------------
 mkdir -p /etc/lightdm/lightdm.conf.d
 cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
+[LightDM]
+logind-check-graphical=false
+
 [Seat:*]
 user-session=xfce
 greeter-session=lightdm-gtk-greeter
+autologin-user=user
+autologin-user-timeout=0
+autologin-session=xfce
 EOF
 
 # ------------------------------------------------------------------------------
-# Script de Sessão (Usa startxfce4 para carregar toda a área de trabalho)
+# Script de Sessão (Usa startxfce4 e sanitiza quebras de linha CRLF)
 # ------------------------------------------------------------------------------
 cat << 'EOF' > /usr/local/bin/legacyos-session-wrapper
 #!/bin/bash
 export DISPLAY="${DISPLAY:-:0}"
 xsetroot -solid "#0F141C" 2>/dev/null || true
+
+mkdir -p "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
+if [ ! -f "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml" ]; then
+    cat << 'INNER' > "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="LegacyOS-Theme"/>
+    <property name="use_compositing" type="bool" value="false"/>
+    <property name="vblank_mode" type="string" value="off"/>
+  </property>
+</channel>
+INNER
+fi
+
 exec /usr/bin/startxfce4
 EOF
-chmod 755 /usr/local/bin/legacyos-session-wrapper
 
 if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
     sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
@@ -306,7 +334,7 @@ echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
 fc-cache -f -v >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Permissões Finais de Todas as Ferramentas e Atalhos do LegacyOS
+# Sanitiza CRLF (\r) e aplica permissões finais em todos os executáveis
 # ------------------------------------------------------------------------------
 for BIN_FILE in \
     legacyos-apps \
@@ -321,7 +349,10 @@ for BIN_FILE in \
     legacyos-desktop-align \
     legacyos-session-wrapper
 do
-    chmod 755 "/usr/local/bin/$BIN_FILE" 2>/dev/null || true
+    if [ -f "/usr/local/bin/$BIN_FILE" ]; then
+        sed -i 's/\r$//' "/usr/local/bin/$BIN_FILE"
+        chmod 755 "/usr/local/bin/$BIN_FILE"
+    fi
 done
 
 for DESKTOP_FILE in \
@@ -331,7 +362,10 @@ for DESKTOP_FILE in \
     legacyos-workspace.desktop \
     legacy-guardian.desktop
 do
-    chmod 644 "/usr/share/applications/$DESKTOP_FILE" 2>/dev/null || true
+    if [ -f "/usr/share/applications/$DESKTOP_FILE" ]; then
+        sed -i 's/\r$//' "/usr/share/applications/$DESKTOP_FILE"
+        chmod 644 "/usr/share/applications/$DESKTOP_FILE"
+    fi
 done
 
 echo "[LegacyOS Hook 0650] Configuração concluída com sucesso."
