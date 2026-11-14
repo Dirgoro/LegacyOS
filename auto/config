@@ -17,5 +17,5 @@ lb config noauto \
     --iso-application "LegacyOS 1.0" \
     --iso-publisher "LegacyOS Project" \
     --iso-volume "LegacyOS_1_0" \
-    --bootappend-live "boot=live components locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo quiet splash" \
+    --bootappend-live "boot=live components locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo plymouth.enable=0" \
     "${@}"
