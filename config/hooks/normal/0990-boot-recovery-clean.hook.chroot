@@ -1,0 +1,61 @@
+#!/bin/bash
+# ==============================================================================
+# LEGACYOS - HOOK 0990: RECUPERAÇÃO DE BOOT E ISOLAMENTO DOS APPS CUSTOMIZADOS
+# Desativa temporariamente Legacy Guardian, Legacy Care Center e Legacy Desktop
+# para garantir boot limpo até a área de trabalho XFCE no modo Live.
+# ==============================================================================
+
+set -e
+
+echo "[LegacyOS Hook 0990] Iniciando isolamento dos softwares customizados e validação do boot..."
+
+# 1. Remove entradas de inicialização automática (autostart) de apps customizados e dock
+rm -f /etc/skel/.config/autostart/legacy-guardian*.desktop
+rm -f /etc/skel/.config/autostart/legacy-care-center*.desktop
+rm -f /etc/skel/.config/autostart/legacyos-*.desktop
+rm -f /etc/skel/.config/autostart/plank.desktop
+
+rm -f /etc/xdg/autostart/legacy-guardian*.desktop
+rm -f /etc/xdg/autostart/legacy-care-center*.desktop
+rm -f /etc/xdg/autostart/legacyos-*.desktop
+rm -f /etc/xdg/autostart/plank.desktop
+
+# 2. Move os lançadores .desktop dos softwares criados para pasta de backup (preserva tudo)
+DISABLED_DIR="/usr/share/legacyos/disabled-apps"
+mkdir -p "$DISABLED_DIR"
+
+for APP_DESKTOP in \
+    legacy-guardian.desktop \
+    legacy-guardian-applet.desktop \
+    legacy-care-center.desktop \
+    legacyos-workspace.desktop \
+    legacyos-desktop.desktop \
+    legacyos-apps.desktop \
+    legacyos-settings.desktop
+do
+    if [ -f "/usr/share/applications/$APP_DESKTOP" ]; then
+        mv "/usr/share/applications/$APP_DESKTOP" "$DISABLED_DIR/$APP_DESKTOP"
+    fi
+done
+
+# 3. Desativa e mascara qualquer serviço systemd customizado caso exista
+for SVC in legacy-guardian legacy-guardian-daemon legacy-care-center legacyos-desktop; do
+    systemctl disable "$SVC" >/dev/null 2>&1 || true
+    systemctl mask "$SVC" >/dev/null 2>&1 || true
+done
+
+# 4. Garante que a sessão XFCE use exclusivamente o startxfce4 oficial
+if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
+    sed -i 's|^Exec=.*|Exec=startxfce4|' /usr/share/xsessions/xfce.desktop
+fi
+
+# 5. Garante que o gerenciador de exibição padrão seja o LightDM
+echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
+systemctl enable lightdm >/dev/null 2>&1 || true
+
+# 6. Sanitiza quebras de linha CRLF (\r) nos arquivos de configuração críticos
+sed -i 's/\r$//' /etc/lightdm/lightdm.conf.d/50-legacyos.conf 2>/dev/null || true
+sed -i 's/\r$//' /usr/share/xsessions/xfce.desktop 2>/dev/null || true
+
+echo "[LegacyOS Hook 0990] Boot limpo configurado e softwares customizados isolados com sucesso."
+exit 0
