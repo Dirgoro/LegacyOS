@@ -1,7 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS, PLYMOUTH, LIGHTDM E DESKTOP XFCE (TRIXIE)
-# Sincronizado com config/package-lists/legacyos.list.chroot
+# LEGACYOS - HOOK DE TEMA VISUAL E CONFIGURAÇÃO LIMPA DO LIGHTDM / XFCE
 # ==============================================================================
 
 set -e
@@ -9,7 +8,7 @@ set -e
 XFWM_DIR="/usr/share/themes/LegacyOS-Theme/xfwm4"
 mkdir -p "$XFWM_DIR"
 
-echo "[LegacyOS Hook 0650] Gerando ativos de janela (xfwm4)..."
+echo "[LegacyOS Hook 0650] Configurando ativos visuais base..."
 
 cat << 'EOF' > "$XFWM_DIR/title-1-active.xpm"
 /* XPM */
@@ -145,77 +144,18 @@ cp "$XFWM_DIR/menu-active.xpm" "$XFWM_DIR/menu-pressed.xpm"
 sed -e 's/#0F141C/#0B0F16/' -e 's/#19212D/#141A23/' -e 's/#137FEC/#475569/' "$XFWM_DIR/menu-active.xpm" > "$XFWM_DIR/menu-inactive.xpm"
 
 # ------------------------------------------------------------------------------
-# Variáveis de ambiente globais (GTK2/3/4 e Qt5/6)
+# Configuração padrão GTK e XFWM4 (sem compositor para garantir renderização VM)
 # ------------------------------------------------------------------------------
-cat << 'EOF' > /etc/environment
-GTK_THEME=LegacyOS-Theme
-GTK2_RC_FILES=/usr/share/themes/LegacyOS-Theme/gtk-2.0/gtkrc
-QT_QPA_PLATFORMTHEME=qt5ct
-ADW_DEBUG_COLOR_SCHEME=prefer-dark
-EOF
-
 mkdir -p /etc/skel/.config/gtk-3.0 /etc/skel/.config/gtk-4.0
 cat << 'EOF' > /etc/skel/.config/gtk-3.0/settings.ini
 [Settings]
 gtk-theme-name=LegacyOS-Theme
 gtk-icon-theme-name=Papirus-Dark
-gtk-font-name=Geist 9.5
+gtk-font-name=Noto Sans 10
 gtk-application-prefer-dark-theme=1
-gtk-decoration-layout=menu:minimize,maximize,close
 EOF
 cp /etc/skel/.config/gtk-3.0/settings.ini /etc/skel/.config/gtk-4.0/settings.ini
 
-cat << 'EOF' > /etc/skel/.gtkrc-2.0
-include "/usr/share/themes/LegacyOS-Theme/gtk-2.0/gtkrc"
-gtk-icon-theme-name="Papirus-Dark"
-gtk-font-name="Geist 9.5"
-EOF
-
-mkdir -p /etc/skel/.config/qt5ct/colors /etc/skel/.config/qt6ct/colors
-cat << 'EOF' > /etc/skel/.config/qt5ct/colors/LegacyOS.conf
-[ColorScheme]
-active_colors=#fff8fafc, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #fff8fafc, #ffffffff, #fff8fafc, #ff0f141c, #ff141a23, #ff0b0f16, #ff137fec, #ffffffff, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #fff8fafc
-disabled_colors=#ff64748b, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #ff64748b, #ffffffff, #ff64748b, #ff0f141c, #ff141a23, #ff0b0f16, #ff19212d, #ff94a3b8, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #ff64748b
-inactive_colors=#fff8fafc, #ff19212d, #ff202a39, #ff19212d, #ff0f141c, #ff19212d, #fff8fafc, #ffffffff, #fff8fafc, #ff0f141c, #ff141a23, #ff0b0f16, #ff0b66c3, #ffffffff, #ff38bdf8, #ff137fec, #ff19212d, #ff0f141c, #ff0f141c, #fff8fafc
-EOF
-cp /etc/skel/.config/qt5ct/colors/LegacyOS.conf /etc/skel/.config/qt6ct/colors/LegacyOS.conf
-
-cat << 'EOF' > /etc/skel/.config/qt5ct/qt5ct.conf
-[Appearance]
-color_scheme_path=/etc/skel/.config/qt5ct/colors/LegacyOS.conf
-custom_palette=true
-icon_theme=Papirus-Dark
-standard_dialogs=gtk3
-style=Fusion
-
-[Fonts]
-fixed="Monospace,9.5,-1,5,50,0,0,0,0,0"
-general="Geist,9.5,-1,5,50,0,0,0,0,0"
-EOF
-sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
-
-# ------------------------------------------------------------------------------
-# Fallback tipográfico (Geist -> Inter -> Noto Sans)
-# ------------------------------------------------------------------------------
-mkdir -p /etc/fonts/conf.d
-cat << 'EOF' > /etc/fonts/local.conf
-<?xml version="1.0"?>
-<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-<fontconfig>
-  <alias>
-    <family>Geist</family>
-    <prefer>
-      <family>Geist</family>
-      <family>Inter</family>
-      <family>Noto Sans</family>
-    </prefer>
-  </alias>
-</fontconfig>
-EOF
-
-# ------------------------------------------------------------------------------
-# Configuração Padrão do XFCE em /etc/skel (Painel Superior Único + Dark Slate)
-# ------------------------------------------------------------------------------
 SKEL_XFCONF="/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml"
 mkdir -p "$SKEL_XFCONF"
 
@@ -238,231 +178,13 @@ cat << 'EOF' > "$SKEL_XFCONF/xsettings.xml"
     <property name="IconThemeName" type="string" value="Papirus-Dark"/>
   </property>
   <property name="Gtk" type="empty">
-    <property name="FontName" type="string" value="Geist 9.5"/>
+    <property name="FontName" type="string" value="Noto Sans 10"/>
   </property>
 </channel>
 EOF
 
-cat << 'EOF' > "$SKEL_XFCONF/xfce4-panel.xml"
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfce4-panel" version="1.0">
-  <property name="configver" type="int" value="2"/>
-  <property name="panels" type="array">
-    <value type="int" value="1"/>
-    <property name="dark-mode" type="bool" value="true"/>
-    <property name="panel-1" type="empty">
-      <property name="position" type="string" value="p=6;x=0;y=0"/>
-      <property name="length" type="uint" value="100"/>
-      <property name="position-locked" type="bool" value="true"/>
-      <property name="size" type="uint" value="32"/>
-      <property name="mode" type="uint" value="0"/>
-      <property name="background-style" type="uint" value="1"/>
-      <property name="background-rgba" type="array">
-        <value type="double" value="0.059"/>
-        <value type="double" value="0.078"/>
-        <value type="double" value="0.110"/>
-        <value type="double" value="0.960"/>
-      </property>
-      <property name="plugin-ids" type="array">
-        <value type="int" value="1"/>
-        <value type="int" value="2"/>
-        <value type="int" value="3"/>
-        <value type="int" value="4"/>
-        <value type="int" value="5"/>
-        <value type="int" value="6"/>
-        <value type="int" value="7"/>
-        <value type="int" value="8"/>
-        <value type="int" value="9"/>
-      </property>
-    </property>
-  </property>
-  <property name="plugins" type="empty">
-    <property name="plugin-1" type="string" value="whiskermenu"/>
-    <property name="plugin-2" type="string" value="tasklist">
-      <property name="flat-buttons" type="bool" value="true"/>
-      <property name="show-handle" type="bool" value="false"/>
-    </property>
-    <property name="plugin-3" type="string" value="separator">
-      <property name="expand" type="bool" value="true"/>
-      <property name="style" type="uint" value="0"/>
-    </property>
-    <property name="plugin-4" type="string" value="systray">
-      <property name="square-icons" type="bool" value="true"/>
-    </property>
-    <property name="plugin-5" type="string" value="pulseaudio">
-      <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
-    </property>
-    <property name="plugin-6" type="string" value="power-manager-plugin"/>
-    <property name="plugin-7" type="string" value="launcher">
-      <property name="items" type="array">
-        <value type="string" value="legacy-guardian-applet.desktop"/>
-      </property>
-    </property>
-    <property name="plugin-8" type="string" value="clock">
-      <property name="digital-layout" type="uint" value="3"/>
-      <property name="digital-time-format" type="string" value="%H:%M"/>
-    </property>
-    <property name="plugin-9" type="string" value="actions"/>
-  </property>
-</channel>
-EOF
-
-mkdir -p /etc/skel/.config/xfce4/panel/launcher-7
-cat << 'EOF' > /etc/skel/.config/xfce4/panel/launcher-7/legacy-guardian-applet.desktop
-[Desktop Entry]
-Type=Application
-Name=Legacy Guardian
-Comment=Central rápida de saúde e alertas do sistema
-Exec=/usr/local/bin/legacy-guardian-applet
-Icon=legacy-guardian
-Terminal=false
-EOF
-
-if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
-    cat << 'EOF' > "$SKEL_XFCONF/xfce4-desktop.xml"
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfce4-desktop" version="1.0">
-  <property name="backdrop" type="empty">
-    <property name="screen0" type="empty">
-      <property name="monitor0" type="empty">
-        <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="5"/>
-          <property name="last-image" type="string" value="/usr/share/backgrounds/legacyos-wallpaper.jpg"/>
-        </property>
-      </property>
-      <property name="monitorVirtual1" type="empty">
-        <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="5"/>
-          <property name="last-image" type="string" value="/usr/share/backgrounds/legacyos-wallpaper.jpg"/>
-        </property>
-      </property>
-    </property>
-  </property>
-  <property name="desktop-icons" type="empty">
-    <property name="gravity" type="int" value="2"/>
-  </property>
-</channel>
-EOF
-fi
-
 # ------------------------------------------------------------------------------
-# Localiza o atalho da calculadora compacta GTK3 (galculator)
-# ------------------------------------------------------------------------------
-if [ -f "/usr/share/applications/galculator.desktop" ]; then
-    sed -i 's/^Name=.*/Name=Calculadora/' /usr/share/applications/galculator.desktop
-    if ! grep -q "^Name\[pt_BR\]=" /usr/share/applications/galculator.desktop; then
-        echo "Name[pt_BR]=Calculadora" >> /usr/share/applications/galculator.desktop
-    fi
-fi
-
-# ------------------------------------------------------------------------------
-# Registra os ícones SVG oficiais no tema hicolor
-# ------------------------------------------------------------------------------
-mkdir -p /usr/share/icons/hicolor/scalable/apps
-for ICON_SVG in legacyos-logo.svg legacy-care-center.svg legacyos-avatar.svg legacyos-workspace.svg legacyos-settings.svg legacy-guardian.svg; do
-    if [ -f "/usr/share/pixmaps/$ICON_SVG" ]; then
-        cp "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
-        chmod 644 "/usr/share/pixmaps/$ICON_SVG" "/usr/share/icons/hicolor/scalable/apps/$ICON_SVG"
-    fi
-done
-gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
-
-# ------------------------------------------------------------------------------
-# Gera e aplica o tema Plymouth oficial (sobrescreve Debian 13 desktop-base)
-# ------------------------------------------------------------------------------
-PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
-mkdir -p "$PLYMOUTH_DIR"
-
-if [ ! -f "$PLYMOUTH_DIR/logo.png" ]; then
-python3 - "$PLYMOUTH_DIR/logo.png" << 'PYEOF'
-import sys
-import cairo
-
-out_logo = sys.argv[1]
-s_logo = cairo.ImageSurface(cairo.FORMAT_ARGB32, 120, 120)
-ctx = cairo.Context(s_logo)
-ctx.translate(60.0 - 50.0 * 1.15, 60.0 - 50.0 * 1.15)
-ctx.scale(1.15, 1.15)
-
-grad_v = cairo.LinearGradient(65, 5, 20, 95)
-grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
-grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
-grad_v.add_color_stop_rgb(0.72, 0.075, 0.498, 0.925)
-grad_v.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)
-ctx.set_source(grad_v)
-ctx.move_to(18, 92)
-ctx.line_to(18, 42)
-ctx.curve_to(18, 24, 30, 12, 46, 8)
-ctx.line_to(46, 68)
-ctx.curve_to(34, 73, 24, 81, 18, 92)
-ctx.close_path()
-ctx.fill()
-
-grad_h = cairo.LinearGradient(10, 90, 92, 55)
-grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
-grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
-grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
-grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
-ctx.set_source(grad_h)
-ctx.move_to(18, 92)
-ctx.curve_to(26, 75, 38, 66, 56, 66)
-ctx.line_to(92, 66)
-ctx.curve_to(88, 82, 76, 92, 58, 92)
-ctx.line_to(18, 92)
-ctx.close_path()
-ctx.fill()
-
-s_logo.write_to_png(out_logo)
-PYEOF
-fi
-
-cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.plymouth"
-[Plymouth Theme]
-Name=LegacyOS
-Description=Tela de inicialização oficial do LegacyOS
-ModuleName=script
-
-[script]
-ImageDir=/usr/share/plymouth/themes/legacyos
-ScriptFile=/usr/share/plymouth/themes/legacyos/legacyos.script
-EOF
-
-cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.script"
-Window.SetBackgroundTopColor(0.059, 0.078, 0.110);
-Window.SetBackgroundBottomColor(0.059, 0.078, 0.110);
-
-logo.image = Image("logo.png");
-logo.sprite = Sprite(logo.image);
-logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 40);
-logo.sprite.SetOpacity(1);
-
-fun refresh_callback () {
-    logo.sprite.SetOpacity(1);
-}
-Plymouth.SetRefreshFunction(refresh_callback);
-EOF
-
-mkdir -p /etc/plymouth
-cat << 'EOF' > /etc/plymouth/plymouthd.conf
-[Daemon]
-Theme=legacyos
-ShowDelay=0
-DeviceTimeout=2
-EOF
-
-update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$PLYMOUTH_DIR/legacyos.plymouth" 250 >/dev/null 2>&1 || true
-update-alternatives --set default.plymouth "$PLYMOUTH_DIR/legacyos.plymouth" >/dev/null 2>&1 || true
-plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
-update-initramfs -u -k all >/dev/null 2>&1 || true
-
-rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
-rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
-
-# ------------------------------------------------------------------------------
-# Configuração do LightDM (permite autologin do live-config sem conflito)
+# LightDM limpo e sessão XFCE padrão (sem wrappers intermediários)
 # ------------------------------------------------------------------------------
 mkdir -p /etc/lightdm/lightdm.conf.d
 cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
@@ -474,90 +196,9 @@ user-session=xfce
 greeter-session=lightdm-gtk-greeter
 EOF
 
-# ------------------------------------------------------------------------------
-# Vincula o wrapper de sessão ao xfce.desktop e fallback .xsessionrc
-# ------------------------------------------------------------------------------
 if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
-    sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
+    sed -i 's|^Exec=.*|Exec=startxfce4|' /usr/share/xsessions/xfce.desktop
 fi
 
-cat << 'EOF' > /etc/skel/.xsessionrc
-export GTK_THEME=LegacyOS-Theme
-export QT_QPA_PLATFORMTHEME=qt5ct
-xsetroot -solid "#0F141C" 2>/dev/null || true
-EOF
-
-# ------------------------------------------------------------------------------
-# Autostart de Sessão (Dock Plank + Daemon Diário do Legacy Guardian)
-# ------------------------------------------------------------------------------
-mkdir -p /etc/skel/.config/autostart
-
-cat << 'EOF' > /etc/skel/.config/autostart/plank.desktop
-[Desktop Entry]
-Type=Application
-Name=LegacyOS Dock
-Exec=plank
-OnlyShowIn=XFCE;
-X-GNOME-Autostart-enabled=true
-EOF
-
-cat << 'EOF' > /etc/skel/.config/autostart/legacy-guardian-daemon.desktop
-[Desktop Entry]
-Type=Application
-Name=Legacy Guardian Monitor
-Comment=Análise diária de saúde de hardware e bateria
-Exec=/usr/local/bin/legacy-guardian-daemon
-OnlyShowIn=XFCE;
-X-GNOME-Autostart-enabled=true
-EOF
-
-# ------------------------------------------------------------------------------
-# Wallpaper Padrão do Sistema
-# ------------------------------------------------------------------------------
-if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
-    mkdir -p /usr/share/images/desktop-base
-    ln -sf /usr/share/backgrounds/legacyos-wallpaper.jpg /usr/share/images/desktop-base/default
-    update-alternatives --install /usr/share/images/desktop-base/desktop-background desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg 90 >/dev/null 2>&1 || true
-    update-alternatives --set desktop-background /usr/share/backgrounds/legacyos-wallpaper.jpg >/dev/null 2>&1 || true
-fi
-
-echo "[LegacyOS Hook 0650] Atualizando cache de fontes..."
-fc-cache -f -v >/dev/null 2>&1 || true
-
-# ------------------------------------------------------------------------------
-# Sanitiza CRLF (\r) e aplica permissões finais em todos os executáveis
-# ------------------------------------------------------------------------------
-for BIN_FILE in \
-    legacyos-apps \
-    legacyos-window-fit \
-    legacy-care-center \
-    legacyos-workspace \
-    legacyos-settings \
-    legacy-guardian \
-    legacy-guardian-daemon \
-    legacy-guardian-applet \
-    legacyos-panel-position \
-    legacyos-desktop-align \
-    legacyos-session-wrapper
-do
-    if [ -f "/usr/local/bin/$BIN_FILE" ]; then
-        sed -i 's/\r$//' "/usr/local/bin/$BIN_FILE"
-        chmod 755 "/usr/local/bin/$BIN_FILE"
-    fi
-done
-
-for DESKTOP_FILE in \
-    legacyos-apps.desktop \
-    legacyos-settings.desktop \
-    legacy-care-center.desktop \
-    legacyos-workspace.desktop \
-    legacy-guardian.desktop
-do
-    if [ -f "/usr/share/applications/$DESKTOP_FILE" ]; then
-        sed -i 's/\r$//' "/usr/share/applications/$DESKTOP_FILE"
-        chmod 644 "/usr/share/applications/$DESKTOP_FILE"
-    fi
-done
-
-echo "[LegacyOS Hook 0650] Auditoria e sincronização concluídas com sucesso."
+echo "[LegacyOS Hook 0650] Hook visual base concluído."
 exit 0
