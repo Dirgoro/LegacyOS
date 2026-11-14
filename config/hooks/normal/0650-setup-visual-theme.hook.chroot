@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# LEGACYOS - HOOK DE ATIVOS VISUAIS, PLYMOUTH, LIGHTDM E SESSÃO XFCE (TRIXIE)
+# LEGACYOS - HOOK DE ATIVOS VISUAIS, PLYMOUTH, LIGHTDM E DESKTOP XFCE (TRIXIE)
 # ==============================================================================
 
 set -e
@@ -194,7 +194,7 @@ EOF
 sed 's|/etc/skel/.config/qt5ct|/etc/skel/.config/qt6ct|' /etc/skel/.config/qt5ct/qt5ct.conf > /etc/skel/.config/qt6ct/qt6ct.conf
 
 # ------------------------------------------------------------------------------
-# Configuração Padrão do XFCE em /etc/skel (Tema, Wallpaper e Compositor)
+# Configuração Padrão do XFCE em /etc/skel (Painel Superior Único + Dark Slate)
 # ------------------------------------------------------------------------------
 SKEL_XFCONF="/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml"
 mkdir -p "$SKEL_XFCONF"
@@ -223,6 +223,81 @@ cat << 'EOF' > "$SKEL_XFCONF/xsettings.xml"
 </channel>
 EOF
 
+cat << 'EOF' > "$SKEL_XFCONF/xfce4-panel.xml"
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-panel" version="1.0">
+  <property name="configver" type="int" value="2"/>
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+    <property name="dark-mode" type="bool" value="true"/>
+    <property name="panel-1" type="empty">
+      <property name="position" type="string" value="p=6;x=0;y=0"/>
+      <property name="length" type="uint" value="100"/>
+      <property name="position-locked" type="bool" value="true"/>
+      <property name="size" type="uint" value="32"/>
+      <property name="mode" type="uint" value="0"/>
+      <property name="background-style" type="uint" value="1"/>
+      <property name="background-rgba" type="array">
+        <value type="double" value="0.059"/>
+        <value type="double" value="0.078"/>
+        <value type="double" value="0.110"/>
+        <value type="double" value="0.960"/>
+      </property>
+      <property name="plugin-ids" type="array">
+        <value type="int" value="1"/>
+        <value type="int" value="2"/>
+        <value type="int" value="3"/>
+        <value type="int" value="4"/>
+        <value type="int" value="5"/>
+        <value type="int" value="6"/>
+        <value type="int" value="7"/>
+        <value type="int" value="8"/>
+        <value type="int" value="9"/>
+      </property>
+    </property>
+  </property>
+  <property name="plugins" type="empty">
+    <property name="plugin-1" type="string" value="whiskermenu"/>
+    <property name="plugin-2" type="string" value="tasklist">
+      <property name="flat-buttons" type="bool" value="true"/>
+      <property name="show-handle" type="bool" value="false"/>
+    </property>
+    <property name="plugin-3" type="string" value="separator">
+      <property name="expand" type="bool" value="true"/>
+      <property name="style" type="uint" value="0"/>
+    </property>
+    <property name="plugin-4" type="string" value="systray">
+      <property name="square-icons" type="bool" value="true"/>
+    </property>
+    <property name="plugin-5" type="string" value="pulseaudio">
+      <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
+    </property>
+    <property name="plugin-6" type="string" value="power-manager-plugin"/>
+    <property name="plugin-7" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="legacy-guardian-applet.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-8" type="string" value="clock">
+      <property name="digital-layout" type="uint" value="3"/>
+      <property name="digital-time-format" type="string" value="%H:%M"/>
+    </property>
+    <property name="plugin-9" type="string" value="actions"/>
+  </property>
+</channel>
+EOF
+
+mkdir -p /etc/skel/.config/xfce4/panel/launcher-7
+cat << 'EOF' > /etc/skel/.config/xfce4/panel/launcher-7/legacy-guardian-applet.desktop
+[Desktop Entry]
+Type=Application
+Name=Legacy Guardian
+Comment=Central rápida de saúde e alertas do sistema
+Exec=/usr/local/bin/legacy-guardian-applet
+Icon=legacy-guardian
+Terminal=false
+EOF
+
 if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
     cat << 'EOF' > "$SKEL_XFCONF/xfce4-desktop.xml"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -244,6 +319,9 @@ if [ -f "/usr/share/backgrounds/legacyos-wallpaper.jpg" ]; then
         </property>
       </property>
     </property>
+  </property>
+  <property name="desktop-icons" type="empty">
+    <property name="gravity" type="int" value="2"/>
   </property>
 </channel>
 EOF
@@ -272,8 +350,81 @@ done
 gtk-update-icon-cache -f /usr/share/icons/hicolor >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# Sobrescreve o tema Debian 13 (desktop-base) no Plymouth com prioridade 200
+# Gera e aplica o tema Plymouth oficial (sobrescreve Debian 13 desktop-base)
 # ------------------------------------------------------------------------------
+PLYMOUTH_DIR="/usr/share/plymouth/themes/legacyos"
+mkdir -p "$PLYMOUTH_DIR"
+
+if [ ! -f "$PLYMOUTH_DIR/logo.png" ]; then
+python3 - "$PLYMOUTH_DIR/logo.png" << 'PYEOF'
+import sys
+import cairo
+
+out_logo = sys.argv[1]
+s_logo = cairo.ImageSurface(cairo.FORMAT_ARGB32, 120, 120)
+ctx = cairo.Context(s_logo)
+ctx.translate(60.0 - 50.0 * 1.15, 60.0 - 50.0 * 1.15)
+ctx.scale(1.15, 1.15)
+
+grad_v = cairo.LinearGradient(65, 5, 20, 95)
+grad_v.add_color_stop_rgb(0.0, 0.878, 0.949, 0.996)
+grad_v.add_color_stop_rgb(0.35, 0.220, 0.741, 0.973)
+grad_v.add_color_stop_rgb(0.72, 0.075, 0.498, 0.925)
+grad_v.add_color_stop_rgb(1.0, 0.043, 0.400, 0.765)
+ctx.set_source(grad_v)
+ctx.move_to(18, 92)
+ctx.line_to(18, 42)
+ctx.curve_to(18, 24, 30, 12, 46, 8)
+ctx.line_to(46, 68)
+ctx.curve_to(34, 73, 24, 81, 18, 92)
+ctx.close_path()
+ctx.fill()
+
+grad_h = cairo.LinearGradient(10, 90, 92, 55)
+grad_h.add_color_stop_rgb(0.0, 0.392, 0.455, 0.545)
+grad_h.add_color_stop_rgb(0.35, 0.796, 0.835, 0.882)
+grad_h.add_color_stop_rgb(0.75, 0.945, 0.961, 0.976)
+grad_h.add_color_stop_rgb(1.0, 1.000, 1.000, 1.000)
+ctx.set_source(grad_h)
+ctx.move_to(18, 92)
+ctx.curve_to(26, 75, 38, 66, 56, 66)
+ctx.line_to(92, 66)
+ctx.curve_to(88, 82, 76, 92, 58, 92)
+ctx.line_to(18, 92)
+ctx.close_path()
+ctx.fill()
+
+s_logo.write_to_png(out_logo)
+PYEOF
+fi
+
+cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.plymouth"
+[Plymouth Theme]
+Name=LegacyOS
+Description=Tela de inicialização oficial do LegacyOS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/legacyos
+ScriptFile=/usr/share/plymouth/themes/legacyos/legacyos.script
+EOF
+
+cat << 'EOF' > "$PLYMOUTH_DIR/legacyos.script"
+Window.SetBackgroundTopColor(0.059, 0.078, 0.110);
+Window.SetBackgroundBottomColor(0.059, 0.078, 0.110);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 40);
+logo.sprite.SetOpacity(1);
+
+fun refresh_callback () {
+    logo.sprite.SetOpacity(1);
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+EOF
+
 mkdir -p /etc/plymouth
 cat << 'EOF' > /etc/plymouth/plymouthd.conf
 [Daemon]
@@ -282,18 +433,16 @@ ShowDelay=0
 DeviceTimeout=2
 EOF
 
-if [ -f "/usr/share/plymouth/themes/legacyos/legacyos.plymouth" ]; then
-    update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/legacyos/legacyos.plymouth 200 >/dev/null 2>&1 || true
-    update-alternatives --set default.plymouth /usr/share/plymouth/themes/legacyos/legacyos.plymouth >/dev/null 2>&1 || true
-fi
+update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$PLYMOUTH_DIR/legacyos.plymouth" 250 >/dev/null 2>&1 || true
+update-alternatives --set default.plymouth "$PLYMOUTH_DIR/legacyos.plymouth" >/dev/null 2>&1 || true
 plymouth-set-default-theme legacyos >/dev/null 2>&1 || true
-update-initramfs -u >/dev/null 2>&1 || true
+update-initramfs -u -k all >/dev/null 2>&1 || true
 
 rm -f /etc/systemd/system/plymouth-quit-wait.service.d/retain-splash.conf
 rm -f /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
 
 # ------------------------------------------------------------------------------
-# Configuração do LightDM (evita trava de logind-check-graphical e define XFCE)
+# Configuração do LightDM (permite autologin do live-config sem conflito)
 # ------------------------------------------------------------------------------
 mkdir -p /etc/lightdm/lightdm.conf.d
 cat << 'EOF' > /etc/lightdm/lightdm.conf.d/50-legacyos.conf
@@ -306,11 +455,17 @@ greeter-session=lightdm-gtk-greeter
 EOF
 
 # ------------------------------------------------------------------------------
-# Vincula o wrapper de sessão ao xfce.desktop
+# Vincula o wrapper de sessão ao xfce.desktop e fallback .xsessionrc
 # ------------------------------------------------------------------------------
 if [ -f "/usr/share/xsessions/xfce.desktop" ]; then
     sed -i 's|^Exec=.*|Exec=/usr/local/bin/legacyos-session-wrapper|' /usr/share/xsessions/xfce.desktop
 fi
+
+cat << 'EOF' > /etc/skel/.xsessionrc
+export GTK_THEME=LegacyOS-Theme
+export QT_QPA_PLATFORMTHEME=qt5ct
+xsetroot -solid "#0F141C" 2>/dev/null || true
+EOF
 
 # ------------------------------------------------------------------------------
 # Autostart de Sessão (Dock Plank + Daemon Diário do Legacy Guardian)
